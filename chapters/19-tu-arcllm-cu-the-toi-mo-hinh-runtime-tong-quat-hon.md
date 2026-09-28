@@ -119,9 +119,9 @@ tạo representation
 → tùy chọn, dựa trên mức tái sử dụng
 ```
 
-### Họ thứ hai — representation bắt buộc
+### Họ thứ hai — representation bắt buộc trong bounded P8 oracle
 
-Ở một họ khác, cách biểu diễn phân đoạn là điều kiện để đường thực thi có thể hoạt động trong phạm vi đã kiểm tra.
+Ở bounded P8 case đã được kiểm tra, cách biểu diễn phân đoạn là điều kiện để đường thực thi có thể hoạt động trong đúng phạm vi evidence đó.
 
 Không có một đường dự phòng đã được xác nhận tương đương.
 
@@ -835,7 +835,7 @@ Nó giữ nguyên:
 
 quyết định của họ đầu tiên.
 
-Nó biểu diễn được họ representation bắt buộc.
+Nó biểu diễn được trường hợp representation bắt buộc trong bounded P8 oracle đã kiểm tra.
 
 Nó biểu diễn được cơ chế trực tiếp không cần representation phụ.
 
@@ -1002,7 +1002,7 @@ Mà vì chúng đã bị thử phá.
 ### Nhớ 3 điều
 
 1. **v4 tách sáu câu hỏi độc lập:** danh tính, khả dụng thực thi, sẵn sàng thực thi, trạng thái cư trú, quá trình thu nhận và vòng đời. Mỗi chiều chỉ nên trả lời một câu hỏi.
-2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được cả representation bắt buộc và cơ chế trực tiếp không có representation phụ.
+2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được bounded P8 mandatory-feasibility case và cơ chế trực tiếp không có representation phụ.
 3. **“Tổng quát” không có nghĩa “phổ quát”.** v4 chỉ được xác nhận trong các lớp đã có bằng chứng. Một phản ví dụ tương lai có quyền mở lại kiến trúc.
 
 **Chương 20 — Ta đã hiểu runtime đến đâu?**
