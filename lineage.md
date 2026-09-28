@@ -399,3 +399,40 @@ README roadmap QA:
 - Part II now mirrors Parts III–IV with direct chapter links and one-sentence summaries for Chapters 9–11;
 - the Bonus is linked from both the main reading list and the supplemental-material section;
 - publication status now records Foreword + Chapters 1–20 + Bonus as public.
+
+
+## 2026-09-28 — FINAL EVIDENCE QA PATCH SET APPROVED AND CLOSED
+
+Author decision:
+- patch every evidence-QA finding affecting the main book;
+- leave the Bonus unchanged because it is intentionally an open research direction rather than a current-state SIX survey.
+
+Applied evidence-alignment patches:
+- Chapter 2: corrected GGUF expansion to **GGML Universal File**;
+- Chapter 13: clarified that Q6 preserves the Q4 Split-K mechanism/geometry but uses a Q6-specific packed reader rather than a byte-identical Q4 shader;
+- Chapter 14: applied the same Q6 transfer boundary and removed ambiguity in the ~1,378x RMSE margin by writing **1 378x**;
+- Chapter 17: made the EXEC148 block layout exact: 2-byte d, 2-byte dmin, 16-byte direct scale/min pairs, 128-byte repacked q payload;
+- Chapter 18: corrected the P8 causal description — total memory capacity passed; the obstruction was the inherited <=256 MiB single-tensor/arena contract, resolved by row-aligned physical segmentation without changing quantization/context/KV precision or total-memory formula; Phase2 use is explicitly bounded mandatory-feasibility evidence, not a new full-inference claim;
+- Chapter 19: bounded mandatory-representation claims to the tested P8 oracle and retained the explicit non-universality boundary;
+- Chapter 20: made NPU provenance explicit — the reported current-canonical NPU numbers are analytical projections from exact-target evidence plus provider timing, not a fresh full-model NPU benchmark and not canonical NPU integration.
+
+Patch commits:
+- Chapter 2: `662933dcdbad8defd61f37ce432c1b8d97ebef6c`
+- Chapter 13: `db74e54df2227e35ce1a159ad30fcdde6bd58b37`
+- Chapter 14: `ce183c55d6d9726d81e1de81f7c0d10cbddf2d76`
+- Chapter 17: `67348852322ad71b549bc4c72813f9d441b62836`
+- Chapter 18: `6fed71848a9a19b6a286e645d3d95f54e025deb8`
+- Chapter 19: `1fb183dd35de93dbf7dc5d0014e52b73ee4599a3`
+- Chapter 20: `e8d538961512444740bdb882a6c659220101cbc3`
+
+Bonus disposition:
+- QA-08 = **ACCEPTED_NO_PATCH**;
+- the root SIX narrative remains scientifically valid for the direction-opening purpose of the Bonus;
+- later SIX_R1/R2/R3 results remain outside this Bonus scope and are not backfilled.
+
+Final QA state:
+- 21 content units QA-CLEAN;
+- 1 Bonus ACCEPTED_NO_PATCH;
+- 0 open findings;
+- no benchmark number or scientific verdict was rewritten;
+- no README change was required.
