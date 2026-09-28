@@ -119,3 +119,23 @@ Scientific scope remains P7:
 Terminology refinement:
 - `family` is introduced as **họ tác vụ tính toán (compute/kernel family)**: tasks related by role, primitive or execution mechanism, not an arbitrary grouping of unrelated computations.
 - Chapter 8 introduces research modes E/M/C/T as a reader-facing governance framework for later work and explicitly does not retroactively relabel historical P7 execution.
+
+
+## 2026-09-28 — Chapter 9 AUTHOR APPROVED
+
+Approved:
+`chapters/09-benchmark-phai-co-doi-chung.md`
+
+Required editorial corrections applied before approval:
+- replaced the unclear phrase `mảnh chronology` with reader-facing Vietnamese: `một bước đã xảy ra trước đó trong hành trình nghiên cứu`;
+- introduced `p95` before use as the 95th percentile, with a concrete 100-measurement interpretation and the reason five samples per cell are insufficient for a stable tail metric.
+
+Scientific scope remains Q2 matched characterization:
+- exact same 7B GGUF bytes on ArcLLM and pinned llama.cpp v0.4.1 Vulkan baseline;
+- raw token IDs, context 4096, F32 KV, greedy generation and fixed 32-token output;
+- W-S prompt-4 and W-C prompt-256 workloads;
+- one warmup plus five measured attempts per system/workload cell;
+- TTFT, decode throughput, E2E latency and resource characterization;
+- 20/20 measured attempts succeeded;
+- formal Q2 classification is `Q2_MATCHED_CHARACTERIZATION_COMPLETE`;
+- Q2 remains characterization-only and does not itself adjudicate a winner or regime advantage.
