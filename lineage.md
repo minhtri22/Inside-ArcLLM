@@ -312,3 +312,25 @@ Scientific/editorial scope:
 - A remains the validated no-extra-representation Split-K32 primitive and B remains the validated EXEC148 representation primitive with unresolved placement/lifetime policy;
 - B's measured latency value, one-time materialization cost, and approximately 550 MB incremental resident image motivate runtime-level representation identity, placement, reuse, and lifetime questions;
 - the abstraction is presented as evidence-driven: the 2×2 study and cost frontier create the need for it rather than a top-down desire for generic architecture.
+
+
+## 2026-09-28 — Chapter 18 AUTHOR APPROVED WITH VIETNAMESE TERMINOLOGY QA
+
+Approved:
+`chapters/18-du-lieu-o-trong-bo-nho-van-chua-du.md`
+
+Author condition applied before publication:
+- performed a full Vietnamese-first terminology pass across the chapter;
+- replaced mixed prose such as `resident = true?`, `request`, `fallback`, `policy`, `session`, `image`, `backend`, `state machine`, and similar half-English constructions with Vietnamese explanations first;
+- English terms are retained only as lookup handles where useful: residency, acquisition, lifecycle, execution readiness/availability, evict, backend, memory pressure;
+- the chapter title and reader-facing transitions are fully Vietnamese.
+
+Scientific/editorial scope:
+- residency is narrowed to presence of separately acquired representation only;
+- acquisition is split between optional reuse-amortized acquisition and mandatory-for-feasibility acquisition;
+- NOT_READY and OUTSIDE_VALIDATED_CAPABILITY are kept as distinct no-route outcomes;
+- the direct Split-K32 holdout demonstrates that execution readiness cannot be encoded by representation residency;
+- execution availability, execution readiness, residency, acquisition and lifecycle are separated as independent questions;
+- lifecycle preserves expensive valid representations independently of temporary execution-readiness loss;
+- a concrete Q4 Vulkan backend is cited only as evidence that these distinctions can be obeyed without hidden family-specific semantics;
+- no new performance claim is introduced.
