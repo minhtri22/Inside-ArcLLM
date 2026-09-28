@@ -139,3 +139,23 @@ Scientific scope remains Q2 matched characterization:
 - 20/20 measured attempts succeeded;
 - formal Q2 classification is `Q2_MATCHED_CHARACTERIZATION_COMPLETE`;
 - Q2 remains characterization-only and does not itself adjudicate a winner or regime advantage.
+
+
+## 2026-09-28 — Chapter 10 AUTHOR APPROVED
+
+Approved:
+`chapters/10-khi-tu-build-duoc-van-chua-du.md`
+
+Scientific scope remains Q3 no-practical-advantage confirmation:
+- unchanged ArcLLM architecture, same model/hardware/baseline and the frozen W-S/W-C workloads;
+- two fresh independent sessions, four cells per session, one warmup + five measured attempts per cell;
+- 40/40 fresh measured attempts succeeded;
+- primary benefit dimensions are TTFT, decode throughput, E2E latency and peak working set;
+- preregistered practical-effect thresholds and blocking-harm guard remain fixed;
+- no primary benefit passes in either session/workload and blocking-harm fails throughout;
+- formal verdict is `FEASIBLE_NO_DEMONSTRATED_ADVANTAGE`, not `UNRESOLVED`;
+- current ArcLLM architecture line closes under the preregistered stop rule.
+
+Editorial boundary:
+- negative result is framed as a bounded result for the frozen model/hardware/workloads/architecture, not a universal claim about ArcLLM or llama.cpp;
+- successor work may only reopen through a separate mechanism-grounded architecture intervention review.
