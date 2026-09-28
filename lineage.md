@@ -202,3 +202,16 @@ Additional outline decisions:
 - the correctness/Q6 story remains an independent Chapter 13;
 - Token-XRay no longer has a main chapter; it appears only lightly as an internally created observability tool, with optional deeper treatment in a bonus section;
 - a research experiment does not automatically become a chapter. A chapter must introduce a concept, change belief, close a path, or force an architectural boundary.
+
+
+## 2026-09-28 — Chapter 11 FINAL AUTHOR APPROVAL / README reader QA
+
+Chapter 11 final author approval confirmed after all conditional edits were applied.
+
+Public README QA:
+- rewritten as a reader-facing landing page rather than an author/editorial planning note;
+- separates currently published reading links (Foreword + Chapters 1–11) from the future roadmap;
+- preserves the approved 20-chapter / 4-part structure and each part's goal;
+- removes author-facing commentary about why Token-XRay does or does not receive a main chapter;
+- future sections are labeled as upcoming content rather than as already published chapters;
+- editorial principles are phrased as promises to the reader rather than internal workflow instructions.
