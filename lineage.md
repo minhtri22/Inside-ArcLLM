@@ -334,3 +334,19 @@ Scientific/editorial scope:
 - lifecycle preserves expensive valid representations independently of temporary execution-readiness loss;
 - a concrete Q4 Vulkan backend is cited only as evidence that these distinctions can be obeyed without hidden family-specific semantics;
 - no new performance claim is introduced.
+
+
+## 2026-09-28 — Chapter 19 AUTHOR APPROVED
+
+Approved:
+`chapters/19-tu-arcllm-cu-the-toi-mo-hinh-runtime-tong-quat-hon.md`
+
+Scientific/editorial scope:
+- Chapter 19 consolidates the evidence-driven runtime surface into six independent dimensions: identity, execution availability, execution readiness, representation residency, acquisition, and lifecycle;
+- the surface is tested across three distinct demonstrated classes: optional reuse-amortized represented execution, mandatory feasibility-enabling representation, and direct execution requiring no extra representation;
+- all 114,688 first-family policy decisions remain preserved after the abstraction changes;
+- one boolean execution-ready state remains sufficient for the tested transition/adversarial states; no larger activation state machine is justified by current evidence;
+- fallback readiness is explicit rather than assumed;
+- a concrete demand-driven Q4 Vulkan backend revalidates the six-way distinction without hidden eager acquisition or family-specific policy semantics;
+- the historical 4-arm experimental harness is explicitly distinguished from a production lifecycle-bound backend after a prior binding FAIL;
+- v4 is framed as bounded-general, not universal, and introduces no new performance claim.
