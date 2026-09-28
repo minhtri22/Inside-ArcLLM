@@ -350,3 +350,31 @@ Scientific/editorial scope:
 - a concrete demand-driven Q4 Vulkan backend revalidates the six-way distinction without hidden eager acquisition or family-specific policy semantics;
 - the historical 4-arm experimental harness is explicitly distinguished from a production lifecycle-bound backend after a prior binding FAIL;
 - v4 is framed as bounded-general, not universal, and introduces no new performance claim.
+
+
+## 2026-09-28 — Chapter 20 AUTHOR APPROVED; MAIN BOOK COMPLETE
+
+Approved:
+`chapters/20-ta-da-hieu-runtime-den-dau.md`
+
+Author condition applied before publication:
+- the book name is now presented Vietnamese-first, English-second:
+  - `Inside ArcLLM — Xây dựng một runtime LLM từ những nguyên lý đầu tiên`
+  - `Building an LLM Runtime from First Principles`
+- all “Tập 1” framing was removed from Chapter 20 and the public roadmap;
+- Chapter 20 closes Inside ArcLLM as a complete standalone book rather than promising a second volume;
+- the closing transition points only to an optional Bonus about observing the running system.
+
+Scientific/editorial scope:
+- canonical runtime extraction is presented as architecture convergence, not new science or new performance evidence;
+- frozen W-S/W-C regression behavior, dispatch topology and lifecycle behavior remain preserved after extraction;
+- a non-fixture request demonstrates reusable request-level runtime behavior but is explicitly not a language-quality validation;
+- prior internal carry-through and fresh external characterization remain separate claims;
+- generic-v4 architecture PASS is kept separate from performance claims;
+- NPU remains outside the canonical runtime: only bounded FFN-down transfer study authorization exists, with long-lived/cached-session constraints and no production-speedup claim;
+- PASS and FAIL lineage is retained as part of the book's core epistemic result.
+
+Publication state:
+- Foreword + Chapters 1–20 are AUTHOR APPROVED and public;
+- the 20-chapter main book is complete;
+- future Bonus/Epilogue material remains optional and does not imply a second volume.
