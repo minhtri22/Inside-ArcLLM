@@ -18,7 +18,7 @@ Việc trước mắt chỉ là **mở chiếc hộp cho đúng cách**.
 
 ## GGUF giống một kho hàng có mục lục
 
-**GGUF là cách viết tắt thường dùng của GGML Universal Format** — một định dạng file nhị phân trong hệ sinh thái GGML, được dùng để lưu model cùng những thông tin cần thiết để runtime có thể đọc và sử dụng nó.
+**GGUF là viết tắt của GGML Universal File** — một định dạng file nhị phân trong hệ sinh thái GGML, được dùng để lưu model cùng những thông tin cần thiết để runtime có thể đọc và sử dụng nó.
 
 Model mà ArcLLM dùng trong giai đoạn này được lưu trong một file **GGUF**.
 
