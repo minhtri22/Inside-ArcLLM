@@ -80,3 +80,24 @@ Scientific scope remains P5:
 - final-normalized-hidden and logits correctness gates PASS;
 - CPU/GPU `top1 = 117612`;
 - no performance or multi-token-generation claim.
+
+
+## 2026-09-28 — Chapter 7 AUTHOR APPROVED
+
+Approved:
+`chapters/07-kv-cache-model-bat-dau-nho-token-truoc.md`
+
+Scientific scope remains P6:
+- four-token prefill prompt `[1, 17, 42, 256]`;
+- persistent GPU-resident K/V across all 28 layers;
+- no intermediate host round-trip for K/V;
+- CPU orchestration reads logits/top1 but does not read/write K/V;
+- independent CPU and GPU KV states;
+- CPU/GPU greedy outputs `[6228, 17]` agree exactly;
+- prefill logits, decode logits, K cache and V cache gates PASS;
+- no performance, long-sequence or production-path claim.
+
+Editorial boundary:
+- `intermediate host round-trip` is reused without re-explaining the term;
+- sampling remains outside scope; greedy argmax is used only as the fixed correctness rule;
+- Chapter 8 may now draft P7 production-path optimization and evidence-driven stopping.
