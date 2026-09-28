@@ -46,3 +46,17 @@ Not published at initialization:
 4. A governance artifact such as `lineage.md` must be labeled as governance and not implied to participate in runtime execution.
 5. Research-management modes are introduced only when the chronology actually requires them.
 6. New chapters are published only after explicit author approval.
+
+## 2026-09-28 — Terminology refinement: intermediate host round-trip
+
+Chapter 5 now introduces the reader-facing term:
+
+`intermediate host round-trip`
+→ vòng lặp tính toán trung gian quay ngược về CPU.
+
+It is explicitly connected to the P4 contract phrase `zero intermediate host read/write`.
+
+Editorial consequence:
+- Chapter 5 introduces and explains the term.
+- Chapter 6 (P5) reuses it as already-known terminology.
+- Chapter 7 (P6) uses the term directly without re-explaining it.

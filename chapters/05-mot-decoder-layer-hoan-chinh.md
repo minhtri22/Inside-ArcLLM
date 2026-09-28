@@ -218,17 +218,23 @@ P4 muốn cả chuỗi chạy liền mạch.
 
 Một điều được khóa rất rõ trong P4 là:
 
-> **zero intermediate host read/write**
+> **không có vòng lặp tính toán trung gian quay ngược về CPU (intermediate host round-trip).**
 
-Ta tách cụm này ra.
+Đây là thuật ngữ chúng ta sẽ dùng từ đây về sau.
+
+Ở cấp contract kỹ thuật, P4 ghi điều này dưới dạng:
+
+> **zero intermediate host read/write**
 
 **Host** ở đây là phía CPU và bộ nhớ mà chương trình trên CPU sử dụng trực tiếp.
 
 **Intermediate — dữ liệu trung gian —** là kết quả đang nằm giữa đầu vào và đầu ra cuối cùng của layer.
 
-Vậy `zero intermediate host read/write` nghĩa là:
+Nói đơn giản, P4 không cho phép đường thực thi:
 
-> **Trong lúc layer đang chạy, ArcLLM không kéo các kết quả trung gian về CPU để đọc hoặc sửa rồi lại đẩy xuống GPU.**
+> **GPU tạo dữ liệu trung gian → đưa về CPU để đọc hoặc sửa → rồi gửi xuống GPU trở lại trước khi tiếp tục.**
+
+Đó chính là **intermediate host round-trip — vòng lặp tính toán trung gian quay ngược về CPU** mà P4 muốn loại bỏ.
 
 Dữ liệu đi theo hướng:
 
@@ -588,7 +594,8 @@ resident intermediates
 → dữ liệu trung gian tiếp tục nằm ở phía GPU
 
 zero intermediate host read/write
-→ không kéo dữ liệu trung gian về CPU giữa các phép
+→ không có intermediate host round-trip
+→ không quay ngược dữ liệu trung gian về CPU giữa các phép
 
 max_abs = 0,0005810260773
 → PASS dưới ngưỡng 0,02
