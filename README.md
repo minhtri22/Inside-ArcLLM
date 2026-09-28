@@ -9,7 +9,7 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–11**, tương ứng với toàn bộ **Phần I và Phần II**.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–13**: Phần I và Phần II đã hoàn chỉnh, Phần III đang được xuất bản.
 
 ## Bắt đầu đọc
 
@@ -25,6 +25,8 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 - [Chương 9 — Benchmark phải có đối chứng](chapters/09-benchmark-phai-co-doi-chung.md)
 - [Chương 10 — Khi “tự build được” vẫn chưa đủ](chapters/10-khi-tu-build-duoc-van-chua-du.md)
 - [Chương 11 — Từ thất bại sang một câu hỏi đúng hơn](chapters/11-tu-that-bai-sang-mot-cau-hoi-dung-hon.md)
+- [Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được](chapters/12-nhieu-kien-truc-nhung-chi-thuc-te-moi-tra-loi-duoc.md)
+- [Chương 13 — Khi correctness nói “không”](chapters/13-khi-correctness-noi-khong.md)
 
 ## Lộ trình của cuốn sách
 
@@ -50,12 +52,10 @@ Phần này đi từ benchmark có đối chứng, tới một phép xác nhận
 
 **Mục tiêu:** cho thấy một ý tưởng kỹ thuật chỉ có giá trị khi nó sống sót qua tính đúng, thực nghiệm, quá trình đưa vào hệ thống lớn hơn và tác động ở cấp toàn hệ.
 
-Dự kiến:
-
-- **Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được**  
-  Nhiều giả thuyết có thể cùng hợp lý trên giấy. Phần này bắt đầu cho thấy cách lọc nhanh ý tưởng, chọn một cơ chế đáng thử và không tiêu bằng chứng mới cho mọi phương án AI có thể sinh ra.
-- **Chương 13 — Khi correctness nói “không”**  
-  Một hướng có thể nhanh hơn nhưng vẫn phải bị loại nếu không giữ được tính đúng theo tiêu chuẩn đã khóa.
+- [**Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được**](chapters/12-nhieu-kien-truc-nhung-chi-thuc-te-moi-tra-loi-duoc.md)  
+  Nhiều giả thuyết có thể cùng hợp lý trên giấy. Chương này cho thấy cách khám phá rộng nhưng chỉ khóa một cơ chế đủ rõ để đáng tiêu bằng chứng mới.
+- [**Chương 13 — Khi correctness nói “không”**](chapters/13-khi-correctness-noi-khong.md)  
+  Một cơ chế có thể rất nhanh ở nơi này nhưng vẫn phải dừng nếu không giữ được tính đúng khi chuyển sang miền khác.
 - **Chương 14 — Từ một cơ chế tốt tới hệ thống thật**  
   Một thành phần chạy tốt chưa có nghĩa toàn bộ runtime sẽ được lợi. Lợi ích phải sống sót khi được đưa vào đường thực thi thật.
 - **Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi**  
