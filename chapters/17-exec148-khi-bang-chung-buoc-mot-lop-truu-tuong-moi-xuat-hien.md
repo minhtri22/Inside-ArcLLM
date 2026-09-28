@@ -72,11 +72,14 @@ Thay vào đó, những thông tin mà kernel cần liên tục được sắp x
 Block 148 byte có thể hình dung thành ba vùng:
 
 ```text
-4 byte đầu
-→ thông tin scale nền tảng
+2 byte đầu
+→ d, giữ nguyên raw FP16 bits từ Q4_K nguồn
+
+2 byte tiếp
+→ dmin, cũng giữ nguyên raw FP16 bits
 
 16 byte tiếp
-→ các giá trị scale/min đã được đặt trực tiếp
+→ 8 cặp scale/min được đặt trực tiếp dưới dạng uint8
 
 128 byte còn lại
 → các giá trị Q4 được sắp lại theo thứ tự K
