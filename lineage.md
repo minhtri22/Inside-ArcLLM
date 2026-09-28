@@ -101,3 +101,21 @@ Editorial boundary:
 - `intermediate host round-trip` is reused without re-explaining the term;
 - sampling remains outside scope; greedy argmax is used only as the fixed correctness rule;
 - Chapter 8 may now draft P7 production-path optimization and evidence-driven stopping.
+
+
+## 2026-09-28 — Chapter 8 AUTHOR APPROVED
+
+Approved:
+`chapters/08-production-path-khong-den-tu-mot-kernel-than-ky.md`
+
+Scientific scope remains P7:
+- P7-A scales the proven path to pp512/tg128 and identifies device-side execution as the first evidenced bottleneck class;
+- P7-B/D/H/M re-profile the production graph rather than optimizing blindly;
+- P7-C, P7-E, P7-G and P7-L are correctness-preserving optimization PASSes under their own frozen contracts;
+- P7-I/J/K/N/O remain first-class negative evidence;
+- P7-L is the frozen production-path winner, not a claim of global optimality or superiority to llama.cpp;
+- cross-run absolute throughput drift is not used to override same-run interleaved A/B evidence.
+
+Terminology refinement:
+- `family` is introduced as **họ tác vụ tính toán (compute/kernel family)**: tasks related by role, primitive or execution mechanism, not an arbitrary grouping of unrelated computations.
+- Chapter 8 introduces research modes E/M/C/T as a reader-facing governance framework for later work and explicitly does not retroactively relabel historical P7 execution.
