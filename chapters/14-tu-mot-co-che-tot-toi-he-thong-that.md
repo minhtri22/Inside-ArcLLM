@@ -6,7 +6,7 @@ Chương 13 cho ta hai con đường khác nhau.
 
 Q6 dừng ở Mode C.
 
-Cùng một cơ chế Split-K đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi chuyển nguyên vẹn sang Q6_K.
+Cùng một cơ chế Split-K và hình học thực thi đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi áp dụng sang Q6_K bằng candidate có bộ đọc packed-Q6 tương ứng.
 
 Vì vậy:
 
@@ -404,10 +404,10 @@ Khoảng cách:
 
 ```text
 0,005 / 0,00000363
-≈ 1.378
+≈ 1 378
 ```
 
-xấp xỉ **1.378 lần** theo cách viết hàng nghìn của tiếng Việt.
+xấp xỉ **1 378 lần** — tức khoảng một nghìn ba trăm bảy mươi tám lần.
 
 Nói dễ hiểu:
 
