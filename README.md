@@ -23,6 +23,7 @@ Nội dung chỉ được đưa vào repository này sau khi đã qua review bi�
 - [Chương 3 — Xây phần lõi Vulkan](chapters/03-vulkan-runtime-core.md)
 - [Chương 4 — Từng phép tính trước, model sau](chapters/04-tung-phep-tinh-truoc-model-sau.md)
 - [Chương 5 — Một decoder layer hoàn chỉnh](chapters/05-mot-decoder-layer-hoan-chinh.md)
+- [Chương 6 — Full decoder residency: giữ cả “tòa nhà” trên GPU](chapters/06-full-decoder-residency.md)
 
 ## Nguyên tắc biên tập
 

@@ -60,3 +60,23 @@ Editorial consequence:
 - Chapter 5 introduces and explains the term.
 - Chapter 6 (P5) reuses it as already-known terminology.
 - Chapter 7 (P6) uses the term directly without re-explaining it.
+
+
+## 2026-09-28 — Chapter 6 AUTHOR APPROVED
+
+Approved:
+`chapters/06-full-decoder-residency.md`
+
+Applied before approval:
+- token-selection wording narrowed to the P5 question: CPU/GPU agreement on `top1`; sampling policy is outside this chapter's scope;
+- `intermediate host round-trip` is reused from Chapter 5 terminology rather than reintroduced from scratch;
+- generation bridge uses the Vietnamese-first phrase `vòng lặp tạo sinh tự hồi quy (autoregressive generation)`.
+
+Scientific scope remains P5:
+- 338/338 tensors and 980,097,536 packed bytes resident;
+- 28 decoder layers + final RMSNorm + tied Q6_K LM head;
+- 441 Vulkan dispatches in one command buffer / one submit / one fence wait;
+- no intermediate host round-trip;
+- final-normalized-hidden and logits correctness gates PASS;
+- CPU/GPU `top1 = 117612`;
+- no performance or multi-token-generation claim.
