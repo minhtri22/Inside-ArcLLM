@@ -1,4 +1,6 @@
-# Inside ArcLLM
+# Inside ArcLLM — Xây dựng một runtime LLM từ những nguyên lý đầu tiên
+
+**Building an LLM Runtime from First Principles**
 
 **Từ con số 0 đến một runtime mà ta hiểu được từng lớp bên trong.**
 
@@ -9,7 +11,7 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–19**: Phần I, Phần II và Phần III đã hoàn chỉnh; Phần IV đang được xuất bản.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–20**: toàn bộ 20 chương chính đã hoàn chỉnh.
 
 ## Bắt đầu đọc
 
@@ -33,6 +35,7 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 - [Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện](chapters/17-exec148-khi-bang-chung-buoc-mot-lop-truu-tuong-moi-xuat-hien.md)
 - [Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu](chapters/18-du-lieu-o-trong-bo-nho-van-chua-du.md)
 - [Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn](chapters/19-tu-arcllm-cu-the-toi-mo-hinh-runtime-tong-quat-hon.md)
+- [Chương 20 — Ta đã hiểu runtime đến đâu?](chapters/20-ta-da-hieu-runtime-den-dau.md)
 
 ## Lộ trình của cuốn sách
 
@@ -69,11 +72,9 @@ Phần này đi từ benchmark có đối chứng, tới một phép xác nhận
 
 Trong Phần III, các mode làm việc E/M/C/T được giới thiệu ngay tại những tình huống thực tế đã tạo ra nhu cầu cho chúng, thay vì tách thành một chương quản trị riêng.
 
-### Phần IV — Từ runtime cụ thể tới abstraction tổng quát
+### Phần IV — Từ runtime cụ thể tới một mô hình tổng quát hơn
 
 **Mục tiêu:** rút ra những ranh giới và khái niệm tổng quát chỉ sau khi thực nghiệm cho thấy runtime thực sự cần chúng.
-
-Dự kiến:
 
 - [**Chương 16 — Experiment 2×2: tách representation khỏi execution**](chapters/16-experiment-2x2-tach-representation-khoi-execution.md)  
   Dùng thiết kế 2×2 để tách hiệu ứng của cách chia công việc khỏi cách biểu diễn dữ liệu, rồi kiểm tra cả tương tác và chi phí kiến trúc.
@@ -83,8 +84,8 @@ Dự kiến:
   Tách trạng thái cư trú, quá trình tạo/thu nhận, trạng thái sẵn sàng thực thi và vòng đời để runtime không dùng một biến duy nhất cho nhiều câu hỏi khác nhau.
 - [**Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn**](chapters/19-tu-arcllm-cu-the-toi-mo-hinh-runtime-tong-quat-hon.md)  
   Sáu chiều đã được thử phá trên nhiều họ cơ chế và một lớp kết nối Vulkan thật, để hình thành một bề mặt runtime chung nhưng vẫn giữ rõ giới hạn bằng chứng.
-- **Chương 20 — Ta đã hiểu runtime đến đâu?**  
-  Khép lại Tập 1 bằng những gì đã được chứng minh, những gì chưa được chứng minh và những câu hỏi còn mở.
+- [**Chương 20 — Ta đã hiểu runtime đến đâu?**](chapters/20-ta-da-hieu-runtime-den-dau.md)  
+  Khép lại cuốn sách bằng những gì đã được chứng minh, những gì chưa được chứng minh, cách runtime hội tụ ra khỏi vỏ thí nghiệm và những câu hỏi vẫn còn mở.
 
 ## Cách cuốn sách được viết
 
@@ -103,8 +104,8 @@ Cuốn sách giữ một số nguyên tắc xuyên suốt:
 
 Sau 20 chương chính, sách dự kiến có thêm:
 
-- **Bonus — Token-XRay:** một phần đào sâu về công cụ quan sát được tạo ra trong quá trình nghiên cứu để nhìn rõ hơn đường đi và chi phí của token bên trong runtime.
-- **Epilogue:** mở sang câu hỏi lớn hơn của Tập 2 — khi đã xây được một hệ thống, liệu ta có thể “lắng nghe” những gì đang xảy ra bên trong nó hay không?
+- **Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy:** mở từ Token-XRay sang SIX và các hướng quan sát hệ thống, với ranh giới rõ giữa điều đã được chứng minh, điều mới được quan sát và những câu hỏi còn mở.
+- **Epilogue:** khép lại bằng những hướng có thể tiếp tục nghiên cứu trong tương lai, không giả định trước rằng sẽ có một tập sách thứ hai.
 - **Phụ lục A — Một người + AI:** một workflow thực hành cho người không cần biết code nhưng muốn dùng AI để biến câu hỏi thành phép thử có thể kiểm tra và truy vết.
 
 ## Về nguồn nghiên cứu
