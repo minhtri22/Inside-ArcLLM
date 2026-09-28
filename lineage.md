@@ -159,3 +159,46 @@ Scientific scope remains Q3 no-practical-advantage confirmation:
 Editorial boundary:
 - negative result is framed as a bounded result for the frozen model/hardware/workloads/architecture, not a universal claim about ArcLLM or llama.cpp;
 - successor work may only reopen through a separate mechanism-grounded architecture intervention review.
+
+
+## 2026-09-28 — Chapter 11 AUTHOR APPROVED WITH CONDITIONS APPLIED
+
+Approved:
+`chapters/11-tu-that-bai-sang-mot-cau-hoi-dung-hon.md`
+
+Author conditions applied before publication:
+- removed the meta-editorial sentence `Không nên bắt người đọc phải tự dịch cụm này.`; the text now moves directly from the technical phrase to its Vietnamese decomposition;
+- introduced **kernel fusion — gộp kernel** before repeated use, with a concrete two-kernel-to-one-kernel example and its intended effects;
+- introduced **primitive — thao tác nền tảng** at SA0-CAP before reuse, so the hardware-capability discussion does not depend on unexplained English terminology.
+
+Scientific/editorial scope:
+- Chapter 11 closes Part II;
+- the current Q3 architecture remains closed;
+- `Successor Architecture (SA)`, `SA-H1`, `SA0` and `SA0-CAP` are introduced as bounded research terms, not as proof of a successful new architecture;
+- successor hypothesis formation uses ArcLLM internal evidence plus published literature as hypothesis support only;
+- no private external research project is named or imported into the public book narrative;
+- SA0/SA0-CAP establish causal/capability qualification only, not successor performance;
+- the chapter explicitly distinguishes same-hardware llama.cpp evidence from causal attribution: the matched comparison proves the hardware/model pair can run much faster than current ArcLLM decode, but does not by itself prove GEMM is the entire root cause.
+
+## 2026-09-28 — 20-chapter / 4-part outline locked
+
+The public book outline is now frozen at 20 main chapters across four parts:
+
+1. **Part I — Build the Machine (Ch. 1–8)**  
+   Goal: build a real runtime from model data, Vulkan and primitive computation through decoder, KV cache and the evidence-selected production path.
+
+2. **Part II — Để evidence phán xét (Ch. 9–11)**  
+   Goal: place the runtime under matched comparison, accept the Q3 negative verdict, close the current architecture, and define the conditions for opening a successor hypothesis. Part II ends at Chapter 11.
+
+3. **Part III — Kiến trúc chỉ có giá trị khi đi qua thực tế (Ch. 12–15)**  
+   Goal: compress multiple architecture hypotheses into their scientific lessons; show that component gains must survive correctness, transfer and end-to-end constraints; weave practical human+AI research governance modes E/M/C/T into the chronology rather than giving them a detached management chapter.
+
+4. **Part IV — Từ runtime cụ thể tới abstraction tổng quát (Ch. 16–20)**  
+   Goal: derive representation/execution, acquisition/lifecycle and generic runtime abstractions only when evidence requires them, then close the volume with validated boundaries and remaining open questions.
+
+Additional outline decisions:
+- Ledger64 is not a standalone public-book chapter; historical evidence remains in lineage/source-of-truth but the main narrative stays compact;
+- former Ch. 12/15/16 material is compressed into the new Part III arc, with the value converging at the whole-system/Amdahl lesson;
+- the correctness/Q6 story remains an independent Chapter 13;
+- Token-XRay no longer has a main chapter; it appears only lightly as an internally created observability tool, with optional deeper treatment in a bonus section;
+- a research experiment does not automatically become a chapter. A chapter must introduce a concept, change belief, close a path, or force an architectural boundary.
