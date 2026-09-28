@@ -9,7 +9,7 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–15**: Phần I, Phần II và Phần III đã hoàn chỉnh; Phần IV sẽ tiếp tục từ Chương 16.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–16**: Phần I, Phần II và Phần III đã hoàn chỉnh; Phần IV đã bắt đầu.
 
 ## Bắt đầu đọc
 
@@ -29,6 +29,7 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 - [Chương 13 — Khi correctness nói “không”](chapters/13-khi-correctness-noi-khong.md)
 - [Chương 14 — Từ một cơ chế tốt tới hệ thống thật](chapters/14-tu-mot-co-che-tot-toi-he-thong-that.md)
 - [Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi](chapters/15-mot-kien-truc-chi-thang-khi-toan-he-duoc-loi.md)
+- [Chương 16 — Experiment 2×2: tách representation khỏi execution](chapters/16-experiment-2x2-tach-representation-khoi-execution.md)
 
 ## Lộ trình của cuốn sách
 
@@ -71,8 +72,8 @@ Trong Phần III, các mode làm việc E/M/C/T được giới thiệu ngay t�
 
 Dự kiến:
 
-- **Chương 16 — Experiment 2×2: tách representation khỏi execution**  
-  Tách hai biến để biết chính xác thay đổi nào tạo ra hiệu ứng.
+- [**Chương 16 — Experiment 2×2: tách representation khỏi execution**](chapters/16-experiment-2x2-tach-representation-khoi-execution.md)  
+  Dùng thiết kế 2×2 để tách hiệu ứng của cách chia công việc khỏi cách biểu diễn dữ liệu, rồi kiểm tra cả tương tác và chi phí kiến trúc.
 - **Chương 17 — EXEC148: khi bằng chứng buộc abstraction mới xuất hiện**  
   Một ranh giới mới giữa cách biểu diễn dữ liệu và cách thực thi chỉ được đưa vào khi bằng chứng cho thấy nó cần thiết.
 - **Chương 18 — Residency chưa đủ: acquisition và lifecycle**  
