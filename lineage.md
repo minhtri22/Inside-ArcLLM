@@ -260,3 +260,19 @@ Scientific/editorial scope:
 - T3 shows material internal ArcLLM carry-through: global decode geomean approximately 2.20× and median-cell E2E geomean approximately 2.00×, with TTFT non-regression gate passing;
 - the chapter explicitly distinguishes internal ArcLLM carry-through from an external llama.cpp advantage claim, which requires a fresh matched comparison for the new candidate;
 - human+AI governance emphasis: AI executes the bounded transfer work while human authority preserves scope, gates, and claim boundaries.
+
+
+## 2026-09-28 — Chapter 15 AUTHOR APPROVED
+
+Approved:
+`chapters/15-mot-kien-truc-chi-thang-khi-toan-he-duoc-loi.md`
+
+Scientific/editorial scope:
+- Chapter 15 closes Part III;
+- the closed I002 candidate is re-benchmarked against the pinned llama.cpp Vulkan baseline using a fresh paired matched characterization rather than historical Q2 numbers;
+- 20/20 matched pairs and 40/40 measured inferences are valid;
+- the fresh post-I002 gap remains large: global cell-median geomean decode-latency ratio approximately 10.38× and E2E-latency ratio approximately 9.97× candidate/llama;
+- historical Q2 and fresh I003 results are not algebraically combined into a causal gap-closure estimate;
+- the chapter emphasizes that a large successful intervention can invalidate the old bottleneck ranking, so measurement must restart before selecting another mechanism;
+- Part III closes with E/M/C/T explicitly framed as a loop: Transfer changes the system, then measurement reopens Explore;
+- human+AI governance converges on preserving question scope, claim boundaries, stale-evidence awareness, and the authority to stop or re-measure rather than optimizing reflexively.
