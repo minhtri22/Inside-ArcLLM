@@ -276,3 +276,18 @@ Scientific/editorial scope:
 - the chapter emphasizes that a large successful intervention can invalidate the old bottleneck ranking, so measurement must restart before selecting another mechanism;
 - Part III closes with E/M/C/T explicitly framed as a loop: Transfer changes the system, then measurement reopens Explore;
 - human+AI governance converges on preserving question scope, claim boundaries, stale-evidence awareness, and the authority to stop or re-measure rather than optimizing reflexively.
+
+
+## 2026-09-28 — Chapter 16 AUTHOR APPROVED
+
+Approved:
+`chapters/16-experiment-2x2-tach-representation-khoi-execution.md`
+
+Scientific/editorial scope:
+- Chapter 16 opens Part IV;
+- the Q4-down causal study is presented as a 2×2 factorial separation between execution/work decomposition (A) and execution representation (B);
+- all four arms pass the frozen correctness gate before timing;
+- A and B independently reduce Q4-down latency, while AB is slower than B in both workloads and the preregistered interaction is antagonistic;
+- architecture cost is included: B requires one-time materialization and an additional resident execution image, creating A-vs-B crossover rather than a universal winner;
+- the chapter introduces the non-dominated frontier concept and preserves the boundary that partial/inadequate hardware counters cannot overwrite valid timing evidence;
+- the conclusion is architectural: representation and execution are distinct axes, motivating a runtime-level representation abstraction rather than another isolated kernel tweak.
