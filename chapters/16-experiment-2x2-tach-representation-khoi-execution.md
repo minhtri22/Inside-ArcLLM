@@ -912,7 +912,7 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 2. **Hai optimization tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm latency mạnh, nhưng AB lại chậm hơn B ở cả hai workload; interaction được phân loại là đối kháng.
 3. **Kiến trúc không chỉ được chọn bằng latency.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident memory. Kết quả đúng có thể là một frontier, không phải một winner duy nhất.
 
-**Chương 17 — EXEC148: khi bằng chứng buộc abstraction mới xuất hiện**
+**Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**
 
 Experiment 2×2 vừa cho thấy một điều rất cụ thể:
 
