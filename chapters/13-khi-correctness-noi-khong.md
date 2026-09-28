@@ -432,7 +432,7 @@ Bởi câu hỏi nghiên cứu không phải:
 
 Câu hỏi đã khóa là:
 
-> **“Cùng cơ chế đã thắng ở Q4 có chuyển nguyên vẹn sang Q6 hay không?”**
+> **“Giữ nguyên cơ chế Split-K và hình học thực thi đã thắng ở Q4, rồi dùng một Q6_K candidate với bộ đọc packed-Q6 tương ứng, correctness có còn giữ được hay không?”**
 
 Evidence đã trả lời:
 
@@ -582,7 +582,7 @@ sẽ cùng PASS.
 
 Q6 đã bác bỏ một claim rộng hơn:
 
-> **cùng cơ chế giữ nguyên có thể chuyển từ Q4_K sang Q6_K mà vẫn giữ correctness contract.**
+> **cùng cơ chế Split-K và hình học thực thi có thể chuyển từ Q4_K sang Q6_K, với bộ đọc packed-Q6 tương ứng, mà vẫn giữ correctness contract.**
 
 Nói cách khác:
 
