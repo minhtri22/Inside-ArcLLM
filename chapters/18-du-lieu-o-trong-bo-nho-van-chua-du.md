@@ -192,18 +192,75 @@ Nếu không có nó, runtime vẫn còn A.
 
 ## Nhưng có biểu diễn phụ lại là bắt buộc trong trường hợp khác
 
-Sau đó ArcLLM gặp một họ bài toán khác.
+Sau đó ArcLLM gặp một họ bài toán khác trong nhánh P8.
 
-Ở đây dữ liệu phải được chia thành một cách biểu diễn phân đoạn để phép tính có thể đi qua giới hạn bộ nhớ và tiếp tục chạy theo đường đã kiểm tra.
+Điểm quan trọng là obstruction ở đây **không phải tổng dung lượng bộ nhớ không đủ**.
+
+Với exact model 7B, P8-A tính được:
+
+```text
+tổng residency dự kiến
+= 5.347.770.372 byte
+
+usable budget đã khóa
+= 16.374.562.816 byte
+
+headroom
+= 11.026.792.444 byte
+```
+
+Tức **capacity tổng thể PASS**.
+
+FAIL nằm ở một contract hẹp hơn đã được kế thừa từ kiến trúc trước:
+
+> **mỗi physical arena / tensor piece không được vượt 256 MiB.**
+
+Hai tensor vocab đơn lẻ vi phạm contract đó:
+
+```text
+token_embd.weight
+
+output.weight
+```
+
+P8-A2 không nới arena cap, không đổi quantization, context hay KV precision để cứu kết quả.
+
+Nó thay cách **biểu diễn vật lý** của đúng hai logical tensor lớn đó:
+
+```text
+một logical tensor lớn
+↓
+nhiều physical segment
+↓
+chỉ cắt tại ranh giới hàng
+↓
+mỗi segment <= 256 MiB
+```
+
+Đây là **row-aligned physical segmentation — phân đoạn vật lý theo ranh giới hàng**.
+
+Tổng dữ liệu logic không đổi.
+
+Tổng công thức bộ nhớ không được cứu bằng cách làm nhỏ model.
+
+Chỉ cách cùng tensor logic được ánh xạ thành các physical piece thay đổi để contract arena vẫn được giữ.
+
+Trong nghiên cứu Phase2 về semantics của runtime, chính trường hợp P8 có giới hạn này được dùng như một:
+
+> **bounded mandatory-feasibility oracle — một trường hợp đối chứng có phạm vi giới hạn, trong đó representation cần thiết là điều kiện để đường thực thi đó khả thi.**
 
 Không có một đường dự phòng đã được xác nhận tương đương như A trong trường hợp EXEC148.
 
 Hình ảnh gần với:
 
 ```text
-cách biểu diễn cần thiết chưa có
+representation bắt buộc chưa có
 ↓
-không thể đưa yêu cầu vào đường thực thi đó
+nếu có acquisition hợp lệ
+→ tạo / thu nhận representation
+
+nếu hiện không thể acquisition
+→ NOT_READY
 ```
 
 Trong trường hợp này, câu hỏi:
@@ -212,7 +269,9 @@ Trong trường hợp này, câu hỏi:
 
 là câu hỏi sai.
 
-Bởi ngay cả khi chỉ cần dùng một lần, biểu diễn đó vẫn cần thiết để phép tính có thể đi tiếp.
+Bởi việc tạo representation không phải một tối ưu tùy chọn để hoàn vốn.
+
+Nó là điều kiện để đường thực thi bounded đó trở nên khả thi.
 
 Đây là loại thứ hai:
 
@@ -237,15 +296,19 @@ với:
 ```text
 TRƯỜNG HỢP 2
 
-biểu diễn bắt buộc chưa có
+representation bắt buộc chưa có
 ↓
 không có đường dự phòng đã xác nhận
 ↓
-phải tạo biểu diễn
-hoặc chưa thể chạy
+phải acquisition
+hoặc NOT_READY
 ```
 
 Hai loại này hoàn toàn khác nhau.
+
+Cũng phải giữ đúng biên giới claim:
+
+> **Phase2 dùng P8 như một bounded oracle cho semantics acquisition; điều đó không tự nó biến P8 thành một claim full-inference mới.**
 
 ## Không được ép mọi cách tạo biểu diễn vào một công thức
 
