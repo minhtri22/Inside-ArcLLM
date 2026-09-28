@@ -245,3 +245,18 @@ Scientific/editorial scope:
 - Q6 timing remains explicitly unknown: zero measured pairs, no target-model run, and no performance claim;
 - the chapter preserves the distinction between implementation/infrastructure success, scientific correctness, and performance;
 - the valid Q6 correctness FAIL is preserved as a generalization boundary rather than rescued by threshold or geometry changes.
+
+
+## 2026-09-28 — Chapter 14 AUTHOR APPROVED
+
+Approved:
+`chapters/14-tu-mot-co-che-tot-toi-he-thong-that.md`
+
+Scientific/editorial scope:
+- Chapter 14 centers Mode T (Transfer / carry-through);
+- the already validated Q4 subgroup32 Split-K mechanism is transferred without broadening scope: decode only, Q4_K only, gate/up only, 56 substitutions per token;
+- T1 real-model transfer preserves correctness across 72/72 comparisons using real weights and baseline-produced activations;
+- T2 preserves full-model 32-token semantics in all required warmup and measured pairs;
+- T3 shows material internal ArcLLM carry-through: global decode geomean approximately 2.20× and median-cell E2E geomean approximately 2.00×, with TTFT non-regression gate passing;
+- the chapter explicitly distinguishes internal ArcLLM carry-through from an external llama.cpp advantage claim, which requires a fresh matched comparison for the new candidate;
+- human+AI governance emphasis: AI executes the bounded transfer work while human authority preserves scope, gates, and claim boundaries.
