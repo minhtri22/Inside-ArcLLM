@@ -567,6 +567,12 @@ Mà để quyết định:
 
 > **Có đáng xây không?**
 
+Có một ranh giới bằng chứng cần khóa ngay trước các con số tiếp theo:
+
+> **Các số NPU dưới đây là phép chiếu phân tích từ evidence exact-target hiện có của ArcLLM kết hợp với timing của NPU provider. Chúng không phải một fresh full-model benchmark có NPU, và ở thời điểm này chưa có NPU backend được tích hợp vào canonical runtime.**
+
+Cụ thể, phần current-canonical được ước tính bằng cách lấy evidence hậu-I002 rồi áp tỷ lệ B/0 đã đo của Q4-down vào phần Q4_K FFN-down trước khi chuẩn hóa lại các family share. Vì vậy những con số này dùng để quyết định **có đáng mở một bounded transfer study hay không**, không phải để tuyên bố production speedup.
+
 ## Cơ chế từng thành công lớn có thể trở thành nơi không đáng chuyển tiếp
 
 Gate/up từng là chiến thắng quan trọng.
