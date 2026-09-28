@@ -378,3 +378,24 @@ Publication state:
 - Foreword + Chapters 1–20 are AUTHOR APPROVED and public;
 - the 20-chapter main book is complete;
 - future Bonus/Epilogue material remains optional and does not imply a second volume.
+
+
+## 2026-09-28 — Bonus AUTHOR APPROVED; README ROADMAP COMPLETED
+
+Approved:
+`chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md`
+
+Bonus editorial scope:
+- opens from the completed ArcLLM runtime story toward broader ways AI might help observe and reason about complex systems;
+- Token X-Ray is presented as an evidence-linking/orchestration layer rather than a generic profiler replacement;
+- SIX is presented as a controlled numerical perturbation program, not as biological EEG, physical electrical token encoding, or a claim of a new universal theory;
+- the bonus preserves major SIX FAIL/UNRESOLVED results, including unsupported intrinsic-frequency, strong mode-switch, fixed-geometry, and strong context-modulation interpretations;
+- the strongest retained SIX claim remains local and bounded: under small perturbations and a common intervention interface, causal-response geometry is explained by an operating-point-conditioned complete local tangent field;
+- future applications to factories, robotics, infrastructure, digital twins and other complex systems are explicitly framed as research directions, not demonstrated outcomes;
+- the book remains standalone and does not promise a second volume.
+
+README roadmap QA:
+- Part I now mirrors Parts III–IV with direct chapter links and one-sentence summaries for Chapters 1–8;
+- Part II now mirrors Parts III–IV with direct chapter links and one-sentence summaries for Chapters 9–11;
+- the Bonus is linked from both the main reading list and the supplemental-material section;
+- publication status now records Foreword + Chapters 1–20 + Bonus as public.
