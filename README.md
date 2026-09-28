@@ -2,27 +2,18 @@
 
 **Từ con số 0 đến một runtime mà ta hiểu được từng lớp bên trong.**
 
-Inside ArcLLM là một cuốn sách tiếng Việt dành cho người bắt đầu từ số 0 — không giả định biết AI, hệ thống máy tính hay lập trình.
+Inside ArcLLM là một cuốn sách tiếng Việt dành cho người bắt đầu từ số 0 — không giả định bạn đã biết AI, hệ thống máy tính hay lập trình.
 
 Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện thật để theo đuổi hai mục tiêu:
 
-1. **Hiểu nền tảng AI** — từ ứng dụng AI, model, token, runtime, tensor, CPU/GPU và bộ nhớ tới cách một runtime được xây dựng, kiểm tra và tối ưu.
-2. **Học cách làm việc và quản trị cùng AI** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, giữ lịch sử và duy trì quyền quyết định của con người.
+1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
+2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-## Trạng thái
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–11**, tương ứng với toàn bộ **Phần I và Phần II**.
 
-Bản đang viết công khai.
+## Bắt đầu đọc
 
-Nội dung chỉ được đưa vào repository này sau khi đã qua review biên tập. Repository nghiên cứu và mã nguồn ArcLLM không nằm trong repository sách này.
-
-Outline chính đã được chốt ở **20 chương / 4 phần**. Chương 1–11 đã được tác giả duyệt; Chương 12–20 hiện mới là outline và chỉ được viết sau khi chương trước được duyệt.
-
-## Cấu trúc 20 chương
-
-### Phần I — Build the Machine
-
-**Mục tiêu:** đi từ con số 0 tới một runtime thực sự chạy được; xây từng lớp từ dữ liệu model, Vulkan và các phép tính cơ bản tới decoder, KV cache và production path.
-
+- [Lời nói đầu — Thư gửi người đọc](chapters/00-loi-noi-dau.md)
 - [Chương 1 — Bên dưới một câu trả lời AI có gì?](chapters/01-khoa-target-truoc-khi-toi-uu.md)
 - [Chương 2 — GGUF không còn là một file, nó trở thành tensor store](chapters/02-gguf-tensor-store.md)
 - [Chương 3 — Xây phần lõi Vulkan](chapters/03-vulkan-runtime-core.md)
@@ -31,74 +22,89 @@ Outline chính đã được chốt ở **20 chương / 4 phần**. Chương 1�
 - [Chương 6 — Full decoder residency: giữ cả “tòa nhà” trên GPU](chapters/06-full-decoder-residency.md)
 - [Chương 7 — KV cache: model bắt đầu nhớ token trước](chapters/07-kv-cache-model-bat-dau-nho-token-truoc.md)
 - [Chương 8 — Production path không đến từ một kernel thần kỳ](chapters/08-production-path-khong-den-tu-mot-kernel-than-ky.md)
-
-**Kết thúc Phần I:** ArcLLM đã có một production path được chọn bằng evidence, nhưng chưa được phép kết luận rằng nó cạnh tranh được với một runtime trưởng thành.
-
-### Phần II — Để evidence phán xét
-
-**Mục tiêu:** đặt runtime trước phép đối chứng cùng điều kiện, để bằng chứng quyết định thay vì tiếp tục bảo vệ kiến trúc đã xây.
-
 - [Chương 9 — Benchmark phải có đối chứng](chapters/09-benchmark-phai-co-doi-chung.md)
 - [Chương 10 — Khi “tự build được” vẫn chưa đủ](chapters/10-khi-tu-build-duoc-van-chua-du.md)
 - [Chương 11 — Từ thất bại sang một câu hỏi đúng hơn](chapters/11-tu-that-bai-sang-mot-cau-hoi-dung-hon.md)
 
-**Kết thúc Phần II:** matched benchmark và fresh confirmation không chứng minh được practical advantage của kiến trúc hiện tại; kiến trúc cũ đóng, và một kiến trúc kế tiếp chỉ được mở khi có một cơ chế mới đủ rõ để kiểm tra.
+## Lộ trình của cuốn sách
+
+### Phần I — Build the Machine
+
+**Mục tiêu:** đi từ con số 0 tới một runtime thực sự chạy được.
+
+Phần này xây từng lớp của ArcLLM: từ cách đọc model, lưu tensor và giao tiếp với GPU bằng Vulkan, tới các phép tính nền tảng, một decoder layer hoàn chỉnh, toàn bộ decoder, KV cache, vòng lặp sinh token và cuối cùng là một production path được chọn bằng đo lường.
+
+**Chương 1–8.**
+
+Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận hoàn chỉnh. Nhưng “chạy được” vẫn chưa trả lời câu hỏi quan trọng hơn: nó đứng ở đâu khi so với một runtime trưởng thành?
+
+### Phần II — Để bằng chứng phán xét
+
+**Mục tiêu:** đặt runtime trước một phép đối chứng cùng điều kiện và chấp nhận kết quả, kể cả khi kết quả đó không có lợi cho kiến trúc mình đã xây.
+
+Phần này đi từ benchmark có đối chứng, tới một phép xác nhận bằng dữ liệu mới, rồi đóng kiến trúc hiện tại khi nó không chứng minh được lợi thế thực tế. Chương cuối của phần này mở ra một nguyên tắc mới: chỉ được nghiên cứu một kiến trúc kế tiếp khi có một cơ chế đủ rõ để kiểm tra.
+
+**Chương 9–11.**
 
 ### Phần III — Kiến trúc chỉ có giá trị khi đi qua thực tế
 
-**Mục tiêu:** cho thấy có thể tồn tại nhiều giả thuyết và nhiều kiến trúc hợp lý trên giấy, nhưng chỉ thực nghiệm, transfer và giá trị ở cấp toàn hệ mới quyết định thứ gì đáng giữ. Đây cũng là nơi các mode quản trị cùng AI được đưa vào đúng ngữ cảnh thực tế.
+**Mục tiêu:** cho thấy một ý tưởng kỹ thuật chỉ có giá trị khi nó sống sót qua tính đúng, thực nghiệm, quá trình đưa vào hệ thống lớn hơn và tác động ở cấp toàn hệ.
+
+Dự kiến:
 
 - **Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được**  
-  Nhiều giả thuyết, nhiều cách phân rã công việc; Mode E → Mode M giúp AI sinh phương án nhưng không tiêu fresh evidence cho mọi ý tưởng.
+  Nhiều giả thuyết có thể cùng hợp lý trên giấy. Phần này bắt đầu cho thấy cách lọc nhanh ý tưởng, chọn một cơ chế đáng thử và không tiêu bằng chứng mới cho mọi phương án AI có thể sinh ra.
 - **Chương 13 — Khi correctness nói “không”**  
-  Giữ correctness như một contract độc lập; Mode C cho thấy nhanh hơn nhưng sai ngoài ngưỡng đã khóa vẫn là FAIL.
+  Một hướng có thể nhanh hơn nhưng vẫn phải bị loại nếu không giữ được tính đúng theo tiêu chuẩn đã khóa.
 - **Chương 14 — Từ một cơ chế tốt tới hệ thống thật**  
-  Carry-through / transfer: component PASS không tự động trở thành system PASS; Mode T kiểm tra lợi ích có sống sót khi đi vào đường thực thi lớn hơn hay không.
+  Một thành phần chạy tốt chưa có nghĩa toàn bộ runtime sẽ được lợi. Lợi ích phải sống sót khi được đưa vào đường thực thi thật.
 - **Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi**  
-  Amdahl, headroom, end-to-end movement, stop rule và quyền quyết định của con người trong một dự án cùng AI.
+  Khép lại vòng từ giả thuyết tới giá trị end-to-end, đồng thời làm rõ vai trò của con người và AI trong việc chọn câu hỏi, thực thi, đọc bằng chứng và quyết định dừng hay tiếp tục.
 
-**Kết thúc Phần III:** một người + AI không nghiên cứu bằng cách để AI thử vô hạn. Con người đặt câu hỏi và ranh giới; AI giúp sinh phương án, triển khai và tổng hợp evidence; PASS/FAIL cùng stop rule quyết định con đường tiếp theo.
+Trong Phần III, các mode làm việc E/M/C/T được giới thiệu ngay tại những tình huống thực tế đã tạo ra nhu cầu cho chúng, thay vì tách thành một chương quản trị riêng.
 
 ### Phần IV — Từ runtime cụ thể tới abstraction tổng quát
 
-**Mục tiêu:** rút ra những abstraction chỉ xuất hiện sau khi evidence cho thấy runtime cần chúng, thay vì thiết kế một kiến trúc đẹp trên giấy từ trước.
+**Mục tiêu:** rút ra những ranh giới và khái niệm tổng quát chỉ sau khi thực nghiệm cho thấy runtime thực sự cần chúng.
+
+Dự kiến:
 
 - **Chương 16 — Experiment 2×2: tách representation khỏi execution**  
   Tách hai biến để biết chính xác thay đổi nào tạo ra hiệu ứng.
-- **Chương 17 — EXEC148: khi evidence buộc abstraction mới xuất hiện**  
-  Representation và execution được tách khi bằng chứng buộc runtime phải có ranh giới mới.
+- **Chương 17 — EXEC148: khi bằng chứng buộc abstraction mới xuất hiện**  
+  Một ranh giới mới giữa cách biểu diễn dữ liệu và cách thực thi chỉ được đưa vào khi bằng chứng cho thấy nó cần thiết.
 - **Chương 18 — Residency chưa đủ: acquisition và lifecycle**  
-  Không chỉ hỏi dữ liệu có ở trong memory hay không, mà còn hỏi nó đến từ đâu, sẵn sàng khi nào, sống bao lâu và ai sở hữu.
+  Không chỉ hỏi dữ liệu có nằm trong bộ nhớ hay không, mà còn hỏi nó đến từ đâu, sẵn sàng khi nào, sống bao lâu và ai chịu trách nhiệm về vòng đời của nó.
 - **Chương 19 — Từ ArcLLM-specific tới runtime abstraction v4**  
-  Identity, execution availability/readiness, residency, acquisition và lifecycle được gom thành một mô hình runtime tổng quát hơn.
+  Những ranh giới đã được kiểm tra dần được gom thành một mô hình runtime tổng quát hơn.
 - **Chương 20 — Ta đã hiểu runtime đến đâu?**  
-  Backend validation/integration, những gì đã được chứng minh, những gì vẫn còn mở và ranh giới của Tập 1.
+  Khép lại Tập 1 bằng những gì đã được chứng minh, những gì chưa được chứng minh và những câu hỏi còn mở.
 
-Trong Phần IV, **Token-XRay chỉ xuất hiện nhẹ như một công cụ đo nội bộ được sinh ra khi chuỗi nghiên cứu cần nhìn sâu hơn vào đường đi và chi phí của token**; nó không có một chương chính riêng.
+## Cách cuốn sách được viết
 
-## Ngoài 20 chương chính
+Cuốn sách giữ một số nguyên tắc xuyên suốt:
 
-- [Lời nói đầu — Thư gửi người đọc](chapters/00-loi-noi-dau.md)
-- **Bonus — Token-XRay**, chỉ nếu cần một phần đào sâu cho độc giả kỹ thuật hơn.
-- **Epilogue — từ runtime sang “lắng nghe hệ thống”**, dẫn sang hướng SIX/RF của Tập 2.
-- **Phụ lục A — Một người + AI**, biến các nguyên tắc quản trị đã xuất hiện trong Chương 12–15 thành workflow thực hành cho người không cần biết code.
+- **Không yêu cầu biết code.** Code là phương tiện để thực thi nghiên cứu, không phải điều kiện để hiểu câu chuyện.
+- **Thuật ngữ kỹ thuật phải được giải thích tại chỗ.** Tiếng Anh được giữ như từ khóa để người đọc có thể tra cứu, nhưng nội dung tiếng Việt phải đủ để hiểu.
+- **Mọi con số quan trọng phải có ngữ cảnh.** Công thức và tham số được đi kèm ví dụ đơn giản khi cần.
+- **PASS và FAIL đều có giá trị.** Một nhánh thất bại có thể giúp đóng một con đường, xác định giới hạn hoặc đặt ra câu hỏi tốt hơn.
+- **Không biến lỗi kỹ thuật thành kết luận khoa học.**
+- **Không tuyên bố hiệu năng vượt quá bằng chứng đã đo.**
+- **Không kể ngược lịch sử từ đáp án cuối cùng.** Người đọc đi qua các câu hỏi theo đúng thứ tự mà bằng chứng đã buộc dự án phải đi.
+- **Một thí nghiệm không mặc nhiên trở thành một chương.** Sách chỉ giữ những bước tạo ra khái niệm mới, thay đổi niềm tin, đóng một con đường hoặc buộc kiến trúc phải thay đổi.
 
-## Nguyên tắc biên tập
+## Các phần bổ sung
 
-- Viết cho người không biết code.
-- Thuật ngữ kỹ thuật được giải thích bằng tiếng Việt trước hoặc ngay tại điểm sử dụng; tiếng Anh chỉ là từ khóa để tra cứu, không phải điều kiện để hiểu sách.
-- Khi một thuật ngữ quay lại sau một khoảng đọc dài, nhắc lại nghĩa ngắn gọn tại chỗ nếu cần.
-- Mọi công thức hoặc tham số quan trọng phải có ví dụ số đơn giản.
-- PASS và FAIL đều là kiến thức.
-- Không biến lỗi hạ tầng thành kết luận khoa học.
-- Không tuyên bố hiệu năng ngoài bằng chứng.
-- Không kể ngược lịch sử từ kiến trúc cuối cùng.
-- Quản trị nghiên cứu, thực thi và hạ tầng được phân biệt rõ.
-- Code là phương tiện thực thi, không phải điều kiện để hiểu sách.
-- Một experiment không mặc nhiên xứng đáng thành một chương; một chương chỉ tồn tại khi nó tạo khái niệm mới, thay đổi niềm tin, đóng một con đường hoặc buộc kiến trúc phải thay đổi.
+Sau 20 chương chính, sách dự kiến có thêm:
+
+- **Bonus — Token-XRay:** một phần đào sâu về công cụ quan sát được tạo ra trong quá trình nghiên cứu để nhìn rõ hơn đường đi và chi phí của token bên trong runtime.
+- **Epilogue:** mở sang câu hỏi lớn hơn của Tập 2 — khi đã xây được một hệ thống, liệu ta có thể “lắng nghe” những gì đang xảy ra bên trong nó hay không?
+- **Phụ lục A — Một người + AI:** một workflow thực hành cho người không cần biết code nhưng muốn dùng AI để biến câu hỏi thành phép thử có thể kiểm tra và truy vết.
 
 ## Về nguồn nghiên cứu
 
-Các số liệu và mốc kỹ thuật trong sách được biên tập từ một research source-of-truth riêng. Repository công khai này chỉ chứa nội dung sách đã được phê duyệt, không chứa source code runtime, raw artifacts hay lịch sử nghiên cứu nội bộ.
+Các số liệu và kết luận kỹ thuật trong sách được biên tập từ những phép thử và tài liệu nghiên cứu của ArcLLM.
 
-Khi nguồn nghiên cứu gốc được công khai trong tương lai, các liên kết provenance có thể được bổ sung mà không thay đổi lịch sử biên tập của cuốn sách.
+Repository này chỉ chứa **nội dung sách đã được xuất bản**. Mã nguồn runtime, dữ liệu thí nghiệm thô và các tài liệu nghiên cứu chi tiết không nằm trong repository sách.
+
+Mục tiêu của Inside ArcLLM không phải chỉ kể rằng một runtime đã được xây như thế nào, mà còn giữ lại **vì sao một hướng được chọn, vì sao một hướng bị loại, và bằng chứng nào đã thay đổi quyết định tiếp theo**.
