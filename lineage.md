@@ -215,3 +215,33 @@ Public README QA:
 - removes author-facing commentary about why Token-XRay does or does not receive a main chapter;
 - future sections are labeled as upcoming content rather than as already published chapters;
 - editorial principles are phrased as promises to the reader rather than internal workflow instructions.
+
+
+## 2026-09-28 — Chapter 12 AUTHOR APPROVED
+
+Approved:
+`chapters/12-nhieu-kien-truc-nhung-chi-thuc-te-moi-tra-loi-duoc.md`
+
+Editorial/scientific scope:
+- Chapter 12 opens Part III;
+- E/M/C/T is briefly reintroduced near the start so readers do not need to return to Chapter 8 after a four-chapter gap;
+- the chapter then focuses on E (Explore) and M (Mechanism): AI may expand the idea space, but only one sufficiently clear mechanism should consume new confirmatory evidence;
+- subgroup32 Split-K Q4 evidence is presented as component evidence only, not as an ArcLLM-wide speed claim;
+- Amdahl/headroom is introduced to separate local speedup from potential whole-system value;
+- a historical integrated-successor negative is used only for the lesson that decode/E2E gains can coexist with a blocking TTFT regression.
+
+## 2026-09-28 — Chapter 13 AUTHOR APPROVED WITH CONDITION APPLIED
+
+Approved:
+`chapters/13-khi-correctness-noi-khong.md`
+
+Author condition applied before publication:
+- changed the reader-facing heading from the metaphorical `Q4 PASS không có hộ chiếu sang Q6` to `Q4 PASS không có nghĩa là Q6 cũng vậy`.
+
+Scientific/editorial scope:
+- Chapter 13 centers Mode C (Confirm);
+- the unchanged subgroup32 Split-K mechanism that passed Q4_K is tested against Q6_K under frozen correctness gates;
+- Q6 shader compile/build succeeds, but candidate-vs-CPU correctness fails before performance measurement;
+- Q6 timing remains explicitly unknown: zero measured pairs, no target-model run, and no performance claim;
+- the chapter preserves the distinction between implementation/infrastructure success, scientific correctness, and performance;
+- the valid Q6 correctness FAIL is preserved as a generalization boundary rather than rescued by threshold or geometry changes.
