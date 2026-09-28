@@ -291,3 +291,24 @@ Scientific/editorial scope:
 - architecture cost is included: B requires one-time materialization and an additional resident execution image, creating A-vs-B crossover rather than a universal winner;
 - the chapter introduces the non-dominated frontier concept and preserves the boundary that partial/inadequate hardware counters cannot overwrite valid timing evidence;
 - the conclusion is architectural: representation and execution are distinct axes, motivating a runtime-level representation abstraction rather than another isolated kernel tweak.
+
+
+## 2026-09-28 — Chapter 17 AUTHOR APPROVED WITH VIETNAMESE TERMINOLOGY CONDITION APPLIED
+
+Approved:
+`chapters/17-exec148-khi-bang-chung-buoc-mot-lop-truu-tuong-moi-xuat-hien.md`
+
+Author condition applied before publication:
+- performed a full Vietnamese-first terminology pass rather than patching only the cited sentences;
+- removed mixed constructions such as `Một possibility...`, `lúc inference bắt đầu`, and `FAIL và trade-off...`;
+- changed the chapter title from `abstraction` to `lớp trừu tượng`, retaining English only as a lookup term at first explanation;
+- `execution`, `representation`, `layout`, `primitive`, `creator`, `residency`, `tuple`, `critical path`, `sidecar`, and related specialist terms are now introduced in Vietnamese first and then used primarily in Vietnamese;
+- reader-facing prose now prefers `cách thực thi`, `cách biểu diễn dữ liệu`, `bố cục dữ liệu`, `khối chức năng nền tảng`, `nơi tạo`, `nơi cư trú`, `vòng đời`, `đường chuyển giao`, and `chính sách duy trì`;
+- the final transition to Chapter 18 is likewise rewritten in Vietnamese rather than relying on bare `residency/acquisition/lifecycle` terminology.
+
+Scientific/editorial scope:
+- EXEC148 remains an execution representation of the same logical Q4_K data, not a new model or quantization;
+- exact logical tuple equality across all 14 target tensors is preserved as the representation-equivalence basis;
+- A remains the validated no-extra-representation Split-K32 primitive and B remains the validated EXEC148 representation primitive with unresolved placement/lifetime policy;
+- B's measured latency value, one-time materialization cost, and approximately 550 MB incremental resident image motivate runtime-level representation identity, placement, reuse, and lifetime questions;
+- the abstraction is presented as evidence-driven: the 2×2 study and cost frontier create the need for it rather than a top-down desire for generic architecture.
