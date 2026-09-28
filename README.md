@@ -9,7 +9,7 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–17**: Phần I, Phần II và Phần III đã hoàn chỉnh; Phần IV đang được xuất bản.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–18**: Phần I, Phần II và Phần III đã hoàn chỉnh; Phần IV đang được xuất bản.
 
 ## Bắt đầu đọc
 
@@ -31,6 +31,7 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 - [Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi](chapters/15-mot-kien-truc-chi-thang-khi-toan-he-duoc-loi.md)
 - [Chương 16 — Experiment 2×2: tách representation khỏi execution](chapters/16-experiment-2x2-tach-representation-khoi-execution.md)
 - [Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện](chapters/17-exec148-khi-bang-chung-buoc-mot-lop-truu-tuong-moi-xuat-hien.md)
+- [Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu](chapters/18-du-lieu-o-trong-bo-nho-van-chua-du.md)
 
 ## Lộ trình của cuốn sách
 
@@ -77,8 +78,8 @@ Dự kiến:
   Dùng thiết kế 2×2 để tách hiệu ứng của cách chia công việc khỏi cách biểu diễn dữ liệu, rồi kiểm tra cả tương tác và chi phí kiến trúc.
 - [**Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**](chapters/17-exec148-khi-bang-chung-buoc-mot-lop-truu-tuong-moi-xuat-hien.md)  
   Cùng một tensor logic có thể có nhiều cách biểu diễn phục vụ thực thi; bằng chứng buộc runtime phải tách khái niệm này khỏi riêng kernel và bắt đầu quản lý chi phí, nơi tạo, nơi cư trú và vòng đời.
-- **Chương 18 — Residency chưa đủ: acquisition và lifecycle**  
-  Không chỉ hỏi dữ liệu có nằm trong bộ nhớ hay không, mà còn hỏi nó đến từ đâu, sẵn sàng khi nào, sống bao lâu và ai chịu trách nhiệm về vòng đời của nó.
+- [**Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu**](chapters/18-du-lieu-o-trong-bo-nho-van-chua-du.md)  
+  Tách trạng thái cư trú, quá trình tạo/thu nhận, trạng thái sẵn sàng thực thi và vòng đời để runtime không dùng một biến duy nhất cho nhiều câu hỏi khác nhau.
 - **Chương 19 — Từ ArcLLM-specific tới runtime abstraction v4**  
   Những ranh giới đã được kiểm tra dần được gom thành một mô hình runtime tổng quát hơn.
 - **Chương 20 — Ta đã hiểu runtime đến đâu?**  
