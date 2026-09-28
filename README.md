@@ -11,7 +11,7 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu và Chương 1–20**: toàn bộ 20 chương chính đã hoàn chỉnh.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu, Chương 1–20 và Bonus**: toàn bộ phần chính của cuốn sách đã hoàn chỉnh.
 
 ## Bắt đầu đọc
 
@@ -36,6 +36,7 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 - [Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu](chapters/18-du-lieu-o-trong-bo-nho-van-chua-du.md)
 - [Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn](chapters/19-tu-arcllm-cu-the-toi-mo-hinh-runtime-tong-quat-hon.md)
 - [Chương 20 — Ta đã hiểu runtime đến đâu?](chapters/20-ta-da-hieu-runtime-den-dau.md)
+- [Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy](chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md)
 
 ## Lộ trình của cuốn sách
 
@@ -43,9 +44,22 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 
 **Mục tiêu:** đi từ con số 0 tới một runtime thực sự chạy được.
 
-Phần này xây từng lớp của ArcLLM: từ cách đọc model, lưu tensor và giao tiếp với GPU bằng Vulkan, tới các phép tính nền tảng, một decoder layer hoàn chỉnh, toàn bộ decoder, KV cache, vòng lặp sinh token và cuối cùng là một production path được chọn bằng đo lường.
-
-**Chương 1–8.**
+- [**Chương 1 — Bên dưới một câu trả lời AI có gì?**](chapters/01-khoa-target-truoc-khi-toi-uu.md)  
+  Bắt đầu từ câu hỏi đơn giản nhất: một câu trả lời AI được tạo ra qua những lớp nào, và vì sao phải khóa đúng mục tiêu trước khi tối ưu bất kỳ thứ gì.
+- [**Chương 2 — GGUF không còn là một file, nó trở thành tensor store**](chapters/02-gguf-tensor-store.md)  
+  Mở model ra như một kho dữ liệu có cấu trúc: metadata, tensor, kiểu dữ liệu và cách runtime phải hiểu đúng những byte đang cầm.
+- [**Chương 3 — Xây phần lõi Vulkan**](chapters/03-vulkan-runtime-core.md)  
+  Dựng nền giao tiếp với GPU: tạo tài nguyên, nạp shader và hình thành đường thực thi Vulkan tối thiểu trước khi nói tới toàn bộ model.
+- [**Chương 4 — Từng phép tính trước, model sau**](chapters/04-tung-phep-tinh-truoc-model-sau.md)  
+  Xác nhận từng primitive tính toán độc lập để bảo đảm nền số học đúng trước khi ghép chúng thành một mạng lớn hơn.
+- [**Chương 5 — Một decoder layer hoàn chỉnh**](chapters/05-mot-decoder-layer-hoan-chinh.md)  
+  Ghép các primitive thành một decoder layer thật và dùng chính layer đó để kiểm tra xem các mảnh riêng lẻ có còn đúng khi phối hợp với nhau hay không.
+- [**Chương 6 — Full decoder residency: giữ cả “tòa nhà” trên GPU**](chapters/06-full-decoder-residency.md)  
+  Đưa toàn bộ 28 layer và trọng số cần thiết vào vùng bộ nhớ GPU có thể sử dụng để loại bỏ vòng đi-về trung gian với CPU trên đường tính chính.
+- [**Chương 7 — KV cache: model bắt đầu nhớ token trước**](chapters/07-kv-cache-model-bat-dau-nho-token-truoc.md)  
+  Thêm bộ nhớ theo thời gian cho attention để token mới có thể sử dụng thông tin từ những token đã sinh trước đó.
+- [**Chương 8 — Production path không đến từ một kernel thần kỳ**](chapters/08-production-path-khong-den-tu-mot-kernel-than-ky.md)  
+  Hội tụ các mảnh thành một đường sinh token nhiều bước và cho thấy một runtime thực không xuất hiện từ một kernel đơn lẻ, mà từ cả đường thực thi được đo và kiểm tra.
 
 Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận hoàn chỉnh. Nhưng “chạy được” vẫn chưa trả lời câu hỏi quan trọng hơn: nó đứng ở đâu khi so với một runtime trưởng thành?
 
@@ -53,9 +67,12 @@ Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận ho�
 
 **Mục tiêu:** đặt runtime trước một phép đối chứng cùng điều kiện và chấp nhận kết quả, kể cả khi kết quả đó không có lợi cho kiến trúc mình đã xây.
 
-Phần này đi từ benchmark có đối chứng, tới một phép xác nhận bằng dữ liệu mới, rồi đóng kiến trúc hiện tại khi nó không chứng minh được lợi thế thực tế. Chương cuối của phần này mở ra một nguyên tắc mới: chỉ được nghiên cứu một kiến trúc kế tiếp khi có một cơ chế đủ rõ để kiểm tra.
-
-**Chương 9–11.**
+- [**Chương 9 — Benchmark phải có đối chứng**](chapters/09-benchmark-phai-co-doi-chung.md)  
+  Đặt ArcLLM và llama.cpp vào cùng model, cùng máy và cùng tải công việc để biến cảm giác “có vẻ nhanh” thành một phép đo có đối chứng.
+- [**Chương 10 — Khi “tự build được” vẫn chưa đủ**](chapters/10-khi-tu-build-duoc-van-chua-du.md)  
+  Dùng bằng chứng mới để kiểm tra lợi thế thực tế; khi kiến trúc tự xây vẫn thua xa đối chứng, kết quả đúng là đóng giả thuyết thay vì tìm cách cứu verdict.
+- [**Chương 11 — Từ thất bại sang một câu hỏi đúng hơn**](chapters/11-tu-that-bai-sang-mot-cau-hoi-dung-hon.md)  
+  Phân rã khoảng cách hiệu năng để tìm cơ chế có thể kiểm tra, thay vì nhảy ngay sang một kiến trúc mới chỉ vì kiến trúc cũ đã thất bại.
 
 ### Phần III — Kiến trúc chỉ có giá trị khi đi qua thực tế
 
@@ -102,9 +119,9 @@ Cuốn sách giữ một số nguyên tắc xuyên suốt:
 
 ## Các phần bổ sung
 
-Sau 20 chương chính, sách dự kiến có thêm:
+Sau 20 chương chính, sách có thêm:
 
-- **Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy:** mở từ Token-XRay sang SIX và các hướng quan sát hệ thống, với ranh giới rõ giữa điều đã được chứng minh, điều mới được quan sát và những câu hỏi còn mở.
+- [**Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy**](chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md): mở từ Token-XRay sang SIX và các hướng quan sát hệ thống, với ranh giới rõ giữa điều đã được chứng minh, điều mới được quan sát và những câu hỏi còn mở.
 - **Epilogue:** khép lại bằng những hướng có thể tiếp tục nghiên cứu trong tương lai, không giả định trước rằng sẽ có một tập sách thứ hai.
 - **Phụ lục A — Một người + AI:** một workflow thực hành cho người không cần biết code nhưng muốn dùng AI để biến câu hỏi thành phép thử có thể kiểm tra và truy vết.
 
