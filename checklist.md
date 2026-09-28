@@ -2,7 +2,7 @@
 
 Ngày QA: **2026-09-28**
 
-Trạng thái: **REVIEW ONLY — CHƯA VÁ NỘI DUNG**
+Trạng thái: **POST-PATCH QA CLOSED — 0 OPEN FINDINGS**
 
 Tài liệu này ghi lại lần QA cuối cho toàn bộ nội dung đã xuất bản của **Inside ArcLLM — Xây dựng một runtime LLM từ những nguyên lý đầu tiên** gồm Lời nói đầu, Chương 1–20 và Bonus.
 
@@ -17,7 +17,7 @@ Nguồn được ưu tiên theo thứ tự:
 
 Nếu spec sớm và adjudication cuối khác nhau, **adjudication cuối được ưu tiên**. Lỗi build, package, CI hoặc harness chỉ được coi là FAIL khoa học khi chính lineage/adjudication phân loại như vậy.
 
-**Không có chương nào được sửa trong lần QA này.** Mọi mục bên dưới chỉ là finding để tác giả xem, duyệt rồi mới vá tài liệu.
+Bản checklist ban đầu được tạo ở chế độ **review-only**. Sau khi tác giả duyệt, **QA-01 đến QA-07 đã được vá đúng phạm vi và QA lại với cùng source hierarchy**. **QA-08 được ACCEPTED_NO_PATCH** vì Bonus được giữ như một hướng mở, không phải snapshot đầy đủ của latest SIX lineage.
 
 ## Quy ước
 
@@ -35,14 +35,16 @@ Nếu spec sớm và adjudication cuối khác nhau, **adjudication cuối đư�
 - 20 chương;
 - 1 Bonus.
 
-Kết quả:
+Kết quả sau author review + patch:
 
-- **14 đơn vị QA-CLEAN**
-- **8 đơn vị có REVIEW**
-- **8 finding cần tác giả xem**
+- **21 đơn vị QA-CLEAN**
+- **1 đơn vị ACCEPTED_NO_PATCH** — Bonus, vì đây là hướng mở và nội dung hiện tại không mâu thuẫn với root SIX evidence;
+- **0 finding còn mở**
+- **QA-01 → QA-07: APPROVED_FIXED**
+- **QA-08: ACCEPTED_NO_PATCH**
 - **Không phát hiện số liệu benchmark cốt lõi nào bị chép sai** trong các bảng/kết quả Q2, Q3, SA1, I002, I003 và Q4-down 2×2.
 
-Các finding còn lại chủ yếu thuộc bốn nhóm: **tên thuật ngữ**, **claim boundary**, **mô tả nguyên nhân**, và **bằng chứng mới hơn chưa được phản ánh**.
+Các bản vá chỉ sửa **tên thuật ngữ, mechanism boundary, claim boundary, causal description và evidence provenance**. Không scientific verdict nào bị viết lại.
 
 # Checklist từng phần
 
@@ -50,7 +52,7 @@ Các finding còn lại chủ yếu thuộc bốn nhóm: **tên thuật ngữ**,
 |---|---|---|
 | Lời nói đầu | QA-CLEAN | Không có số liệu khoa học cần đối chiếu; framing con người + AI không vượt claim nguồn. |
 | Chương 1 | QA-CLEAN | P0: 338 tensor; ctx4096 ~2,120 GiB; frozen resident floor 3,75 GiB; 8 GiB launch reserve là advisory — khớp lineage. |
-| Chương 2 | **REVIEW** | Số tensor và block size đúng; xem **QA-01** về tên đầy đủ GGUF. |
+| Chương 2 | **QA-CLEAN** | **QA-01 APPROVED_FIXED:** GGUF được sửa thành `GGML Universal File`; số tensor và block size giữ nguyên. |
 | Chương 3 | QA-CLEAN | P2: 980.097.536 byte, ~934,7 MiB, 4 arena <=256 MiB, scratch 64 MiB, 5 buffer sống — khớp lineage. |
 | Chương 4 | QA-CLEAN | P3: glslang 16.5.0, 7 kernel gate, CPU reference độc lập — khớp lineage. |
 | Chương 5 | QA-CLEAN | P4: 15 dispatch, 1 command buffer/submit/fence, no intermediate host read/write, numerical gate và infra-fail đều đúng. |
@@ -61,19 +63,19 @@ Các finding còn lại chủ yếu thuộc bốn nhóm: **tên thuật ngữ**,
 | Chương 10 | QA-CLEAN | Q3: 40/40 fresh attempts, thresholds, 4 cell ratios và verdict FEASIBLE_NO_DEMONSTRATED_ADVANTAGE đúng. |
 | Chương 11 | QA-CLEAN | 469 dispatch, 196 projection/GEMM, 84-dispatch fusion ceiling, 1,218× và 0,0276% đều khớp SA-H1/SA0. |
 | Chương 12 | QA-CLEAN | Q4 aggregate ~3,137×/~3,148×, headroom/Amdahl và successor TTFT FAIL đều đúng. |
-| Chương 13 | **REVIEW** | Q6 correctness FAIL đúng; timing=0 và target model not run đúng; xem **QA-02** về cụm “chuyển nguyên vẹn”. |
-| Chương 14 | **REVIEW** | I002 số liệu T1/T2/T3 đúng; xem **QA-02** và **QA-03**. |
+| Chương 13 | **QA-CLEAN** | **QA-02 APPROVED_FIXED:** làm rõ Q6 dùng candidate reader packed-Q6 riêng trong khi giữ cơ chế Split-K + geometry; verdict/timing boundary giữ nguyên. |
+| Chương 14 | **QA-CLEAN** | **QA-02/03 APPROVED_FIXED:** Q6 transfer wording được thu hẹp; RMSE margin viết rõ `1 378×`; I002 T1/T2/T3 giữ nguyên. |
 | Chương 15 | QA-CLEAN | I003: 20/20 pairs, 40/40 inferences, decode global ratio 10,3787×, E2E 9,9722×, throughput 0,09635 đúng. |
 | Chương 16 | QA-CLEAN | 2×2 Q4-down: correctness, timing, antagonistic interaction, 231,6382 ms, 549.527.552 byte, crossover 16,33/36,07 đúng. |
-| Chương 17 | **REVIEW** | EXEC148 và cost model đúng; xem **QA-04** về mô tả chính xác 4 byte đầu block148. |
-| Chương 18 | **REVIEW** | Semantics acquisition/readiness đúng; xem **QA-05** vì mô tả P8 có thể làm sai nguyên nhân obstruction. |
-| Chương 19 | **REVIEW** | v4 sáu chiều, 114.688 decisions và Q4 backend PASS đúng; xem **QA-06** về phạm vi bounded P8 oracle. |
-| Chương 20 | **REVIEW** | Canonical runtime extraction đúng; NPU số liệu đúng; xem **QA-07** về provenance của các con số NPU. |
-| Bonus | **REVIEW** | SIX root được kể đúng; xem **QA-08** vì latest SIX lineage đã đi xa hơn root branch. |
+| Chương 17 | **QA-CLEAN** | **QA-04 APPROVED_FIXED:** EXEC148 ghi chính xác `2 byte d + 2 byte dmin + 16 byte scale/min + 128 byte q`. |
+| Chương 18 | **QA-CLEAN** | **QA-05 APPROVED_FIXED:** làm rõ P8 total capacity PASS; obstruction là inherited 256 MiB arena/single-tensor contract; P8 Phase2 chỉ là bounded mandatory-feasibility oracle. |
+| Chương 19 | **QA-CLEAN** | **QA-06 APPROVED_FIXED:** mọi claim về mandatory P8 được bound về `bounded P8 oracle`; v4/114.688/Q4 backend result giữ nguyên. |
+| Chương 20 | **QA-CLEAN** | **QA-07 APPROVED_FIXED:** thêm provenance rằng NPU numbers là analytical current-canonical projection + provider timing, không phải fresh full-model NPU benchmark. |
+| Bonus | **ACCEPTED_NO_PATCH** | **QA-08:** tác giả giữ Bonus như hướng mở; root SIX narrative không sai và không cần cập nhật thành latest-research survey. |
 
 # Findings cần tác giả duyệt
 
-## QA-01 — Chương 2 — tên đầy đủ của GGUF
+## QA-01 — APPROVED_FIXED — Chương 2 — tên đầy đủ của GGUF
 
 **Mức:** MEDIUM  
 **Loại:** factual terminology
@@ -98,7 +100,7 @@ Không ảnh hưởng bất kỳ số liệu hay kết luận ArcLLM nào.
 
 ---
 
-## QA-02 — Chương 13 và mở đầu Chương 14 — “chuyển nguyên vẹn sang Q6”
+## QA-02 — APPROVED_FIXED — Chương 13 và mở đầu Chương 14 — “chuyển nguyên vẹn sang Q6”
 
 **Mức:** MEDIUM  
 **Loại:** mechanism/implementation precision
@@ -148,7 +150,7 @@ Không thay verdict khoa học.
 
 ---
 
-## QA-03 — Chương 14 — cách viết khoảng cách RMSE 1.378×
+## QA-03 — APPROVED_FIXED — Chương 14 — cách viết khoảng cách RMSE 1.378×
 
 **Mức:** LOW  
 **Loại:** presentation ambiguity
@@ -192,7 +194,7 @@ hoặc:
 
 ---
 
-## QA-04 — Chương 17 — mô tả 4 byte đầu của EXEC148 còn quá gộp
+## QA-04 — APPROVED_FIXED — Chương 17 — mô tả 4 byte đầu của EXEC148 còn quá gộp
 
 **Mức:** LOW  
 **Loại:** representation precision
@@ -241,7 +243,7 @@ Mô tả hiện tại không sai về tổng kích thước, nhưng làm mất d
 
 ---
 
-## QA-05 — Chương 18 — P8 không FAIL vì thiếu tổng dung lượng bộ nhớ
+## QA-05 — APPROVED_FIXED — Chương 18 — P8 không FAIL vì thiếu tổng dung lượng bộ nhớ
 
 **Mức:** HIGH  
 **Loại:** causal / claim-boundary correction
@@ -300,7 +302,7 @@ Sau đó nhắc rõ:
 
 ---
 
-## QA-06 — Chương 19 — cần gắn chữ “bounded” rõ hơn với họ P8
+## QA-06 — APPROVED_FIXED — Chương 19 — cần gắn chữ “bounded” rõ hơn với họ P8
 
 **Mức:** MEDIUM  
 **Loại:** scope precision
@@ -353,7 +355,7 @@ Không cần đổi kiến trúc v4 hay số 114.688.
 
 ---
 
-## QA-07 — Chương 20 — số liệu NPU đúng nhưng cần gắn provenance “analytical projection”
+## QA-07 — APPROVED_FIXED — Chương 20 — số liệu NPU đúng nhưng cần gắn provenance “analytical projection”
 
 **Mức:** MEDIUM  
 **Loại:** evidence provenance
@@ -401,7 +403,7 @@ Giữ nguyên tất cả giá trị số và conclusion: chỉ FFN-down được
 
 ---
 
-## QA-08 — Bonus — SIX root đúng nhưng chưa phản ánh các replication mới hơn
+## QA-08 — ACCEPTED_NO_PATCH — Bonus — SIX root đúng nhưng chưa phản ánh các replication mới hơn
 
 **Mức:** MEDIUM  
 **Loại:** latest-lineage completeness, không phải contradiction
@@ -621,17 +623,24 @@ Không chép raw experimental evidence vào repository sách. Các nhóm nguồn
 
 # Patch policy sau checklist
 
-Tại thời điểm tạo checklist:
+Kết quả sau khi tác giả duyệt:
 
 ~~~text
-chapter patches applied = 0
+chapter patches applied = 7
+bonus patches applied = 0
 README content patches caused by QA = 0
 scientific verdicts rewritten = 0
+open findings = 0
 ~~~
 
-Đề nghị khi tác giả duyệt:
+Patch commits:
 
-1. duyệt từng finding hoặc duyệt theo nhóm;
-2. vá đúng finding đã duyệt, không rewrite chương ngoài phạm vi;
-3. QA lại riêng những đoạn đã vá với cùng source hierarchy;
-4. cập nhật checklist finding thành APPROVED_FIXED hoặc REJECTED_NO_CHANGE, giữ lịch sử thay vì xóa finding.
+- Chương 2: `662933dcdbad8defd61f37ce432c1b8d97ebef6c`
+- Chương 13: `db74e54df2227e35ce1a159ad30fcdde6bd58b37`
+- Chương 14: `ce183c55d6d9726d81e1de81f7c0d10cbddf2d76`
+- Chương 17: `67348852322ad71b549bc4c72813f9d441b62836`
+- Chương 18: `6fed71848a9a19b6a286e645d3d95f54e025deb8`
+- Chương 19: `1fb183dd35de93dbf7dc5d0014e52b73ee4599a3`
+- Chương 20: `e8d538961512444740bdb882a6c659220101cbc3`
+
+Post-patch QA xác nhận các đoạn đã sửa vẫn khớp final scientific evidence. Bonus không sửa theo quyết định tác giả vì đây là hướng mở; finding QA-08 được giữ lại trong checklist như lịch sử QA thay vì xóa.
