@@ -1,42 +1,18 @@
-# Chương 16 — Experiment 2×2: tách representation khỏi execution
+# Chương 16 — Tách cách sắp dữ liệu khỏi cách thực hiện phép tính
 
 > **Mức đọc: Nâng cao**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở câu hỏi nào?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Cùng một dữ liệu
+>       ↓
+> ┌──────────────┬──────────────┐
+> │ cách chia việc│ cách sắp dữ liệu │
+> └──────────────┴──────────────┘
+>       ↓
+> [ thí nghiệm 2×2 để tách hai hiệu ứng ]
 > ```
->
-> ▶ **Đang mở ở chương này:** execution / representation / interaction.
 
 
 > **Câu hỏi của chương:** Khi một phép tính đang chậm, làm thế nào biết nó chậm vì cách ta chia công việc cho GPU hay vì cách dữ liệu được tổ chức để GPU đọc?
@@ -51,7 +27,7 @@ Sau khi gate/up đã được tăng tốc mạnh, bản đồ bottleneck cũ kh�
 
 Một vùng khác bắt đầu đáng chú ý: **FFN-down Q4_K**.
 
-Trong model 7B đang xét, có 14 layer mà phép `FFN-down` dùng trọng số Q4_K với hình dạng:
+Trong mô hình 7B đang xét, có 14 layer mà phép `FFN-down` dùng trọng số Q4_K với hình dạng:
 
 ```text
 K    = 18944
@@ -73,9 +49,9 @@ mà còn nằm ở:
 
 Đây là lúc ArcLLM phải tách hai khái niệm mà trước đó rất dễ bị trộn vào nhau.
 
-## Execution và representation là hai chuyện khác nhau
+## Cách thực thi và cách biểu diễn dữ liệu là hai chuyện khác nhau
 
-**Execution — cách thực thi** trả lời:
+**cách thực thi — cách thực thi** trả lời:
 
 > GPU chia công việc cho các đơn vị tính toán như thế nào?
 
@@ -100,13 +76,13 @@ Ví dụ đường cũ:
 
 Còn:
 
-> **Representation — cách biểu diễn dữ liệu**
+> **cách biểu diễn dữ liệu — cách biểu diễn dữ liệu**
 
 trả lời một câu khác:
 
-> Các byte của trọng số được sắp xếp thế nào trong bộ nhớ để kernel đọc và sử dụng?
+> Các byte của trọng số được sắp xếp thế nào trong bộ nhớ để chương trình GPU đọc và sử dụng?
 
-Hai representation có thể mang **cùng một nội dung toán học**, nhưng bố trí byte khác nhau.
+Hai cách biểu diễn dữ liệu có thể mang **cùng một nội dung toán học**, nhưng bố trí byte khác nhau.
 
 Hãy tưởng tượng cùng một bộ hồ sơ.
 
@@ -152,7 +128,7 @@ Split-K32
 representation mới
 ```
 
-và candidate nhanh hơn 5×.
+và phương án thử nhanh hơn 5×.
 
 Ta biết gì?
 
@@ -174,13 +150,13 @@ hay thực ra chúng đang làm trùng một việc?
 
 Đây là lý do cần một:
 
-> **factorial experiment — thí nghiệm nhân tố**, ở đây là thiết kế **2×2**.
+> **factorial Thí nghiệm — thí nghiệm nhân tố**, ở đây là thiết kế **2×2**.
 
 Không phải vì bảng 2×2 trông đẹp.
 
 Mà vì nó cho phép tách hai biến.
 
-## Bốn ô thay vì một candidate
+## Bốn ô thay vì một phương án thử
 
 Ta gọi hai yếu tố:
 
@@ -192,14 +168,14 @@ B = thay representation
 
 Ta có bốn trường hợp:
 
-| | Representation gốc | Representation mới |
+| | cách biểu diễn dữ liệu gốc | cách biểu diễn dữ liệu mới |
 |---|---|---|
 | **Serial-K** | **0** | **B** |
 | **Split-K32** | **A** | **AB** |
 
 Đọc từng ô:
 
-### 0 — baseline
+### 0 — mốc đối chứng
 
 ```text
 Serial-K
@@ -207,11 +183,11 @@ Serial-K
 Q4_K storage-native
 ```
 
-`Storage-native — dạng lưu trữ gốc`, tức kernel đọc trực tiếp representation Q4_K vốn có trong model.
+`Storage-native — dạng lưu trữ gốc`, tức chương trình GPU đọc trực tiếp cách biểu diễn dữ liệu Q4_K vốn có trong mô hình.
 
 Đây là mốc để so.
 
-### A — chỉ thay execution
+### A — chỉ thay cách thực thi
 
 ```text
 Split-K32
@@ -225,9 +201,9 @@ Chỉ thay:
 
 > **cách chia chiều K cho GPU.**
 
-Nếu A nhanh hơn 0, ta biết thay đổi execution có hiệu ứng.
+Nếu A nhanh hơn 0, ta biết thay đổi cách thực thi có hiệu ứng.
 
-### B — chỉ thay representation
+### B — chỉ thay cách biểu diễn dữ liệu
 
 ```text
 Serial-K
@@ -235,11 +211,11 @@ Serial-K
 representation mới
 ```
 
-Cách chia công việc vẫn Serial-K như baseline.
+Cách chia công việc vẫn Serial-K như mốc đối chứng.
 
-Chỉ thay cách dữ liệu được chuẩn bị cho execution.
+Chỉ thay cách dữ liệu được chuẩn bị cho cách thực thi.
 
-Nếu B nhanh hơn 0, ta biết representation tự nó có hiệu ứng.
+Nếu B nhanh hơn 0, ta biết cách biểu diễn dữ liệu tự nó có hiệu ứng.
 
 ### AB — thay cả hai
 
@@ -263,9 +239,9 @@ B
 
 Nếu không, bảng 2×2 mất ý nghĩa.
 
-## Representation mới vẫn phải là cùng dữ liệu
+## Cách biểu diễn mới vẫn phải chứa cùng dữ liệu logic
 
-Representation B sau này được đặt tên là:
+cách biểu diễn dữ liệu B sau này được đặt tên là:
 
 > **EXEC148**
 
@@ -279,7 +255,7 @@ Một block Q4_K gốc chiếm:
 144 byte
 ```
 
-Representation mới dùng:
+cách biểu diễn dữ liệu mới dùng:
 
 ```text
 148 byte
@@ -287,16 +263,16 @@ Representation mới dùng:
 
 Nhưng nó không được phép:
 
-- đổi logical weight;
+- đổi logical trọng số;
 - bung toàn bộ sang FP16;
 - bung toàn bộ sang F32;
-- làm CPU model math ở mỗi token.
+- làm CPU mô hình math ở mỗi token.
 
 Nó chỉ:
 
 > **sắp xếp lại thông tin Q4_K thành một hình thức thuận tiện hơn cho đường thực thi.**
 
-Việc chuyển từ representation gốc sang representation mới được làm **một lần trước inference được đo**.
+Việc chuyển từ cách biểu diễn dữ liệu gốc sang cách biểu diễn dữ liệu mới được làm **một lần trước suy luận được đo**.
 
 Sau đó GPU dùng image đã được chuẩn bị sẵn.
 
@@ -318,19 +294,19 @@ GPU dùng lại cho nhiều token
 
 Nếu phải materialize lại mỗi token thì đó là một bài toán hoàn toàn khác.
 
-## Trước performance, bốn ô phải tính đúng
+## Trước khi nói về tốc độ, cả bốn ô phải tính đúng
 
 Một thí nghiệm 2×2 vô nghĩa nếu mỗi ô đang tính một thứ hơi khác nhau.
 
 Vì vậy correctness phải được khóa trước.
 
-Đặc biệt với representation mới, ArcLLM còn kiểm tra:
+Đặc biệt với cách biểu diễn dữ liệu mới, ArcLLM còn kiểm tra:
 
-> khi giải mã representation gốc và representation mới về cùng một dạng logic, mọi giá trị Q4_K phải giống nhau.
+> khi giải mã cách biểu diễn dữ liệu gốc và cách biểu diễn dữ liệu mới về cùng một dạng logic, mọi giá trị Q4_K phải giống nhau.
 
-Cả 14 tensor đều vượt kiểm tra này.
+Cả 14 khối số đều vượt kiểm tra này.
 
-Sau đó ba candidate A, B và AB được so ở cấp phép tính.
+Sau đó ba phương án thử A, B và AB được so ở cấp phép tính.
 
 Ngưỡng vẫn là:
 
@@ -363,7 +339,7 @@ RMSE    = 0
 
 B vẫn giữ Serial-K và thứ tự cộng cũ.
 
-Representation thay đổi nhưng kết quả phép tính vẫn bit-for-bit theo phép kiểm tra component này.
+cách biểu diễn dữ liệu thay đổi nhưng kết quả phép tính vẫn bit-for-bit theo phép kiểm tra component này.
 
 Quan trọng hơn, ở hai workload:
 
@@ -383,9 +359,9 @@ B
 AB
 ```
 
-đều đủ điều kiện bước sang timing.
+đều đủ điều kiện bước sang đo thời gian.
 
-## Timing cũng phải tránh lợi thế do thứ tự chạy
+## Đo thời gian cũng phải tránh lợi thế do thứ tự chạy
 
 Nếu luôn chạy:
 
@@ -423,7 +399,7 @@ Mục tiêu là làm cho câu hỏi:
 
 ## Kết quả đầu tiên: cả A lẫn B đều có hiệu ứng
 
-Ở workload W-S, median latency của họ Q4-down là:
+Ở workload W-S, median độ trễ của họ Q4-down là:
 
 ```text
 0   100,58 ms
@@ -435,14 +411,14 @@ B    24,19 ms
 AB   34,41 ms
 ```
 
-So A với baseline:
+So A với mốc đối chứng:
 
 ```text
 100,58 / 38,37
 ≈ 2,62×
 ```
 
-Tức chỉ thay execution sang Split-K32 đã tạo speedup khoảng:
+Tức chỉ thay cách thực thi sang Split-K32 đã tạo speedup khoảng:
 
 ```text
 2,62×
@@ -455,7 +431,7 @@ B:
 ≈ 4,16×
 ```
 
-Chỉ thay representation, vẫn giữ Serial-K, thậm chí tốt hơn A ở workload này.
+Chỉ thay cách biểu diễn dữ liệu, vẫn giữ Serial-K, thậm chí tốt hơn A ở workload này.
 
 Ở W-C:
 
@@ -485,7 +461,7 @@ B:
 
 Như vậy có một kết luận khá mạnh:
 
-> **Cả cách chia công việc và cách biểu diễn dữ liệu đều có thể tạo ra hiệu ứng latency lớn một cách độc lập.**
+> **Cả cách chia công việc và cách biểu diễn dữ liệu đều có thể tạo ra hiệu ứng độ trễ lớn một cách độc lập.**
 
 Nếu ta chỉ chạy AB ngay từ đầu, điều này đã bị che mất.
 
@@ -525,13 +501,13 @@ Một lần nữa:
 
 Nó cho phép ta nhìn thấy:
 
-> **interaction — sự tương tác giữa hai yếu tố.**
+> **tương tác — sự tương tác giữa hai yếu tố.**
 
-## Interaction nghĩa là gì?
+## Tương tác giữa hai thay đổi nghĩa là gì?
 
 Ta thử một ví dụ đời thường trước.
 
-Baseline mất:
+mốc đối chứng mất:
 
 ```text
 100 giây
@@ -582,7 +558,7 @@ Ta đã “mất”:
 
 lợi ích so với kỳ vọng cộng đơn giản.
 
-Một cách viết interaction là:
+Một cách viết tương tác là:
 
 ```text
 G_INT
@@ -598,13 +574,13 @@ Thế ví dụ:
 -10
 ```
 
-Interaction âm.
+tương tác âm.
 
 Ta gọi đây là:
 
-> **antagonistic interaction — tương tác đối kháng**, tức hai thay đổi đang chồng lấn hoặc cản một phần lợi ích của nhau.
+> **antagonistic tương tác — tương tác đối kháng**, tức hai thay đổi đang chồng lấn hoặc cản một phần lợi ích của nhau.
 
-Trong experiment thật của ArcLLM, interaction cũng âm rõ rệt ở cả W-S và W-C.
+Trong Thí nghiệm thật của ArcLLM, tương tác cũng âm rõ rệt ở cả W-S và W-C.
 
 Phân tích thống kê đã khóa trước cho kết luận:
 
@@ -640,7 +616,7 @@ W-C:
 ≈ 0,91
 ```
 
-tức representation mới vẫn giúp khi đặt trên Split-K.
+tức cách biểu diễn dữ liệu mới vẫn giúp khi đặt trên Split-K.
 
 Nhưng AB lại chậm hơn B:
 
@@ -658,7 +634,7 @@ W-C:
 ≈ 1,09
 ```
 
-Tức khi representation mới đã xử lý một phần vấn đề, thêm Split-K không còn mang lại lợi ích như khi Split-K đứng một mình.
+Tức khi cách biểu diễn dữ liệu mới đã xử lý một phần vấn đề, thêm Split-K không còn mang lại lợi ích như khi Split-K đứng một mình.
 
 Hai cơ chế đang giải quyết những phần **không hoàn toàn độc lập** của chi phí.
 
@@ -666,7 +642,7 @@ Hai cơ chế đang giải quyết những phần **không hoàn toàn độc l�
 
 ## “Nhanh nhất” vẫn chưa chắc là kiến trúc nên chọn
 
-Nhìn bảng timing, B nhanh nhất ở cả hai workload.
+Nhìn bảng đo thời gian, B nhanh nhất ở cả hai workload.
 
 Có phải B mặc nhiên thắng?
 
@@ -674,7 +650,7 @@ Chưa.
 
 B phải trả một cái giá.
 
-Để có representation mới, runtime cần tạo thêm một execution image.
+Để có cách biểu diễn dữ liệu mới, hệ thực thi cần tạo thêm một cách thực thi image.
 
 Trong study này, image đó chiếm thêm:
 
@@ -698,7 +674,7 @@ Ngoài ra còn có chi phí materialization một lần:
 
 A thì khác.
 
-A dùng representation Q4_K gốc.
+A dùng cách biểu diễn dữ liệu Q4_K gốc.
 
 Không cần image bổ sung.
 
@@ -721,7 +697,7 @@ có chi phí upfront + RAM
 
 Bài toán kiến trúc vì vậy không còn là:
 
-> “Ai có latency nhỏ nhất?”
+> “Ai có độ trễ nhỏ nhất?”
 
 Mà là:
 
@@ -752,9 +728,9 @@ N × L_B
 Trong đó:
 
 - `N` là số token chịu chi phí của họ phép tính này;
-- `L_A` là latency mỗi token của A;
-- `L_B` là latency mỗi token của B;
-- `T_materialize` là chi phí tạo representation B một lần.
+- `L_A` là độ trễ mỗi token của A;
+- `L_B` là độ trễ mỗi token của B;
+- `T_materialize` là chi phí tạo cách biểu diễn dữ liệu B một lần.
 
 Hai bên hòa nhau khi:
 
@@ -805,23 +781,23 @@ N
 ≈ 36,1 token
 ```
 
-Nhưng nhớ rằng B vẫn cần thêm khoảng 550 MB resident memory.
+Nhưng nhớ rằng B vẫn cần thêm khoảng 550 MB resident bộ nhớ.
 
 Vì vậy crossover thời gian không tự động quyết định architecture.
 
-## Không còn một “winner” duy nhất
+## Không còn một “phương án thắng” duy nhất
 
-Sau timing, hai arm bị loại khá rõ.
+Sau đo thời gian, hai arm bị loại khá rõ.
 
-Baseline 0 bị A **dominate — lấn át**:
+mốc đối chứng 0 bị A **dominate — lấn át**:
 
 - cùng lớp chi phí không-materialization;
 - nhưng A nhanh hơn.
 
 AB bị B dominate:
 
-- cùng phải có representation mới;
-- cùng chịu lớp chi phí memory/materialization;
+- cùng phải có cách biểu diễn dữ liệu mới;
+- cùng chịu lớp chi phí bộ nhớ/materialization;
 - nhưng B nhanh hơn ở cả hai workload.
 
 Còn lại:
@@ -834,9 +810,9 @@ B
 
 Không arm nào thắng tuyệt đối.
 
-A tiết kiệm memory và startup cost.
+A tiết kiệm bộ nhớ và startup cost.
 
-B giảm steady-state latency hơn.
+B giảm steady-state độ trễ hơn.
 
 Hai phương án tạo thành:
 
@@ -844,7 +820,7 @@ Hai phương án tạo thành:
 
 Đây là một bước trưởng thành khác của cách nghĩ kiến trúc.
 
-Không phải mọi experiment cuối cùng đều phải cho:
+Không phải mọi Thí nghiệm cuối cùng đều phải cho:
 
 ```text
 WINNER = X
@@ -854,9 +830,9 @@ WINNER = X
 
 > **Có hai phương án hợp lệ cho hai chế độ sử dụng khác nhau.**
 
-## Hardware counter cũng không được phép viết lại câu chuyện
+## Bộ đếm phần cứng cũng không được phép viết lại câu chuyện
 
-Sau timing, ArcLLM thử dùng một số bộ đếm phần cứng để hiểu sâu hơn *vì sao* A và B có hiệu ứng.
+Sau đo thời gian, ArcLLM thử dùng một số bộ đếm phần cứng để hiểu sâu hơn *vì sao* A và B có hiệu ứng.
 
 Một số counter được kỳ vọng đo lượng dữ liệu đọc, mức sử dụng ALU và trạng thái stall.
 
@@ -880,11 +856,11 @@ Mà là:
 
 > **Kênh đo không đủ khả năng xác nhận mechanism ở mức chi tiết đó.**
 
-Timing của A và B vẫn hợp lệ.
+đo thời gian của A và B vẫn hợp lệ.
 
-Interaction vẫn hợp lệ.
+tương tác vẫn hợp lệ.
 
-Chỉ có phần giải thích sâu bằng hardware counter là chưa được xác nhận đầy đủ.
+Chỉ có phần giải thích sâu bằng bộ đếm phần cứng là chưa được xác nhận đầy đủ.
 
 Đây là một ranh giới rất quan trọng:
 
@@ -894,11 +870,11 @@ effect được đo
 mọi chi tiết nguyên nhân đã được đo
 ```
 
-## Thí nghiệm 2×2 đã thay đổi cách ta nhìn runtime
+## Thí nghiệm 2×2 đã thay đổi cách ta nhìn hệ thực thi
 
-Trước experiment này, một optimization có thể được mô tả khá đơn giản:
+Trước Thí nghiệm này, một optimization có thể được mô tả khá đơn giản:
 
-> “Viết kernel nhanh hơn.”
+> “Viết chương trình GPU nhanh hơn.”
 
 Sau nó, câu chuyện trở nên khác.
 
@@ -916,9 +892,9 @@ Và hai trục còn có thể tương tác.
 
 Đây chính là lúc ta bắt đầu thấy một nhu cầu kiến trúc lớn hơn:
 
-> **Có lẽ representation không nên chỉ là chi tiết ẩn bên trong một kernel.**
+> **Có lẽ cách biểu diễn dữ liệu không nên chỉ là chi tiết ẩn bên trong một chương trình GPU.**
 
-Nếu cùng một logical tensor có thể có:
+Nếu cùng một logical khối số có thể có:
 
 ```text
 representation lưu trữ
@@ -930,12 +906,12 @@ và:
 representation phục vụ execution
 ```
 
-thì runtime cần biết chúng khác nhau.
+thì hệ thực thi cần biết chúng khác nhau.
 
 Nó cần biết:
 
-- representation nào đang tồn tại;
-- representation nào một executor cần;
+- cách biểu diễn dữ liệu nào đang tồn tại;
+- cách biểu diễn dữ liệu nào một executor cần;
 - khi nào phải tạo nó;
 - chi phí tạo bao nhiêu;
 - nó sống bao lâu;
@@ -947,16 +923,16 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 
 ### Nhớ 3 điều
 
-1. **Representation và execution là hai biến khác nhau.** Một cái quyết định dữ liệu được bố trí thế nào; cái kia quyết định GPU chia và thực hiện công việc thế nào. Thí nghiệm 2×2 cho phép thay từng yếu tố riêng rồi mới thử kết hợp.
-2. **Hai optimization tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm latency mạnh, nhưng AB lại chậm hơn B ở cả hai workload; interaction được phân loại là đối kháng.
-3. **Kiến trúc không chỉ được chọn bằng latency.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident memory. Kết quả đúng có thể là một frontier, không phải một winner duy nhất.
+1. **cách biểu diễn dữ liệu và cách thực thi là hai biến khác nhau.** Một cái quyết định dữ liệu được bố trí thế nào; cái kia quyết định GPU chia và thực hiện công việc thế nào. Thí nghiệm 2×2 cho phép thay từng yếu tố riêng rồi mới thử kết hợp.
+2. **Hai optimization tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai workload; tương tác được phân loại là đối kháng.
+3. **Kiến trúc không chỉ được chọn bằng độ trễ.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident bộ nhớ. Kết quả đúng có thể là một frontier, không phải một phương án thắng duy nhất.
 
 **Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**
 
-Experiment 2×2 vừa cho thấy một điều rất cụ thể:
+Thí nghiệm 2×2 vừa cho thấy một điều rất cụ thể:
 
-> **Cùng một tensor logic có thể cần một cách biểu diễn khác khi bước vào execution — và cách biểu diễn đó có chi phí, vòng đời và giá trị riêng.**
+> **Cùng một khối số logic có thể cần một cách biểu diễn khác khi bước vào cách thực thi — và cách biểu diễn đó có chi phí, vòng đời và giá trị riêng.**
 
-Nếu vậy, representation không còn có thể được coi chỉ là vài byte layout nằm kín bên trong kernel.
+Nếu vậy, cách biểu diễn dữ liệu không còn có thể được coi chỉ là vài byte layout nằm kín bên trong chương trình GPU.
 
-Runtime phải bắt đầu hiểu nó như một đối tượng kiến trúc thực sự.
+Hệ thực thi phải bắt đầu hiểu nó như một đối tượng kiến trúc thực sự.
