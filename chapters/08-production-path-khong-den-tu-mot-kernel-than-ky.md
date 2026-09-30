@@ -24,11 +24,11 @@ Mô hình không chỉ chạy một lượt rồi dừng.
 Nó đã có:
 
 ```text
-prefill
+xử lý đầu vào
    ↓
 KV cache trên GPU
    ↓
-decode
+sinh token
    ↓
 token mới
    ↓
@@ -132,7 +132,7 @@ Có thể hình dung:
 ```text
 512 token đầu vào
         ↓
-      prefill
+      xử lý đầu vào
         ↓
    KV cache lớn dần
         ↓
@@ -270,13 +270,13 @@ P7-B dùng **Vulkan timestamp queries — dấu thời gian do GPU ghi lại qua
 Ý tưởng rất đơn giản:
 
 ```text
-dispatch A
+lần giao việc A
 → mất bao lâu?
 
-dispatch B
+lần giao việc B
 → mất bao lâu?
 
-dispatch C
+lần giao việc C
 → mất bao lâu?
 ```
 
@@ -333,7 +333,7 @@ Top1 vẫn đúng.
 Và trong A/B cùng run, thời gian `pp512` thay đổi mạnh:
 
 ```text
-baseline
+mốc đối chứng
 ≈ 61,8 giây
 
 optimized
@@ -419,7 +419,7 @@ Ta bắt đầu thấy một pattern:
 ```text
 đo
 ↓
-đánh đúng bottleneck
+đánh đúng nút thắt
 ↓
 PASS
 ↓
@@ -443,9 +443,9 @@ Bởi mỗi lần một nút thắt được giảm, nút thắt tiếp theo có
 Một AI có thể nghĩ ra hàng chục ý tưởng tối ưu rất nhanh:
 
 ```text
-tăng tile?
+tăng khối xử lý?
 
-fuse kernel?
+gộp chương trình GPU?
 
 đổi layout?
 
@@ -455,7 +455,7 @@ K64?
 
 K128?
 
-thêm subgroup — một nhóm nhỏ các lane GPU có thể phối hợp thực thi?
+thêm nhóm con GPU để nhiều làn tính toán phối hợp?
 
 ...
 ```
@@ -489,7 +489,7 @@ Mục đích là **loại nhanh những hướng không đáng tiêu thêm evide
 Các timestamp profile P7-B, P7-D, P7-H, P7-M là hình ảnh rất dễ hiểu cho tinh thần này:
 
 ```text
-đừng đoán bottleneck
+đừng đoán nút thắt
 → nhìn evidence trước
 ```
 
@@ -518,12 +518,12 @@ Nếu mechanism sống sót, mới đi sang **Mode C — phép xác nhận ĐẠ
 Ví dụ P7 thường dùng:
 
 ```text
-A = baseline hiện tại
-B = candidate mới
+A = mốc đối chứng hiện tại
+B = phương án thử mới
 
 3 trial A/B xen kẽ
-correctness phải giữ
-speedup gate >= 1,10×
+tính đúng phải giữ
+ngưỡng tăng tốc >= 1,10×
 ```
 
 Quan trọng nhất:
@@ -579,7 +579,7 @@ tính đúng ĐẠT (PASS).
 Nhưng hiệu năng:
 
 ```text
-speedup
+mức tăng tốc
 ≈ 1,0034×
 ```
 
@@ -662,7 +662,7 @@ up
 mốc đối chứng dùng:
 
 ```text
-56 dispatch riêng
+56 lần giao việc riêng
 ```
 
 cho 28 lớp.
@@ -672,8 +672,8 @@ P7-L thử **gộp phép tính — gộp hai công việc liên quan vào một 
 Kết quả:
 
 ```text
-56 gate/up dispatch
-→ 28 fused dispatch
+56 lần giao việc gate/up
+→ 28 lần giao việc đã gộp
 ```
 
 tính đúng ĐẠT (PASS).
@@ -709,13 +709,13 @@ P7-M đo chính graph P7-L đã thắng.
 giai đoạn xử lý đầu vào lúc này có:
 
 ```text
-441 dispatch
+441 lần giao việc
 ```
 
 Một cached giai đoạn sinh token step có:
 
 ```text
-469 dispatch
+469 lần giao việc
 ```
 
 Trong giai đoạn xử lý đầu vào, tỷ trọng thời gian GPU xấp xỉ:
@@ -823,10 +823,10 @@ Mà vì evidence hiện tại không còn biện minh cho việc tiếp tục k�
 
 ```text
 Q4_K / Q6_K packed weights
-→ đọc trực tiếp, không bung toàn model
+→ đọc trực tiếp, không bung toàn mô hình
 
-whole decoder resident
-→ trọng số toàn decoder giữ sẵn
+whole sinh tokenr resident
+→ trọng số toàn sinh tokenr giữ sẵn
 
 GPU-resident KV cache
 → trạng thái attention giữ trên GPU
@@ -843,11 +843,11 @@ FFN down
 SwiGLU
 → vẫn là bước riêng
 
-prefill attention
+cơ chế chú ý ở giai đoạn xử lý đầu vào
 → online attention
 
-decode
-→ validated cached-decode graph
+sinh token
+→ đồ thị sinh token dùng bộ nhớ đệm đã xác nhận
 ```
 
 Đây là ý nghĩa của từ **đường chạy thực tế** trong P7.
@@ -903,17 +903,17 @@ Chương 9 sẽ đi sâu hơn vào cách phép đo so sánh và các thống kê
 Ta đã đi từ:
 
 ```text
-một file GGUF
+một tệp GGUF
 ↓
 tensor store
 ↓
-Vulkan device
+thiết bị Vulkan
 ↓
-primitive
+phép tính nền tảng
 ↓
-một layer
+một lớp
 ↓
-28 layer
+28 lớp
 ↓
 KV cache
 ↓
@@ -923,7 +923,7 @@ profile
 ↓
 nhiều PASS và FAIL
 ↓
-P7-L production path
+đường chạy thực tế P7-L
 ```
 
 Đó là một thành tựu kỹ thuật có thật.
@@ -945,15 +945,15 @@ Không phải cảm giác “nhanh hơn nhiều”.
 Mà là:
 
 ```text
-cùng model
+cùng mô hình
 cùng quant
 cùng hardware
-cùng workload
+cùng bài đo
 cùng cách đo
         ↓
 ArcLLM
 vs
-baseline phù hợp
+mốc đối chứng phù hợp
 ```
 
 Phần II bắt đầu từ đó.
