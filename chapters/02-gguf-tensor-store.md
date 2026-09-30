@@ -91,7 +91,7 @@ Nó có một bản đồ.
 
 Bây giờ ta có thể làm rõ hơn một chút.
 
-Trong quá trình huấn luyện, mô hình học bằng cách điều chỉnh rất nhiều con số. Những con số đã học ấy thường được gọi là **trọng số — trọng số**.
+Trong quá trình huấn luyện, mô hình học bằng cách điều chỉnh rất nhiều con số. Những con số đã học ấy thường được gọi là **trọng số (weights)**.
 
 Nếu hàng tỷ con số chỉ nằm trong một danh sách dài vô tận, việc quản lý chúng sẽ rất khó.
 
@@ -173,7 +173,7 @@ Chỉ 256 con số đã cần 1.024 byte.
 
 Với một mô hình có hàng tỷ trọng số, con số ấy tăng lên rất nhanh.
 
-Đó là một trong những lý do người ta sử dụng **lượng tử hóa — lượng tử hóa**.
+Đó là một trong những lý do người ta sử dụng **lượng tử hóa (quantization)**.
 
 Ý tưởng cơ bản không quá khó.
 
@@ -267,19 +267,19 @@ Cách đó có thể hoạt động.
 
 Nhưng với tệp mô hình lớn, nó có nghĩa ta vừa có tệp gốc, vừa tạo thêm một vùng nhớ lớn để chứa bản sao của tệp.
 
-P1 dùng một cơ chế của hệ điều hành gọi là **bộ nhớ mapping — ánh xạ tệp vào không gian bộ nhớ của chương trình**.
+P1 dùng một cơ chế của hệ điều hành gọi là **ánh xạ tệp vào bộ nhớ (memory mapping)** — cho phép chương trình nhìn một phần tệp như một vùng trong bộ nhớ.
 
 Có thể hình dung hệ điều hành mở cho ArcLLM một “cửa sổ” nhìn vào tệp.
 
 Hệ thực thi có thể truy cập một vùng trong tệp gần giống như đang truy cập bộ nhớ, thay vì tự đọc toàn bộ tệp rồi chép nó sang một vùng nhớ khác.
 
-Trong P1, cửa sổ này là **read-only — chỉ đọc**.
+Trong P1, cửa sổ này là **chỉ đọc (read-only)**.
 
 ArcLLM không được phép dùng nó để sửa tệp mô hình.
 
 Ánh xạ chỉ đọc giúp tránh ghi đè mô hình gốc và cho phép dùng GGUF như một:
 
-> **kho các khối số — kho khối số.**
+> **kho các khối số (tensor store).**
 
 Hệ thực thi biết khối số mình cần nằm ở đâu, rồi truy cập đúng vùng byte tương ứng.
 
@@ -330,11 +330,11 @@ Tensor B        1.130 ──────────
 
 một đoạn byte đang bị cả hai khối số cùng nhận là của mình.
 
-Đó gọi là **overlap — chồng lấn**.
+Đó gọi là **chồng lấn (overlap)**.
 
 P1 vì vậy kiểm tra hai điều.
 
-Thứ nhất là **bounds — giới hạn**.
+Thứ nhất là **giới hạn biên (bounds)**.
 
 Nếu tệp kết thúc ở byte 10.000 nhưng một khối số tuyên bố dữ liệu của nó kéo dài tới byte 10.200, rõ ràng có vấn đề.
 
@@ -360,7 +360,7 @@ Nếu địa chỉ sai, một chương trình chạy nhanh hơn chỉ có nghĩa
 
 ## Q4_K được giữ nguyên dạng đóng gói
 
-Một mục tiêu quan trọng khác của P1 là xác nhận ArcLLM có thể đi thẳng tới dữ liệu **Q4_K packed — Q4_K vẫn còn nguyên dạng đóng gói trong tệp**.
+Một mục tiêu quan trọng khác của P1 là xác nhận ArcLLM có thể đi thẳng tới dữ liệu **Q4_K ở dạng đóng gói (packed Q4_K)** — dữ liệu vẫn còn nguyên dạng đóng gói trong tệp.
 
 P1 đã ĐẠT (PASS) điều đó.
 
@@ -496,7 +496,7 @@ Câu hỏi tiếp theo vì thế trở nên tự nhiên:
 2. **lượng tử hóa giúp lưu trọng số gọn hơn.** P1 giữ Q4_K và Q6_K ở dạng đóng gói thay vì mở toàn bộ thành F32 ngay từ đầu.
 3. **Script hỏng hoặc build hỏng không tự động là KHÔNG ĐẠT (FAIL) của giả thuyết.** Chỉ khi phép thử thực sự chạy, evidence mới được quyền trả lời câu hỏi.
 
-**Chương 3 — Xây phần lõi Vulkan**
+**Chương 3 — Làm thế nào để giao việc cho GPU? (Vulkan)**
 
 Ở Chương 2, dữ liệu vẫn chủ yếu nằm phía tệp và bộ nhớ do hệ điều hành quản lý.
 
