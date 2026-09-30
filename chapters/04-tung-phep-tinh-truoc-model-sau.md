@@ -90,7 +90,7 @@ P3 hỏi:
 
 Bây giờ GPU phải thực hiện những phép toán có ý nghĩa đối với mô hình.
 
-Một chương trình nhỏ chạy trên GPU để thực hiện một loại công việc cụ thể thường được gọi là **chương trình GPU — chương trình tính toán nhỏ chạy trên GPU**.
+Một chương trình nhỏ chạy trên GPU để thực hiện một loại công việc cụ thể thường được gọi là **chương trình GPU (kernel)** — chương trình tính toán nhỏ chạy trên GPU.
 
 Ví dụ, ta có thể có một chương trình GPU chuyên chuẩn hóa dữ liệu.
 
@@ -112,7 +112,7 @@ chương trình GPU
 kết quả
 ```
 
-Trong Vulkan, những chương trình tính toán này được viết dưới dạng **compute shader — chương trình tính toán dành cho GPU** rồi được biên dịch sang dạng GPU có thể thực thi.
+Trong Vulkan, những chương trình tính toán này được viết dưới dạng **chương trình tính toán GPU (compute shader)** rồi được biên dịch sang dạng GPU có thể thực thi.
 
 P3 sử dụng một compiler — **trình biên dịch** — đã được khóa phiên bản: `glslang 16.5.0`.
 
@@ -134,7 +134,7 @@ Không thể hỏi chính chương trình GPU đó:
 
 > “Anh có tính đúng không?”
 
-ArcLLM dùng một cách rất phổ biến trong kỹ thuật số: tạo một **CPU reference — cách tính tham chiếu độc lập trên CPU**.
+ArcLLM dùng một cách rất phổ biến trong kỹ thuật số: tạo một **cách tính tham chiếu độc lập trên CPU (CPU reference)**.
 
 Hãy tưởng tượng học sinh làm một phép tính bằng máy tính bỏ túi, còn giáo viên đã có một cách giải độc lập.
 
@@ -178,7 +178,7 @@ Một sai khác rất nhỏ như vậy có thể nằm trong giới hạn đã �
 
 ## Viên gạch đầu tiên: RMSNorm
 
-Phép đầu tiên đáng làm quen là **RMSNorm — một phép chuẩn hóa giúp giữ độ lớn của tín hiệu ở mức phù hợp**.
+Phép đầu tiên đáng làm quen là **phép chuẩn hóa RMS (RMSNorm)** — phép chuẩn hóa giúp giữ độ lớn của tín hiệu ở mức phù hợp.
 
 Ta chưa cần đi vào công thức đầy đủ.
 
@@ -226,7 +226,7 @@ Gate — **cổng kiểm tra** — đạt ĐẠT (PASS).
 
 Chương 2 đã dành khá nhiều thời gian cho Q4_K.
 
-Ta biết đây là một dạng **lượng tử hóa — cách lưu trọng số bằng ít bit hơn**, và ArcLLM cố tình giữ dữ liệu ở dạng đóng gói thay vì bung toàn bộ sang F32.
+Ta biết đây là một dạng **lượng tử hóa (quantization)** — cách lưu trọng số bằng ít bit hơn, và ArcLLM cố tình giữ dữ liệu ở dạng đóng gói thay vì bung toàn bộ sang F32.
 
 P3 bây giờ phải trả lời câu hỏi khó hơn:
 
@@ -270,7 +270,7 @@ thì P3 bắt đầu chứng minh:
 
 > “Ta có thể dùng chính dạng Q4_K đóng gói đó trong một phép toán GPU thật.”
 
-Phần này bao gồm **matvec/GEMM — các phép nhân giữa vector hoặc ma trận với trọng số**.
+Phần này bao gồm **phép nhân ma trận–vectơ và ma trận (matvec/GEMM)**.
 
 Không cần học đại số tuyến tính ở đây.
 
@@ -302,7 +302,7 @@ và:
 
 có cùng ba từ nhưng thứ tự tạo ra ý nghĩa rất khác.
 
-Một cơ chế được mô hình này sử dụng là **RoPE — Rotary Position phép nhúng**, có thể hiểu ở mức đầu tiên là **cách đưa thông tin vị trí vào dữ liệu bằng một phép biến đổi dạng xoay**.
+Một cơ chế được mô hình này sử dụng là **phép nhúng vị trí xoay (Rotary Position Embedding, RoPE)**, có thể hiểu ở mức đầu tiên là **cách đưa thông tin vị trí vào dữ liệu bằng một phép biến đổi dạng xoay**.
 
 Ta chưa cần hiểu hình học phía sau chữ “xoay”.
 
@@ -324,7 +324,7 @@ Vì vậy RoPE cũng phải được chứng minh riêng trước khi ghép thà
 
 ## Softmax: từ điểm số thành tỷ lệ
 
-Một phép toán khác là **softmax — phép biến một nhóm điểm số thành những giá trị dương có tổng bằng 1**.
+Một phép toán khác là **hàm biến điểm số thành phân bố (softmax)** — biến một nhóm điểm số thành những giá trị dương có tổng bằng 1.
 
 Ví dụ đơn giản, giả sử sau một số bước ta có ba giá trị cuối:
 
@@ -366,7 +366,7 @@ Rồi hai bên được so.
 
 ## cơ chế chú ý: token nhìn lại thông tin liên quan
 
-Bây giờ ta tới một thuật ngữ nổi tiếng hơn: **cơ chế chú ý — cơ chế cho phép mô hình cân nhắc những phần thông tin khác nhau khi xử lý token hiện tại**.
+Bây giờ ta tới một thuật ngữ nổi tiếng hơn: **cơ chế chú ý (attention)** — cơ chế cho phép mô hình cân nhắc những phần thông tin khác nhau khi xử lý token hiện tại.
 
 Hãy lấy một câu đơn giản:
 
@@ -381,7 +381,7 @@ P3 sử dụng một phép thử **GQA cho cơ chế chú ý trong phạm vi gi�
 Ta tách cụm này ra:
 
 - **cơ chế chú ý**: cơ chế kết hợp thông tin theo mức liên quan;
-- **GQA — Grouped Query cơ chế chú ý**: một cách tổ chức cơ chế chú ý mà mô hình mục tiêu sử dụng;
+- **cơ chế chú ý truy vấn nhóm (Grouped Query Attention, GQA)**: một cách tổ chức cơ chế chú ý mà mô hình mục tiêu sử dụng;
 - **phạm vi giới hạn**: P3 chỉ kiểm tra trong một vùng nhỏ, có kiểm soát, chưa phải toàn bộ mô hình.
 
 Cụm **“trong phạm vi giới hạn”** rất quan trọng.
@@ -414,7 +414,7 @@ một nhánh điều tiết nhánh còn lại
 kết quả
 ```
 
-Sau đó mô hình còn sử dụng **residual — đường cộng tắt**, tức kết quả mới được cộng trở lại với tín hiệu cũ.
+Sau đó mô hình còn sử dụng **đường cộng tắt (residual connection)**, tức kết quả mới được cộng trở lại với tín hiệu cũ.
 
 Ẩn dụ đơn giản:
 
@@ -435,7 +435,7 @@ P3 kiểm tra cả nhóm **SwiGLU + residual** như một phép tính nền tả
 
 ## Bảy cổng, nhưng chưa có một mô hình
 
-Tổng cộng P3 đóng **bảy Vulkan chương trình GPU gates — bảy cổng kiểm tra cho các phép tính GPU**.
+Tổng cộng P3 đóng **bảy cổng kiểm tra chương trình GPU qua Vulkan**.
 
 Chúng bao phủ các nhóm phép toán cần thiết ở bước này:
 
@@ -459,7 +459,7 @@ SwiGLU + residual
 → biến đổi qua nhánh FFN rồi cộng đường tắt
 ```
 
-Cả bảy gate đều ĐẠT (PASS) khi so với **independent CPU references — cách tính tham chiếu độc lập trên CPU**.
+Cả bảy gate đều ĐẠT (PASS) khi so với **các cách tính tham chiếu độc lập trên CPU (independent CPU references)**.
 
 Điều này quan trọng.
 
@@ -547,11 +547,11 @@ P3 ĐẠT (PASS) chỉ mở quyền đi sang câu hỏi mới:
 
 ### Nhớ 3 điều
 
-1. **chương trình GPU — chương trình tính toán nhỏ trên GPU — phải được kiểm tra riêng trước khi được tin tưởng trong một mô hình lớn.**
-2. **CPU reference — cách tính tham chiếu độc lập trên CPU — đóng vai trò “đáp án” để kiểm tra GPU, và ngưỡng sai số phải được khóa trước khi nhìn kết quả.**
-3. **P3 ĐẠT (PASS) là ĐẠT (PASS) của các phép tính nền tảng — những phép toán nền tảng — chứ chưa phải ĐẠT (PASS) của lớp giải mã hay toàn mô hình.**
+1. **Chương trình GPU (kernel) phải được kiểm tra riêng trước khi được tin tưởng trong một mô hình lớn.**
+2. **Cách tính tham chiếu trên CPU (CPU reference) đóng vai trò “đáp án” để kiểm tra GPU, và ngưỡng sai số phải được khóa trước khi nhìn kết quả.**
+3. **P3 ĐẠT (PASS) ở các phép tính nền tảng (primitives), chưa phải ĐẠT của lớp giải mã hay toàn mô hình.**
 
-**Chương 5 — Một lớp giải mã hoàn chỉnh**
+**Chương 5 — Ghép các phép tính thành một lớp giải mã**
 
 Ở P3, ta đã đặt từng viên gạch lên bàn và thử riêng từng viên.
 
