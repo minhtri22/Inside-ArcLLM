@@ -1047,3 +1047,6 @@ Và khi câu trả lời xuất hiện, ta phải thực sự dừng.
 > **Phần II kết thúc tại đây.**
 >
 > Ta đã xây được một hệ thực thi, để bằng chứng phán xét nó, chấp nhận một kết quả âm tính và học được cách đặt một câu hỏi mới mà không phủ nhận kết quả cũ.
+
+
+**Tiếp theo: [Chương 12 — Nhiều cách đều có lý, nhưng chỉ thực tế mới trả lời](12-nhieu-kien-truc-nhung-chi-thuc-te-moi-tra-loi-duoc.md)**
