@@ -135,9 +135,9 @@ Hệ thực thi không tự làm mọi phép tính bằng ý nghĩ.
 
 Cuối cùng công việc phải chạy trên phần cứng.
 
-**CPU — bộ xử lý trung tâm** là bộ xử lý đa dụng của máy tính.
+**bộ xử lý trung tâm (CPU)** là bộ xử lý đa dụng của máy tính.
 
-**GPU — bộ xử lý đồ họa** có khả năng thực hiện rất nhiều phép tính số tương tự nhau song song, nên đặc biệt hữu ích với nhiều phép tính trong mô hình ngôn ngữ.
+**bộ xử lý đồ họa (GPU)** có khả năng thực hiện rất nhiều phép tính số tương tự nhau song song, nên đặc biệt hữu ích với nhiều phép tính trong mô hình ngôn ngữ.
 
 Bộ nhớ giữ dữ liệu đang được sử dụng.
 
