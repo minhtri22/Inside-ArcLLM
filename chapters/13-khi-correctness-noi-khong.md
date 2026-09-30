@@ -133,14 +133,14 @@ Nó phải tự đi qua tính đúng gate.
 Thứ tự phép thử đã được khóa:
 
 ```text
-1. baseline so với CPU reference
+1. mốc đối chứng so với cách tính tham chiếu trên CPU
 
-2. candidate so với CPU reference
+2. phương án thử so với cách tính tham chiếu trên CPU
 
-3. candidate so với baseline
+3. phương án thử so với mốc đối chứng
 
-4. chỉ khi tất cả correctness PASS
-   mới được đo performance
+4. chỉ khi tất cả kiểm tra tính đúng ĐẠT
+   mới được đo tốc độ
 ```
 
 `CPU reference — kết quả tham chiếu trên CPU` đóng vai trò như một đường tính độc lập để kiểm tra GPU.
@@ -152,7 +152,7 @@ Phần quan trọng nhất:
 Nếu phương án thử sai, không có:
 
 ```text
-candidate chạy nhanh bao nhiêu?
+phương án thử chạy nhanh bao nhiêu?
 ```
 
 Câu hỏi đó chưa được phép tồn tại.
@@ -317,7 +317,7 @@ Kết quả được giữ lại là:
 ```text
 status = ERROR
 
-correctness gate failed:
+kiểm tra tính đúng không đạt:
 candidate_cpu
 ```
 
@@ -427,13 +427,13 @@ nới threshold
 
 đổi geometry
 
-thử subgroup khác
+thử nhóm con GPU khác
 
 đổi reduction
 
-tuning để cứu performance
+tinh chỉnh để cứu tốc độ
 
-đưa vào model thật
+đưa vào mô hình thật
 ```
 
 Điều này nghe có vẻ cứng nhắc.
@@ -473,8 +473,8 @@ Có thể chỉ là triển khai defect.
 Trường hợp thứ hai:
 
 ```text
-file sai
-driver lỗi
+tệp sai
+trình điều khiển lỗi
 runner hỏng
 provenance không khớp
 ```
@@ -490,10 +490,10 @@ shader compile
 native build
 → PASS
 
-baseline correctness
+tính đúng của mốc đối chứng
 → PASS
 
-candidate correctness
+tính đúng của phương án thử
 → FAIL
 ```
 
@@ -548,13 +548,13 @@ không được chạy
 Từ:
 
 ```text
-correctness FAIL
+tính đúng: KHÔNG ĐẠT
 ```
 
 không được suy ra:
 
 ```text
-performance FAIL
+tốc độ: KHÔNG ĐẠT
 ```
 
 Đó là **hai kết luận hoàn toàn khác nhau**.
@@ -574,7 +574,7 @@ Và study này không được phép đi tìm câu trả lời hiệu năng nữ
 Q4 đã cho kết quả rất đẹp:
 
 ```text
-~3,14× aggregate component speedup
+~3,14× mức tăng tốc tổng hợp ở cấp thành phần
 ```
 
 tính đúng ĐẠT (PASS).
@@ -588,7 +588,7 @@ Nó không chứng minh:
 ```text
 mọi quantization
 mọi shape
-mọi model
+mọi mô hình
 mọi GPU
 ```
 
@@ -621,8 +621,8 @@ Trước thực thi:
 ```text
 khóa hypothesis
 khóa implementation
-khóa correctness gate
-khóa performance gate
+khóa ngưỡng tính đúng
+khóa ngưỡng tốc độ
 khóa stop rule
 ```
 
@@ -710,10 +710,10 @@ Sau Q6:
 
 ```text
 Q4
-→ efficacy + correctness supported
+→ hiệu quả + tính đúng được hỗ trợ
 
 Q6
-→ unchanged mechanism violates correctness
+→ cơ chế giữ nguyên làm vi phạm tính đúng
 ```
 
 Bản đồ hiểu biết đã tốt hơn.
@@ -779,7 +779,7 @@ giữ nguyên mechanism Q4
 ↓
 
 C
-correctness FAIL
+tính đúng: KHÔNG ĐẠT
 
 ↓
 
