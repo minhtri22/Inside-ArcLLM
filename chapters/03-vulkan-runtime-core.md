@@ -40,7 +40,7 @@ ArcLLM
    ↓
 Vulkan
    ↓
-driver
+trình điều khiển
    ↓
 GPU
 ```
@@ -82,9 +82,9 @@ Tới đây ta có:
 ```text
 ArcLLM
    ↓
-Vulkan device
+thiết bị Vulkan
    ↓
-compute queue
+hàng đợi tính toán
    ↓
 GPU
 ```
@@ -106,7 +106,7 @@ Từ **persistent** có thể hiểu đơn giản là **được giữ lại tro
 Thay vì:
 
 ```text
-tạo buffer
+tạo vùng nhớ
 → dùng một lần
 → xóa
 → lần sau tạo lại
@@ -182,7 +182,7 @@ P2 tạo một **vùng nhớ tạm vùng bộ nhớ lớn — vùng nhớ làm v
 4 vùng lưu trọng số
 + 1 vùng scratch làm việc tạm
 -----------------------------
-= 5 buffer đang sống
+= 5 vùng nhớ đang tồn tại
 ```
 
 Đây chính là năm vùng nhớ được ghi nhận còn tồn tại khi lệnh GPU được thực hiện trong P2.
@@ -201,13 +201,13 @@ Trong ngữ cảnh hiện tại, có thể hiểu **vùng nhớ — vùng chứa
 GGUF payload
      ↓
 ┌────────────┐
-│ weight #1  │
+│ trọng số #1  │
 ├────────────┤
-│ weight #2  │
+│ trọng số #2  │
 ├────────────┤
-│ weight #3  │
+│ trọng số #3  │
 ├────────────┤
-│ weight #4  │
+│ trọng số #4  │
 └────────────┘
 
 ┌────────────┐
@@ -254,7 +254,7 @@ Chuỗi đơn giản là:
 ```text
 CPU chuẩn bị command
         ↓
-submit vào queue
+gửi vào hàng đợi
         ↓
 GPU thực hiện
         ↓
@@ -314,25 +314,25 @@ Nó chỉ chứng minh **đường đưa và giữ dữ liệu đã hoạt độ
 Đến cuối P2, ArcLLM có:
 
 ```text
-1 Vulkan device
+1 thiết bị Vulkan
 → 1 thiết bị Vulkan mà ArcLLM đã mở để làm việc với GPU
 
-1 compute queue
+1 hàng đợi tính toán
 → 1 hàng đợi nhận công việc tính toán
 
 980.097.536 byte dữ liệu GGUF vẫn ở dạng đóng gói (packed GGUF payload)
 → khoảng 934,7 MiB
 → cư trú (resident) trong 4 vùng lưu giữ trọng số
-  (persistent weight arenas)
+  (các vùng trọng số giữ lâu)
 
 64 MiB vùng nhớ làm việc tạm
 (persistent scratch)
 
-4 vùng lưu trọng số (weight buffers)
-+ 1 vùng làm việc tạm (scratch buffer)
-= 5 buffer sống trong lúc thực thi
+4 vùng lưu trọng số
++ 1 vùng làm việc tạm
+= 5 vùng nhớ tồn tại trong lúc thực thi
 
-command submit — gửi lệnh xuống queue
+gửi bộ lệnh — đưa công việc xuống hàng đợi
 / fence — tín hiệu chờ GPU hoàn tất
 → PASS
 
