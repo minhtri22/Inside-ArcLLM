@@ -1,5 +1,34 @@
 # Chương 11 — Từ thất bại sang một câu hỏi đúng hơn
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: bottleneck / cơ chế kế tiếp**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** bottleneck / cơ chế kế tiếp.
+
+
 > **Câu hỏi của chương:** Khi một kiến trúc đã bị bằng chứng đo lường buộc phải dừng lại, điều gì đủ mạnh để cho phép ta mở một kiến trúc kế tiếp?
 
 Chương 10 kết thúc bằng một verdict rất rõ:
