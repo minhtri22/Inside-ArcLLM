@@ -1,45 +1,19 @@
-# Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi
+# Chương 15 — Chỉ có ích khi toàn hệ thực sự được lợi
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Cải thiện bên trong ArcLLM
+>         ↓
+> [ đo lại với đối chứng bên ngoài ]
+>         ↓
+> giá trị ở cấp toàn hệ
 > ```
->
-> ▶ **Đang mở ở chương này:** đối chứng toàn hệ / đo lại.
 
 
-> **Câu hỏi của chương:** Sau khi một cơ chế đã giúp ArcLLM nhanh hơn khoảng hai lần ở cấp toàn hệ nội bộ, làm thế nào biết cải thiện đó thực sự đã đưa runtime tới gần một hệ thống trưởng thành hơn hay chưa?
+> **Câu hỏi của chương:** Sau khi một cơ chế đã giúp ArcLLM nhanh hơn khoảng hai lần ở cấp toàn hệ nội bộ, làm thế nào biết cải thiện đó thực sự đã đưa hệ thực thi tới gần một hệ thống trưởng thành hơn hay chưa?
 
 Chương 14 kết thúc bằng một kết quả rất đáng kể.
 
@@ -59,7 +33,7 @@ decode
 E2E
 ```
 
-Decode cải thiện trung bình hình học khoảng:
+giai đoạn sinh token cải thiện trung bình hình học khoảng:
 
 ```text
 2,20×
@@ -77,7 +51,7 @@ Nếu chỉ nhìn ArcLLM trước và sau thay đổi, đây là một thành c�
 
 Nhưng có một câu hỏi chưa được trả lời:
 
-> **Nhanh hơn chính mình rất nhiều có đồng nghĩa đã trở thành một runtime nhanh hay chưa?**
+> **Nhanh hơn chính mình rất nhiều có đồng nghĩa đã trở thành một hệ thực thi nhanh hay chưa?**
 
 Không nhất thiết.
 
@@ -85,9 +59,9 @@ Một người chạy 100 mét trong 40 giây rồi cải thiện xuống 20 gi�
 
 Nhưng điều đó chưa nói người ấy đang đứng ở đâu so với những người khác.
 
-Runtime cũng vậy.
+Hệ thực thi cũng vậy.
 
-## Sau một PASS lớn, phép đo cũ đã hết hạn
+## Sau một kết quả ĐẠT lớn, phép đo cũ đã hết hạn
 
 Ở Chương 9 và 10, ArcLLM từng được so với llama.cpp.
 
@@ -95,7 +69,7 @@ Nhưng đó là kiến trúc cũ.
 
 Sau I002, ArcLLM đã thay đổi.
 
-56 phép gate/up Q4_K trong mỗi token decode giờ chạy bằng một mechanism khác.
+56 phép gate/up Q4_K trong mỗi token giai đoạn sinh token giờ chạy bằng một mechanism khác.
 
 Vì vậy không được lấy:
 
@@ -109,21 +83,21 @@ rồi so trực tiếp với:
 số llama.cpp cũ
 ```
 
-và gọi đó là matched benchmark.
+và gọi đó là phép đo đối chứng cùng điều kiện.
 
 Ta cần một **phép đối chứng mới cùng điều kiện**.
 
 Đây là một nguyên tắc dễ bỏ qua:
 
-> **Khi candidate thay đổi đáng kể, bằng chứng đối chứng phải được làm mới.**
+> **Khi phương án thử thay đổi đáng kể, bằng chứng đối chứng phải được làm mới.**
 
-Một benchmark cũ có thể cho bối cảnh lịch sử.
+Một phép đo so sánh cũ có thể cho bối cảnh lịch sử.
 
 Nó không tự động trở thành bằng chứng xác nhận cho kiến trúc mới.
 
 ## Đối chứng mới phải khóa lại từ đầu
 
-Nghiên cứu tiếp theo giữ nguyên candidate I002 đã đóng.
+Nghiên cứu tiếp theo giữ nguyên phương án thử I002 đã đóng.
 
 Không tối ưu thêm.
 
@@ -190,7 +164,7 @@ Vậy tổng cộng:
 = 20 cặp
 ```
 
-Mỗi cặp có hai lần inference:
+Mỗi cặp có hai lần suy luận:
 
 ```text
 20 × 2
@@ -199,7 +173,7 @@ Mỗi cặp có hai lần inference:
 
 Cả 20/20 cặp đều hợp lệ.
 
-## Đây vẫn là characterization, không phải cuộc thi lấy cúp
+## Đây vẫn là phép mô tả đặc tính, không phải cuộc thi lấy cúp
 
 Tên chính xác của kết quả là:
 
@@ -215,7 +189,7 @@ Nó hỏi:
 
 > **Sau I002, khoảng cách thực tế giữa ArcLLM mới và đối chứng trưởng thành còn bao nhiêu?**
 
-Đó là câu hỏi cần trả lời trước khi chọn bất kỳ kernel tiếp theo nào.
+Đó là câu hỏi cần trả lời trước khi chọn bất kỳ chương trình GPU tiếp theo nào.
 
 ## Kết quả khá rõ
 
@@ -225,9 +199,9 @@ Tỷ lệ dưới đây đều là:
 ArcLLM candidate / llama.cpp
 ```
 
-Với latency, lớn hơn `1` nghĩa là ArcLLM mất nhiều thời gian hơn.
+Với độ trễ, lớn hơn `1` nghĩa là ArcLLM mất nhiều thời gian hơn.
 
-| Cell | TTFT | Decode latency | Decode throughput | E2E |
+| Cell | TTFT | giai đoạn sinh token độ trễ | giai đoạn sinh token thông lượng | E2E |
 |---|---:|---:|---:|---:|
 | A/W-S | 7,50× | 8,83× | 0,113× | 8,73× |
 | A/W-C | 8,76× | 9,21× | 0,109× | 9,16× |
@@ -248,7 +222,7 @@ E2E latency
 ≈ 9,97×
 ```
 
-Decode throughput ratio:
+giai đoạn sinh token thông lượng tỷ lệ:
 
 ```text
 ≈ 0,096
@@ -262,14 +236,14 @@ Giả sử đối chứng sinh được:
 10 token/giây
 ```
 
-một ratio `0,096` tương đương khoảng:
+một tỷ lệ `0,096` tương đương khoảng:
 
 ```text
 10 × 0,096
 = 0,96 token/giây
 ```
 
-Tức trong phép so sánh mới này, ArcLLM vẫn chỉ đạt gần một phần mười decode throughput của đối chứng.
+Tức trong phép so sánh mới này, ArcLLM vẫn chỉ đạt gần một phần mười giai đoạn sinh token thông lượng của đối chứng.
 
 Nói ngắn gọn:
 
@@ -277,21 +251,21 @@ Nói ngắn gọn:
 
 Hai điều này hoàn toàn có thể cùng đúng.
 
-## Không được lấy gap cũ trừ gap mới
+## Không được lấy khoảng cách cũ trừ khoảng cách mới
 
 Một phản xạ rất hấp dẫn là nhìn lại Q2.
 
-ArcLLM cũ từng có khoảng cách decode rất lớn.
+ArcLLM cũ từng có khoảng cách giai đoạn sinh token rất lớn.
 
 Bây giờ khoảng cách chỉ còn khoảng 10×.
 
 Rồi nói:
 
-> “Vậy I002 đã đóng được chính xác bao nhiêu phần trăm gap.”
+> “Vậy I002 đã đóng được chính xác bao nhiêu phần trăm khoảng cách.”
 
 Nhưng phép tính đó không hợp lệ.
 
-Q2 và phép đo mới không có cùng thiết kế execution.
+Q2 và phép đo mới không có cùng thiết kế thực thi.
 
 Chúng cũng xảy ra ở những trạng thái môi trường khác nhau.
 
@@ -317,9 +291,9 @@ nếu experiment không được thiết kế để đo đúng quantity đó.
 
 Đây là một ví dụ khác về kỷ luật claim.
 
-## Một metric tốt cũng không cứu toàn bộ bức tranh
+## Một chỉ số tốt cũng không cứu toàn bộ bức tranh
 
-Memory cho một bài học tương tự.
+bộ nhớ cho một bài học tương tự.
 
 Peak working set của ArcLLM mới so với llama.cpp vẫn khoảng:
 
@@ -351,9 +325,9 @@ Cả hai câu riêng lẻ đều bỏ mất bức tranh.
 
 Điều đúng hơn là:
 
-> **Các metric bộ nhớ đang kể những câu chuyện khác nhau; chưa có bằng chứng để ép chúng thành một verdict bộ nhớ duy nhất.**
+> **Các chỉ số bộ nhớ đang kể những câu chuyện khác nhau; chưa có bằng chứng để ép chúng thành một kết luận bộ nhớ duy nhất.**
 
-Đây chính là lý do một runtime không nên được đánh giá bằng metric thuận lợi nhất của nó.
+Đây chính là lý do một hệ thực thi không nên được đánh giá bằng chỉ số thuận lợi nhất của nó.
 
 ## Vậy cải thiện 2× ở Chương 14 có vô nghĩa không?
 
@@ -369,11 +343,11 @@ Câu trả lời là:
 
 > **Có.**
 
-Decode và E2E đều cải thiện mạnh, semantics được giữ, TTFT guard PASS.
+giai đoạn sinh token và E2E đều cải thiện mạnh, semantics được giữ, TTFT guard ĐẠT (PASS).
 
 Chương 15 hỏi:
 
-> **Sau cải thiện đó, ArcLLM đã ở đâu so với một runtime trưởng thành?**
+> **Sau cải thiện đó, ArcLLM đã ở đâu so với một hệ thực thi trưởng thành?**
 
 Câu trả lời từ phép đo mới là:
 
@@ -396,7 +370,7 @@ một mechanism chưa đủ
 
 > **Một kiến trúc chỉ có giá trị ở cấp toàn hệ khi những lợi ích cục bộ thực sự thay đổi hành vi của toàn hệ — và toàn hệ vẫn phải được đặt trước một đối chứng phù hợp.**
 
-## Thành công có thể làm evidence cũ trở nên lỗi thời
+## Thành công có thể làm bằng chứng cũ trở nên lỗi thời
 
 Sau I002, gate/up đã thay đổi rất mạnh.
 
@@ -406,7 +380,7 @@ Trước đó, một profile cho thấy gate/up chiếm gần:
 59,67%
 ```
 
-chi phí GPU decode.
+chi phí GPU giai đoạn sinh token.
 
 Nhưng sau khi phần đó được tăng tốc nhiều lần, tỷ lệ này không còn được phép coi là profile hiện tại.
 
@@ -453,11 +427,11 @@ Nó chỉ còn:
 ≈ 33%
 ```
 
-Bottleneck — **nơi chiếm chi phí lớn nhất** — có thể đã chuyển sang phần khác.
+nút thắt — **nơi chiếm chi phí lớn nhất** — có thể đã chuyển sang phần khác.
 
 Đây là một nguyên tắc rất quan trọng:
 
-> **Mỗi tối ưu lớn đều có thể làm bản đồ bottleneck cũ hết hạn.**
+> **Mỗi tối ưu lớn đều có thể làm bản đồ nút thắt cũ hết hạn.**
 
 Vì vậy sau I003, quyết định khoa học không phải:
 
@@ -475,11 +449,11 @@ I003 khóa trước rằng nếu khoảng cách bên ngoài vẫn lớn, bước
 
 > **profile lại chính kiến trúc sau I002.**
 
-Không chọn kernel mới trước.
+Không chọn chương trình GPU mới trước.
 
 Không lấy ranking cũ.
 
-Không để AI nhìn danh sách kernel rồi chọn phần tiếp theo theo cảm giác.
+Không để AI nhìn danh sách chương trình GPU rồi chọn phần tiếp theo theo cảm giác.
 
 Lý do rất đơn giản:
 
@@ -495,7 +469,7 @@ phải đo lại
 
 `Stale — đã cũ đến mức không còn đủ an toàn để dùng như trạng thái hiện tại.`
 
-Một success vì vậy không chỉ tạo ra performance.
+Một success vì vậy không chỉ tạo ra hiệu năng.
 
 Nó còn có thể **phá hiệu lực của measurement cũ**.
 
@@ -545,7 +519,7 @@ Nó tạo ra một **trạng thái hệ thống mới**.
 
 Và trạng thái mới cần evidence mới.
 
-## Đây cũng là cách quản trị AI khác với “agent cứ làm tiếp”
+## Đây cũng là cách làm việc với AI khác với “cứ để tác nhân AI làm tiếp”
 
 Hãy tưởng tượng ta giao mục tiêu:
 
@@ -575,9 +549,9 @@ Nó cần biết:
 
 > **Khi nào evidence cũ hết hạn?**
 
-> **Khi nào một PASS chỉ là local PASS?**
+> **Khi nào một ĐẠT (PASS) chỉ là local ĐẠT (PASS)?**
 
-> **Khi nào cần benchmark lại với thế giới bên ngoài?**
+> **Khi nào cần phép đo so sánh lại với thế giới bên ngoài?**
 
 > **Khi nào không được chọn bước tiếp theo từ lịch sử?**
 
@@ -589,7 +563,7 @@ Nó cần biết:
 
 Qua bốn chương của Phần III, ta có thể nhìn vai trò hai phía rõ hơn.
 
-AI rất phù hợp để đọc hàng nghìn dòng source, sinh candidate, dựng harness, chạy QA, tính ratio, kiểm tra artifact, tìm mismatch và tổng hợp evidence.
+AI rất phù hợp để đọc hàng nghìn dòng source, sinh phương án thử, dựng harness, chạy QA, tính tỷ lệ, kiểm tra artifact, tìm mismatch và tổng hợp evidence.
 
 Nhưng quyền quyết định khoa học nằm ở những ranh giới khác:
 
@@ -624,13 +598,13 @@ Ta bắt đầu Phần III với rất nhiều khả năng.
 
 Chương 12 cho phép AI và con người mở rộng không gian ý tưởng, nhưng dùng Mode E và M để không biến mọi ý tưởng thành một experiment.
 
-Chương 13 cho thấy Mode C có thể giết một hướng ngay trước performance: Q4 PASS không có nghĩa Q6 cũng vậy.
+Chương 13 cho thấy Mode C có thể giết một hướng ngay trước hiệu năng: Q4 ĐẠT (PASS) không có nghĩa Q6 cũng vậy.
 
-Chương 14 cho thấy Mode T: một cơ chế chỉ thực sự có giá trị khi hiệu ứng sống sót từ phép thử nhỏ tới model thật và E2E.
+Chương 14 cho thấy Mode T: một cơ chế chỉ thực sự có giá trị khi hiệu ứng sống sót từ phép thử nhỏ tới mô hình thật và E2E.
 
 Chương 15 đưa câu chuyện ra ngoài ArcLLM.
 
-Sau một improvement nội bộ khoảng 2×, phép đối chứng mới vẫn cho thấy khoảng cách bên ngoài xấp xỉ một bậc độ lớn ở decode và E2E.
+Sau một improvement nội bộ khoảng 2×, phép đối chứng mới vẫn cho thấy khoảng cách bên ngoài xấp xỉ một bậc độ lớn ở giai đoạn sinh token và E2E.
 
 Ta vì vậy đi từ:
 
@@ -662,13 +636,13 @@ Mỗi bước đều cần một loại evidence khác.
 
 Có lẽ đây là bài học quan trọng nhất của Phần III.
 
-Khi experiment FAIL, ta thường biết phải thận trọng.
+Khi experiment KHÔNG ĐẠT (FAIL), ta thường biết phải thận trọng.
 
-Nhưng khi experiment PASS rất đẹp, ta dễ mất cảnh giác hơn.
+Nhưng khi experiment ĐẠT (PASS) rất đẹp, ta dễ mất cảnh giác hơn.
 
-Một PASS `5×`.
+Một ĐẠT (PASS) `5×`.
 
-Một carry-through `2×`.
+Một khả năng giữ lợi ích khi đi lên toàn hệ `2×`.
 
 Một E2E cải thiện rõ rệt.
 
@@ -678,7 +652,7 @@ Tất cả đều tạo cảm giác:
 
 Nhưng chính lúc đó ta càng cần hỏi:
 
-> **Hệ thống bây giờ đã khác trước. Ta còn biết bottleneck hiện tại ở đâu không?**
+> **Hệ thống bây giờ đã khác trước. Ta còn biết nút thắt hiện tại ở đâu không?**
 
 Nếu câu trả lời là:
 
@@ -729,20 +703,20 @@ Vì vậy cuốn sách chuyển sang một loại câu hỏi khác.
 
 Không còn chỉ:
 
-> “Kernel nào nên nhanh hơn?”
+> “chương trình GPU nào nên nhanh hơn?”
 
 Mà bắt đầu hỏi:
 
-> **Runtime cần được tổ chức thành những ranh giới nào để ta có thể thay đổi một phần, đo một phần và vẫn biết chính xác điều gì đã tạo ra kết quả?**
+> **hệ thực thi cần được tổ chức thành những ranh giới nào để ta có thể thay đổi một phần, đo một phần và vẫn biết chính xác điều gì đã tạo ra kết quả?**
 
 Đó là nơi Phần IV bắt đầu.
 
 ### Nhớ 3 điều
 
-1. **Nhanh hơn chính mình không đồng nghĩa đã gần đối chứng.** Sau carry-through khoảng `2,20×` decode và `2,00×` E2E, phép đối chứng mới vẫn cho thấy ArcLLM có decode latency khoảng `10,38×` và E2E latency khoảng `9,97×` đối chứng trong các cell đã đo.
-2. **Một tối ưu lớn làm evidence cũ về bottleneck có thể hết hạn.** Sau khi gate/up thay đổi mạnh, không được dùng ranking lịch sử để tự động chọn kernel tiếp theo; phải profile lại hệ thống mới.
-3. **E/M/C/T là một vòng, không phải đường chạy tới PASS rồi kết thúc.** Khi Transfer thay đổi hệ thống, measurement mới mở lại Explore. Con người giữ quyền quyết định câu hỏi, phạm vi claim và lúc dừng; AI giúp mở rộng năng lực thực thi và kiểm tra.
+1. **Nhanh hơn chính mình không đồng nghĩa đã gần đối chứng.** Sau khả năng giữ lợi ích khi đi lên toàn hệ khoảng `2,20×` giai đoạn sinh token và `2,00×` E2E, phép đối chứng mới vẫn cho thấy ArcLLM có giai đoạn sinh token độ trễ khoảng `10,38×` và E2E độ trễ khoảng `9,97×` đối chứng trong các cell đã đo.
+2. **Một tối ưu lớn làm evidence cũ về nút thắt có thể hết hạn.** Sau khi gate/up thay đổi mạnh, không được dùng ranking lịch sử để tự động chọn chương trình GPU tiếp theo; phải profile lại hệ thống mới.
+3. **E/M/C/T là một vòng, không phải đường chạy tới ĐẠT (PASS) rồi kết thúc.** Khi Transfer thay đổi hệ thống, measurement mới mở lại Explore. Con người giữ quyền quyết định câu hỏi, phạm vi claim và lúc dừng; AI giúp mở rộng năng lực thực thi và kiểm tra.
 
 > **Phần III kết thúc tại đây.**
 >
-> Ta đã học cách nghĩ ra nhiều phương án mà không chạy tất cả, chấp nhận FAIL mà không cứu kết quả, chuyển một PASS nhỏ vào hệ thống thật, và cuối cùng đặt chính thành công đó trở lại trước một phép đối chứng mới.
+> Ta đã học cách nghĩ ra nhiều phương án mà không chạy tất cả, chấp nhận KHÔNG ĐẠT (FAIL) mà không cứu kết quả, chuyển một ĐẠT (PASS) nhỏ vào hệ thống thật, và cuối cùng đặt chính thành công đó trở lại trước một phép đối chứng mới.
