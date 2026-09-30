@@ -907,7 +907,7 @@ real system value
 2. **Transfer phải giữ phạm vi hẹp.** Trong phép thử này chỉ 56 gate/up Q4_K node của giai đoạn sinh token được thay. Nếu đồng thời sửa nhiều phần khác, ta sẽ mất khả năng biết cơ chế nào tạo ra kết quả.
 3. **I002 tạo ra một cải thiện ArcLLM nội bộ có ý nghĩa: khoảng `2,20×` giai đoạn sinh token và `2,00×` E2E, đồng thời giữ TTFT guard và token semantics.** Nhưng đây vẫn chưa phải bằng chứng ArcLLM thắng llama.cpp; đối chứng bên ngoài phải được đo lại với kiến trúc mới.
 
-**Chương 15 — Chỉ có ích khi toàn hệ thực sự được lợi**
+**Tiếp theo: [Chương 15 — Chỉ có ích khi toàn hệ thực sự được lợi](15-mot-kien-truc-chi-thang-khi-toan-he-duoc-loi.md)**
 
 Ta đã đi hết một vòng:
 
