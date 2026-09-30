@@ -16,22 +16,22 @@
 
 Ở cuối Chương 8, ta đã có một điều mà lúc bắt đầu cuốn sách chưa hề có.
 
-Một sử dụng thật path.
+Một đường chạy thực tế.
 
 Nó có thể:
 
 ```text
 đọc trọng số Q4_K / Q6_K đóng gói
         ↓
-giữ decoder resident
+giữ các lớp xử lý sẵn trong bộ nhớ
         ↓
-prefill
+xử lý đầu vào
         ↓
-giữ KV cache trên GPU
+giữ bộ nhớ đệm KV trên GPU
         ↓
-decode nhiều token
+sinh nhiều token
         ↓
-tạo logits
+tạo điểm dự đoán
         ↓
 chọn token tiếp theo
 ```
