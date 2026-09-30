@@ -416,7 +416,7 @@ Nhưng quyết định khác nhau chỉ vì:
 
 Đây là lúc cách biểu diễn dữ liệu bắt đầu kéo theo khái niệm:
 
-> **lifetime — vòng đời**, tức dữ liệu đó cần tồn tại bao lâu trước khi có thể bỏ hoặc phải tạo lại.
+> **vòng đời (lifetime)**, tức dữ liệu đó cần tồn tại bao lâu trước khi có thể bỏ hoặc phải tạo lại.
 
 Ta sẽ đi sâu vào điều này ở Chương 18.
 
@@ -592,7 +592,7 @@ Nếu ngay cả **giới hạn lạc quan nhất (optimistic bound)** cũng khô
 
 Đây lại là triết lý:
 
-> **kill before build — loại trước khi xây nếu giới hạn vật lý đã đủ để trả lời.**
+> **loại trước khi xây (kill before build)** — dừng trước khi triển khai nếu giới hạn vật lý đã đủ để trả lời.
 
 Một lớp trừu tượng tốt không tồn tại chỉ để làm hệ thống “trừu tượng hơn”.
 
@@ -789,7 +789,7 @@ cách biểu diễn đó sẵn sàng cho phép tính ngay lúc này
 2. **Khi một cách biểu diễn có lợi ích và chi phí riêng, hệ thực thi phải hiểu nó như một đối tượng kiến trúc.** EXEC148 có độ trễ tốt hơn trong phạm vi đã đo, nhưng phải trả chi phí tạo một lần và khoảng `550 MB` vùng dữ liệu bổ sung trong thí nghiệm.
 3. **Lớp trừu tượng xuất hiện sau bằng chứng, không phải trước bằng chứng.** Thí nghiệm 2×2 buộc ArcLLM tách cách thực thi khỏi cách biểu diễn; từ đó mới nảy sinh các câu hỏi về ai tạo, nằm ở đâu, sống bao lâu và khi nào nên giữ hoặc bỏ.
 
-**Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu**
+**Chương 18 — Dữ liệu có mặt chưa đủ: nó phải sẵn sàng đúng lúc**
 
 Ta từng nghĩ một câu hỏi lớn của hệ thực thi là:
 
