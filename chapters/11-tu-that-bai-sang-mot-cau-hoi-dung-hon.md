@@ -899,7 +899,7 @@ kiểm soát kích thước nhóm con GPU
 cooperative matrix
 ```
 
-**Nhóm con GPU (nhóm con GPU)** có thể hiểu gần đúng là:
+**Nhóm con GPU (subgroup)** có thể hiểu gần đúng là:
 
 > **một nhóm nhỏ các lane GPU có thể phối hợp chặt chẽ khi thực hiện cùng một công việc.**
 
