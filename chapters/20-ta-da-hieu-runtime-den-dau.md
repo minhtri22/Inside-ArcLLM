@@ -25,24 +25,24 @@ Chúng ta bắt đầu cuốn sách bằng một câu hỏi rất đơn giản:
 
 Lúc đó chưa có hệ thực thi.
 
-Chỉ có một file mô hình.
+Chỉ có một tệp mô hình.
 
 Rồi từng lớp xuất hiện.
 
 ```text
 GGUF
 ↓
-tensor
+khối số
 ↓
 Vulkan
 ↓
 các phép tính nền tảng
 ↓
-một decoder layer
+một lớp giải mã
 ↓
-28 layer
+28 lớp
 ↓
-KV cache
+bộ nhớ đệm KV
 ↓
 sinh nhiều token
 ↓
@@ -56,7 +56,7 @@ cách biểu diễn dữ liệu phục vụ thực thi
 ↓
 vòng đời dữ liệu
 ↓
-một mô hình runtime tổng quát hơn
+một mô hình mô tả hệ thực thi tổng quát hơn
 ```
 
 Nhưng đến đây vẫn còn một câu hỏi rất quan trọng.
@@ -188,7 +188,7 @@ W-C là gì
 
 nhánh A hay B là gì
 
-thí nghiệm nào đã sinh ra kernel đang chạy
+thí nghiệm nào đã sinh ra chương trình GPU đang chạy
 ```
 
 Đây là một ranh giới rất quan trọng.
@@ -206,11 +206,11 @@ Vì vậy hệ thực thi mới phải chạy lại các **đối chứng đã �
 Ở hai hồ sơ lịch sử, nó vẫn phải giữ đúng:
 
 ```text
-441 dispatch ở prefill
+441 lần giao việc cho GPU ở giai đoạn xử lý đầu vào
 
-469 dispatch cho mỗi bước decode
+469 lần giao việc cho GPU cho mỗi bước sinh token
 
-31 bước decode
+31 bước sinh token
 ```
 
 Với đường Q4-down, mỗi lượt vẫn có:
@@ -292,15 +292,15 @@ Trong nghĩa thực dụng mà cuốn sách này đặt ra:
 Nó có thể thực hiện một chuỗi hoàn chỉnh:
 
 ```text
-nạp model
+nạp mô hình
 ↓
-prefill
+xử lý đầu vào
 ↓
 tạo và sử dụng KV cache
 ↓
-decode nhiều token
+sinh nhiều token
 ↓
-dùng các kernel đã được xác nhận
+dùng các chương trình GPU đã được xác nhận
 ↓
 chọn đường thực thi
 ↓
@@ -334,7 +334,7 @@ Có thể nhìn toàn bộ hành trình như một chuỗi câu hỏi ngày càn
 Ban đầu:
 
 ```text
-có đọc đúng model không?
+có đọc đúng mô hình không?
 ```
 
 Rồi:
@@ -346,13 +346,13 @@ có tính đúng không?
 Rồi:
 
 ```text
-có chạy được một decoder layer không?
+có chạy được một lớp giải mã không?
 ```
 
 Rồi:
 
 ```text
-có chạy được cả model không?
+có chạy được cả mô hình không?
 ```
 
 Rồi:
@@ -370,7 +370,7 @@ có sinh được nhiều token liên tiếp không?
 Rồi:
 
 ```text
-đứng ở đâu trước một runtime trưởng thành?
+đứng ở đâu trước một hệ thực thi trưởng thành?
 ```
 
 Rồi:
@@ -383,7 +383,7 @@ Rồi:
 
 ```text
 một cơ chế nhanh ở phép thử nhỏ
-có còn nhanh trong model thật không?
+có còn nhanh trong mô hình thật không?
 ```
 
 Rồi:
@@ -404,7 +404,7 @@ Và cuối cùng:
 
 ```text
 những cơ chế khác nhau đó
-có thể cùng sống trong một runtime
+có thể cùng sống trong một hệ thực thi
 mà không cần lõi biết tên từng cơ chế không?
 ```
 
@@ -468,13 +468,13 @@ Nhưng phép đối chứng mới sau đó lại cho thấy:
 ```text
 nhanh hơn ArcLLM trước đó
 ≠
-đã bắt kịp runtime trưởng thành
+đã bắt kịp hệ thực thi trưởng thành
 ```
 
 Trong các trường hợp đã đo, khoảng cách với llama.cpp vẫn vào khoảng:
 
 ```text
-decode latency
+độ trễ sinh token
 ≈ 10,38×
 
 E2E latency
@@ -650,13 +650,13 @@ Không phải:
 
 Để FFN-down đi qua đường NPU đang khả thi, trọng số lượng tử hóa cần được tạo thành một cách biểu diễn FP16 ở thời điểm nạp mô hình hoặc từ một bản đã được lưu sẵn.
 
-Tổng dữ liệu FP16 cho 28 layer FFN-down vào khoảng:
+Tổng dữ liệu FP16 cho FFN-down của 28 lớp vào khoảng:
 
 ```text
 3,54 GiB
 ```
 
-Chi phí nhập đồ thị đã biên dịch, nếu nhìn theo phép đo tuần tự hiện tại cho cả 28 layer, lên tới khoảng:
+Chi phí nhập đồ thị đã biên dịch, nếu nhìn theo phép đo tuần tự hiện tại cho cả 28 lớp, lên tới khoảng:
 
 ```text
 12,6 giây
@@ -712,7 +712,7 @@ NPU đã làm ArcLLM nhanh hơn
 hay:
 
 ```text
-toàn model nên chuyển sang NPU
+toàn bộ mô hình nên chuyển sang NPU
 ```
 
 hay:
@@ -724,7 +724,7 @@ yêu cầu ngắn sẽ có lợi
 hay:
 
 ```text
-NPU đã được tích hợp vào runtime chuẩn
+NPU đã được tích hợp vào hệ thực thi chuẩn
 ```
 
 Không có kết luận nào trong số đó.
@@ -831,7 +831,7 @@ Nhưng:
 Ta có thể viết lại ArcLLM thành một câu chuyện rất đẹp:
 
 ```text
-xây runtime
+xây hệ thực thi
 ↓
 tìm nút thắt
 ↓
@@ -860,7 +860,7 @@ Q6 Split-K
 
 ```text
 một kiến trúc kế tiếp
-→ decode tốt hơn
+→ sinh token tốt hơn
 → E2E tốt hơn
 → nhưng FAIL vì TTFT
 ```
@@ -878,7 +878,7 @@ bộ đếm phần cứng
 ```
 
 ```text
-mô hình thu nhận đầu tiên
+Mô hình thu nhận đầu tiên
 → bị một họ mới phá
 ```
 
@@ -991,11 +991,11 @@ Tới đây, ta đã biết rất nhiều thứ mà trước đó chỉ nằm sa
 ```text
 token đi qua đâu
 
-tensor nào được đọc
+khối số nào được đọc
 
 phép tính nào xảy ra
 
-kernel nào thực thi
+chương trình GPU nào thực thi
 
 KV cache thay đổi thế nào
 
