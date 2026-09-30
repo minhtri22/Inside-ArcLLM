@@ -17,7 +17,7 @@
 
 > **Câu hỏi của chương:** Ta đã biết dữ liệu của mô hình nằm ở đâu. Làm thế nào để GPU thật sự có một nơi nhận dữ liệu, nhận lệnh và báo lại rằng công việc đã hoàn thành?
 
-Ở cuối Chương 2, ArcLLM đã biến file GGUF từ một “cục dữ liệu” thành một kho khối số có bản đồ rõ ràng. hệ thực thi biết khối số nào nằm ở đâu, dài bao nhiêu byte và đang được lưu theo kiểu nào. Q4_K vẫn có thể được giữ nguyên dạng đóng gói thay vì bung toàn bộ thành F32.
+Ở cuối Chương 2, ArcLLM đã biến tệp GGUF từ một “cục dữ liệu” thành một kho khối số có bản đồ rõ ràng. hệ thực thi biết khối số nào nằm ở đâu, dài bao nhiêu byte và đang được lưu theo kiểu nào. Q4_K vẫn có thể được giữ nguyên dạng đóng gói thay vì bung toàn bộ thành F32.
 
 Nhưng lúc này GPU vẫn chưa thật sự làm việc.
 
@@ -45,7 +45,7 @@ driver
 GPU
 ```
 
-**Driver — trình điều khiển —** là phần mềm nối hệ điều hành và chương trình với phần cứng cụ thể. ArcLLM không nói trực tiếp với từng mạch điện trong GPU. Nó dùng Vulkan; Vulkan và driver chịu trách nhiệm chuyển yêu cầu đó xuống phần cứng.
+**trình điều khiển — trình điều khiển —** là phần mềm nối hệ điều hành và chương trình với phần cứng cụ thể. ArcLLM không nói trực tiếp với từng mạch điện trong GPU. Nó dùng Vulkan; Vulkan và trình điều khiển chịu trách nhiệm chuyển yêu cầu đó xuống phần cứng.
 
 P2 chưa cố chạy mô hình.
 
@@ -53,29 +53,29 @@ Mục tiêu thấp hơn nhiều:
 
 > **Dựng được một “xưởng” tối thiểu nơi dữ liệu có thể ở lại, GPU có thể nhận một công việc, thực hiện nó và cho hệ thực thi biết công việc đã xong.**
 
-## Device: trước hết phải biết ta đang nói chuyện với GPU nào
+## Thiết bị (thiết bị): trước hết phải biết ta đang nói chuyện với GPU nào
 
-Trong Vulkan, một trong những khái niệm đầu tiên là **device — thiết bị**.
+Trong Vulkan, một trong những khái niệm đầu tiên là **thiết bị — thiết bị**.
 
 Máy tính có thể có nhiều thiết bị hoặc nhiều khả năng khác nhau. hệ thực thi không thể chỉ nói chung chung “hãy chạy trên GPU”. Nó phải mở một kết nối làm việc với thiết bị cụ thể mà Vulkan cung cấp.
 
-Trong P2, ArcLLM lấy được **một Vulkan device — một thiết bị Vulkan mà hệ thực thi có thể dùng để làm việc với GPU**.
+Trong P2, ArcLLM lấy được **một Vulkan thiết bị — một thiết bị Vulkan mà hệ thực thi có thể dùng để làm việc với GPU**.
 
 Con số “1” ở đây chỉ có nghĩa hệ thực thi đã chọn và mở được một thiết bị Vulkan cho đường thực thi này.
 
-Nhưng có device vẫn chưa đủ.
+Nhưng có thiết bị vẫn chưa đủ.
 
 Ta cần một nơi để gửi công việc.
 
-## Queue: hàng chờ nhận việc của GPU
+## Hàng đợi (hàng đợi): nơi GPU nhận việc
 
-Vulkan dùng khái niệm **queue — hàng đợi công việc**.
+Vulkan dùng khái niệm **hàng đợi — hàng đợi công việc**.
 
 Hãy tưởng tượng một xưởng có một cửa nhận phiếu việc. Bạn không chạy vào giữa dây chuyền và tự tay ra lệnh cho từng bộ phận. Bạn chuẩn bị một phiếu rõ ràng rồi đặt nó vào hàng chờ. Xưởng lấy các phiếu theo cơ chế của nó và xử lý.
 
-P2 cần một **compute queue — hàng đợi có khả năng nhận công việc tính toán**.
+P2 cần một **compute hàng đợi — hàng đợi có khả năng nhận công việc tính toán**.
 
-Kết quả: ArcLLM lấy được queue đó.
+Kết quả: ArcLLM lấy được hàng đợi đó.
 
 Tới đây ta có:
 
@@ -93,7 +93,7 @@ Nhưng vẫn còn một câu hỏi lớn: dữ liệu ở đâu?
 
 ## Không thể mỗi lần cần khối số lại đi lấy từ đầu
 
-Ở P1, GGUF được ánh xạ để hệ thực thi biết và truy cập trực tiếp từng vùng byte. Đó là một nền móng tốt cho phía file.
+Ở P1, GGUF được ánh xạ để hệ thực thi biết và truy cập trực tiếp từng vùng byte. Đó là một nền móng tốt cho phía tệp.
 
 P2 chuyển sang câu hỏi phía GPU:
 
@@ -123,7 +123,7 @@ tạo vùng nhớ
 
 Trong giai đoạn này, ta có thể gọi đó là dữ liệu **resident — cư trú, tức đang nằm sẵn trong vùng bộ nhớ phục vụ GPU**. Ở P2, nghĩa rất đơn giản: vùng nhớ đã được tạo, dữ liệu đã được đặt vào và hệ thực thi chưa giải phóng nó.
 
-## Tại sao phải chia thành bốn arena?
+## Tại sao phải chia thành bốn vùng bộ nhớ lớn?
 
 Payload đóng gói của GGUF mà P2 cần giữ có kích thước:
 
@@ -140,7 +140,7 @@ Payload đóng gói của GGUF mà P2 cần giữ có kích thước:
 ≈ 934,7 MiB
 ```
 
-P2 chọn chia vùng chứa trọng số thành các **arena — vùng chứa lớn được hệ thực thi quản lý**, mỗi arena không lớn hơn 256 MiB.
+P2 chọn chia vùng chứa trọng số thành các **vùng bộ nhớ lớn — vùng chứa lớn được hệ thực thi quản lý**, mỗi vùng bộ nhớ lớn không lớn hơn 256 MiB.
 
 Thay vì tạo hàng trăm vùng nhỏ cho từng khối số, hệ thực thi có một số khoang lớn để giữ cả payload.
 
@@ -160,13 +160,13 @@ Còn:
 
 thì đủ sức chứa.
 
-Vì vậy P2 giữ toàn bộ payload trong **4 persistent trọng số arenas — bốn vùng lưu giữ trọng số tồn tại lâu dài**, mỗi arena không vượt quá giới hạn 256 MiB mà thiết kế đã đặt ra.
+Vì vậy P2 giữ toàn bộ payload trong **4 persistent trọng số arenas — bốn vùng lưu giữ trọng số tồn tại lâu dài**, mỗi vùng bộ nhớ lớn không vượt quá giới hạn 256 MiB mà thiết kế đã đặt ra.
 
 Điểm quan trọng ở đây: 256 MiB là cách P2 tổ chức bộ nhớ cho bước này; không nên đọc nó thành “GPU chỉ cấp được tối đa 256 MiB”.
 
-Bốn arena là quyết định của hệ thực thi trong contract P2.
+Bốn vùng bộ nhớ lớn là quyết định của hệ thực thi trong contract P2.
 
-## Một bàn làm việc riêng: scratch bộ nhớ
+## Một bàn làm việc riêng: vùng nhớ tạm (vùng nhớ tạm)
 
 Trọng số của mô hình giống nguyên liệu hoặc dụng cụ được giữ lâu dài.
 
@@ -174,9 +174,9 @@ Nhưng khi tính toán, chương trình còn cần chỗ để đặt kết qu�
 
 Ví dụ rất đời thường: trong bếp, tủ đựng gạo và gia vị có thể tồn tại lâu dài; nhưng bạn vẫn cần mặt bàn để thái rau, đặt bát và chuẩn bị món ăn. Mặt bàn không phải nguyên liệu. Nó là không gian làm việc.
 
-hệ thực thi cũng cần một vùng như vậy.
+Hệ thực thi cũng cần một vùng như vậy.
 
-P2 tạo một **scratch arena — vùng nhớ làm việc tạm**, dung lượng 64 MiB, và cũng giữ vùng này tồn tại để sẵn sàng cho các công việc tiếp theo.
+P2 tạo một **vùng nhớ tạm vùng bộ nhớ lớn — vùng nhớ làm việc tạm**, dung lượng 64 MiB, và cũng giữ vùng này tồn tại để sẵn sàng cho các công việc tiếp theo.
 
 ```text
 4 vùng lưu trọng số
@@ -187,9 +187,9 @@ P2 tạo một **scratch arena — vùng nhớ làm việc tạm**, dung lượn
 
 Đây chính là năm vùng nhớ được ghi nhận còn tồn tại khi lệnh GPU được thực hiện trong P2.
 
-Một lần nữa, P2 chưa dùng scratch để chạy cơ chế chú ý hay nhân ma trận của mô hình. Nó chỉ đang chứng minh rằng hạ tầng bộ nhớ tồn tại và có thể được GPU đụng tới đúng cách.
+Một lần nữa, P2 chưa dùng vùng nhớ tạm để chạy cơ chế chú ý hay nhân ma trận của mô hình. Nó chỉ đang chứng minh rằng hạ tầng bộ nhớ tồn tại và có thể được GPU đụng tới đúng cách.
 
-## vùng nhớ là gì?
+## Vùng nhớ là gì?
 
 Từ **vùng nhớ** xuất hiện rất nhiều trong lập trình hệ thống.
 
@@ -221,9 +221,9 @@ Vùng phía dưới là bàn làm việc.
 
 ## Nhưng làm sao “giao việc” cho GPU?
 
-Có device, queue và vùng nhớ rồi vẫn chưa đủ. hệ thực thi phải mô tả công việc cần làm.
+Có thiết bị, hàng đợi và vùng nhớ rồi vẫn chưa đủ. hệ thực thi phải mô tả công việc cần làm.
 
-Vulkan dùng **command vùng nhớ — vùng ghi các lệnh sẽ gửi cho GPU**.
+Vulkan dùng **bộ lệnh — vùng ghi các lệnh sẽ gửi cho GPU**.
 
 Command vùng nhớ không phải kho chứa trọng số. Nó giống một tờ phiếu công việc:
 
@@ -233,21 +233,21 @@ sau đó làm việc B
 sau đó làm việc C
 ```
 
-Các command vùng nhớ thường được cấp từ một **command pool — nơi quản lý các command vùng nhớ**.
+Các bộ lệnh thường được cấp từ một **command pool — nơi quản lý các bộ lệnh**.
 
-P2 dựng được command pool và command vùng nhớ cần thiết, rồi gửi command vùng nhớ vào compute queue.
+P2 dựng được command pool và bộ lệnh cần thiết, rồi gửi bộ lệnh vào compute hàng đợi.
 
 Nhưng một vấn đề khác xuất hiện.
 
 GPU làm việc bất đồng bộ với CPU: CPU có thể giao việc rồi tiếp tục chạy. Vậy làm sao CPU biết lúc nào GPU đã hoàn thành?
 
-## Fence: tấm biển “đã làm xong”
+## Tín hiệu hoàn thành (tín hiệu hoàn thành): tấm biển “đã làm xong”
 
-P2 dùng một **fence — tín hiệu đồng bộ cho biết công việc GPU đã hoàn thành**.
+P2 dùng một **tín hiệu hoàn thành — tín hiệu đồng bộ cho biết công việc GPU đã hoàn thành**.
 
 Hãy tưởng tượng bạn gửi một đơn xuống xưởng rồi nhận một số thứ tự. Bạn không thể kiểm tra sản phẩm trước khi xưởng báo hoàn tất.
 
-Fence đóng vai trò tương tự.
+tín hiệu hoàn thành đóng vai trò tương tự.
 
 Chuỗi đơn giản là:
 
@@ -277,9 +277,9 @@ Nếu mục tiêu chỉ là kiểm tra:
 
 thì một phép thử nhỏ sẽ tốt hơn.
 
-P2 yêu cầu GPU **fill — điền một giá trị vào vùng scratch**.
+P2 yêu cầu GPU **fill — điền một giá trị vào vùng vùng nhớ tạm**.
 
-Sau khi command được submit và fence báo hoàn thành, phía CPU kiểm tra lại vùng nhớ có mang đúng dấu vết mong đợi hay không.
+Sau khi command được submit và tín hiệu hoàn thành báo hoàn thành, phía CPU kiểm tra lại vùng nhớ có mang đúng dấu vết mong đợi hay không.
 
 Kết quả:
 
@@ -295,13 +295,13 @@ Nói bằng tiếng Việt bình thường:
 
 Đây chưa phải phép tính AI, nhưng “nhà máy” đã thật sự nhận một phiếu việc và phản hồi.
 
-## Làm sao biết dữ liệu trọng số không bị sai khi đưa vào các arena?
+## Làm sao biết dữ liệu trọng số không bị sai khi đưa vào các vùng bộ nhớ lớn?
 
-P2 còn kiểm tra **fingerprint — dấu nhận dạng rút gọn của dữ liệu** cho các arena trọng số.
+P2 còn kiểm tra **fingerprint — dấu nhận dạng rút gọn của dữ liệu** cho các vùng bộ nhớ lớn trọng số.
 
 Ý tưởng giống việc niêm phong bốn kiện hàng trước khi vận chuyển rồi kiểm tra lại dấu nhận dạng sau khi chúng đã được đặt vào kho mới.
 
-Kết quả là cả bốn arena đều vượt qua kiểm tra fingerprint.
+Kết quả là cả bốn vùng bộ nhớ lớn đều vượt qua kiểm tra fingerprint.
 
 Điều đó cho P2 bằng chứng rằng payload vẫn nhất quán trong các vùng bộ nhớ mới. Nhưng đây chưa phải bằng chứng mọi khối số sẽ tính đúng: P2 chưa thực hiện phép toán mô hình.
 
@@ -309,7 +309,7 @@ Nó chỉ chứng minh **đường đưa và giữ dữ liệu đã hoạt độ
 
 > **Ghi chú nhỏ:** “Contract” trong sách không phải hợp đồng pháp lý. Nó là tập những điều đã được xác định trước rằng mỗi lớp phải làm đúng: ArcLLM yêu cầu gì, Vulkan chuyển và đồng bộ yêu cầu đó thế nào, CPU/GPU phải tạo ra dấu hiệu/kết quả nào để phép thử được coi là đạt.
 
-## P2 PASS thực sự có nghĩa gì?
+## P2 ĐẠT thực sự có nghĩa gì?
 
 Đến cuối P2, ArcLLM có:
 
@@ -341,9 +341,9 @@ GPU scratch fill
 → VERIFIED
 ```
 
-P2 vì vậy được đóng với kết quả PASS.
+P2 vì vậy được đóng với kết quả ĐẠT (PASS).
 
-Nhưng PASS ở đây có phạm vi rất cụ thể.
+Nhưng ĐẠT (PASS) ở đây có phạm vi rất cụ thể.
 
 P2 **không chứng minh mô hình chạy đúng**.
 
@@ -381,9 +381,9 @@ Nhưng có một nguyên tắc sẽ giữ nguyên:
 
 ### Nhớ 3 điều
 
-1. **Vulkan cho ArcLLM một con đường có kiểm soát tới GPU:** device — thiết bị để làm việc với GPU; queue — hàng đợi để giao việc; fence — tín hiệu để biết khi nào việc đã hoàn thành.
-2. **P2 tách bộ nhớ thành phần giữ lâu và phần làm việc:** khoảng 934,7 MiB payload cư trú trong bốn vùng lưu trọng số; 64 MiB scratch là vùng làm việc tạm.
-3. **P2 PASS chưa phải mô hình PASS.** Nó chỉ chứng minh hạ tầng bộ nhớ và đường gửi lệnh GPU đã hoạt động đủ để bắt đầu kiểm tra những phép toán thật.
+1. **Vulkan cho ArcLLM một con đường có kiểm soát tới GPU:** thiết bị — thiết bị để làm việc với GPU; hàng đợi — hàng đợi để giao việc; tín hiệu hoàn thành — tín hiệu để biết khi nào việc đã hoàn thành.
+2. **P2 tách bộ nhớ thành phần giữ lâu và phần làm việc:** khoảng 934,7 MiB payload cư trú trong bốn vùng lưu trọng số; 64 MiB vùng nhớ tạm là vùng làm việc tạm.
+3. **P2 ĐẠT (PASS) chưa phải mô hình ĐẠT (PASS).** Nó chỉ chứng minh hạ tầng bộ nhớ và đường gửi lệnh GPU đã hoạt động đủ để bắt đầu kiểm tra những phép toán thật.
 
 **Chương 4 — Từng phép tính trước, mô hình sau**
 
