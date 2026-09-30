@@ -125,7 +125,7 @@ Nhưng nó tạo ra một nghịch lý:
 
 > **Khi việc tạo phương án trở nên rẻ, khả năng lựa chọn đúng phương án lại trở nên đắt giá hơn.**
 
-Thứ đắt không còn chỉ là code.
+Thứ đắt không còn chỉ là **mã nguồn**.
 
 Thứ đắt là:
 
@@ -296,7 +296,7 @@ Không gộp chương trình GPU.
 
 Không thử nhiều kích thước nhóm con GPU cùng lúc.
 
-Không thêm bước giải mã toàn bộ trọng số ra buffer khác.
+Không thêm bước giải mã toàn bộ trọng số ra một **vùng nhớ khác**.
 
 Đó chính là chế độ M — Kiểm tra cơ chế:
 
