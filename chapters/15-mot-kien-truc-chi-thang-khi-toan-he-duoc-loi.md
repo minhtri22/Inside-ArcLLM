@@ -106,12 +106,12 @@ Không tối ưu thêm.
 Hai bên tiếp tục dùng:
 
 ```text
-cùng model GGUF
-cùng bytes model
+cùng mô hình GGUF
+cùng byte của mô hình
 cùng phần cứng
 cùng W-S và W-C
 cùng 32 token đầu ra
-cùng raw prompt token IDs
+cùng mã token đầu vào thô
 cùng greedy generation
 ```
 
@@ -124,7 +124,7 @@ Tải nền có thể thay đổi theo thời gian.
 Nếu chạy toàn bộ ArcLLM trước rồi vài phút sau mới chạy llama.cpp, ta dễ trộn:
 
 ```text
-khác biệt runtime
+khác biệt hệ thực thi
 +
 khác biệt trạng thái máy
 ```
@@ -196,7 +196,7 @@ Nó hỏi:
 Tỷ lệ dưới đây đều là:
 
 ```text
-ArcLLM candidate / llama.cpp
+phương án ArcLLM / llama.cpp
 ```
 
 Với độ trễ, lớn hơn `1` nghĩa là ArcLLM mất nhiều thời gian hơn.
@@ -211,14 +211,14 @@ Với độ trễ, lớn hơn `1` nghĩa là ArcLLM mất nhiều thời gian h�
 Khi lấy trung bình hình học của bốn cell:
 
 ```text
-decode latency
+độ trễ sinh token
 ≈ 10,38×
 ```
 
 và:
 
 ```text
-E2E latency
+độ trễ toàn lượt
 ≈ 9,97×
 ```
 
@@ -363,7 +363,7 @@ mechanism có giá trị thật
 nhưng
         ↓
 một mechanism chưa đủ
-để giải quyết toàn bộ maturity gap
+để giải quyết toàn bộ khoảng cách tới mức trưởng thành
 ```
 
 Đây chính là ý nghĩa của tiêu đề chương:
@@ -462,7 +462,7 @@ ta vừa thay đổi hệ thống
 ↓
 phân bố chi phí có thể đã đổi
 ↓
-bằng chứng cũ về bottleneck có thể stale
+bằng chứng cũ về nút thắt có thể đã lỗi thời
 ↓
 phải đo lại
 ```
@@ -530,13 +530,13 @@ Một AI có khả năng **viết mã** tốt có thể chạy một vòng rất
 ```text
 profile
 ↓
-chọn bottleneck
+chọn nút thắt
 ↓
 sửa
 ↓
 thấy nhanh hơn
 ↓
-chọn bottleneck tiếp theo
+chọn nút thắt tiếp theo
 ↓
 sửa tiếp
 ```
@@ -570,7 +570,7 @@ Nhưng quyền quyết định khoa học nằm ở những ranh giới khác:
 ```text
 câu hỏi nào đáng hỏi?
 
-claim nào đang được kiểm tra?
+kết luận nào đang được kiểm tra?
 
 điều gì phải khóa trước outcome?
 
@@ -615,13 +615,13 @@ Ta vì vậy đi từ:
 tới:
 
 ```text
-“component nhanh”
+“thành phần nhanh”
 ```
 
 rồi:
 
 ```text
-“runtime nội bộ nhanh hơn”
+“hệ thực thi nội bộ nhanh hơn”
 ```
 
 và cuối cùng:
