@@ -1,5 +1,34 @@
 # Chương 9 — Benchmark phải có đối chứng
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: benchmark / đối chứng / cách đo**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** benchmark / đối chứng / cách đo.
+
+
 > **Câu hỏi của chương:** Nếu ArcLLM chạy được và đã tự tối ưu qua nhiều bước, làm thế nào biết nó thực sự đang đứng ở đâu khi đặt cạnh một runtime trưởng thành?
 
 Ở cuối Chương 8, ta đã có một điều mà lúc bắt đầu cuốn sách chưa hề có.
