@@ -2,540 +2,417 @@
 
 > **Mức đọc: Nền tảng**
 >
-> Phần này dành cho người bắt đầu từ số 0. Nếu bạn chưa biết model, LLM, parameter, dense, Transformer, CPU hay GPU là gì, hãy đọc phần này trước Chương 1.
+> Nếu bạn chưa biết AI, mô hình, token, CPU hay GPU là gì, hãy bắt đầu ở đây. Không cần ghi nhớ thuật ngữ. Mục tiêu chỉ là hiểu từng vai trò một.
 
-Cuốn sách này sẽ đi rất sâu vào bên trong một runtime LLM. Nhưng trước khi mở cỗ máy, ta cần một tấm bản đồ.
+## Bắt đầu từ thứ quen thuộc nhất
 
-Mục tiêu của Phần 0 không phải biến bạn thành kỹ sư AI. Ta chỉ cần dựng đủ những “móc” kiến thức để khi các từ như **token**, **tensor**, **decoder layer**, **GPU** hay **quantization** xuất hiện ở những chương sau, bạn biết chúng đang nằm ở đâu trong bức tranh lớn.
-
-Nếu có chỗ nào chưa nhớ ngay, điều đó hoàn toàn bình thường. Hãy giữ lại sơ đồ lớn trước. Những chi tiết sẽ được mở dần khi ArcLLM thật sự cần tới chúng.
-
-## Hai bản đồ cần nhớ
-
-Bản đồ thứ nhất trả lời:
-
-> **LLM nằm ở đâu trong thế giới AI?**
-
-Bản đồ thứ hai trả lời:
-
-> **Một đoạn văn đi qua model như thế nào để tạo ra token tiếp theo?**
-
-Có thể đặt hai bản đồ cạnh nhau như sau:
+Bạn mở một ứng dụng AI và gõ:
 
 ```text
-HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-
-AI                                   Văn bản
-↓                                    ↓
-Machine Learning                     Tokenizer
-↓                                    ↓
-Neural Network                       Token / token ID
-↓                                    ↓
-Language Model                       Embedding → tensor
-↓                                           +
-LLM                                  parameters / weights từ model
-↓                                           ↓
-Transformer                          Runtime
-↓                                           ↓
-Decoder-only Transformer             CPU / GPU / bộ nhớ
-↓                                           ↓
-Nhiều decoder layer                  RMSNorm / Attention / FFN
-↓ chứa                                      ↓
-Parameters / Weights                 một decoder layer
-                                             ↓
-                                      nhiều decoder layer
-                                             ↓
-                                      logits → token tiếp theo
-                                             ↓
-                                      KV cache / lặp lại
-                                             ↓
-                                      benchmark / tối ưu
-                                             ↓
-                                      representation / lifecycle
+Hà Nội là thủ đô của nước nào?
 ```
 
-Đây là **bản đồ xuyên suốt duy nhất** của cuốn sách. Đừng cố học thuộc ngay; từ Chương 1 trở đi, cùng sơ đồ này sẽ xuất hiện lại và chỉ thay dòng **“Đang mở ở chương này”**.
-
-## AI không đồng nghĩa với LLM
-
-**Artificial Intelligence — trí tuệ nhân tạo (AI)** là tên rất rộng cho những hệ thống thực hiện các công việc mà ta thường liên hệ với khả năng “thông minh”: nhận biết, dự đoán, lập kế hoạch, tạo nội dung hoặc ra quyết định.
-
-Bên trong chiếc ô rất rộng đó có **Machine Learning — học máy**.
-
-Học máy là cách xây hệ thống không chỉ bằng những luật viết tay kiểu:
+Vài giây sau, màn hình hiện:
 
 ```text
-nếu A thì làm B
-nếu C thì làm D
+Việt Nam.
 ```
 
-mà còn bằng cách cho hệ thống học những mẫu từ dữ liệu.
-
-Một họ rất quan trọng của học máy là **Neural Network — mạng nơ-ron nhân tạo**. Đây là những hệ thống gồm nhiều phép biến đổi số học nối tiếp nhau. Từ “nơ-ron” gợi liên tưởng tới sinh học, nhưng trong cuốn sách này hãy hiểu nó đơn giản là **một mô hình toán học được tạo bởi rất nhiều phép tính và rất nhiều con số có thể học được**.
-
-Một **Language Model — mô hình ngôn ngữ** là model được dùng để mô hình hóa ngôn ngữ. Một cách rất hữu ích để hiểu nó là:
-
-> **Cho những token đã có, model ước lượng token nào có thể đứng tiếp theo.**
-
-Khi mô hình ngôn ngữ có quy mô rất lớn, ta thường gọi nó là:
-
-**Large Language Model — mô hình ngôn ngữ lớn (LLM).**
-
-Vì vậy:
+Từ góc nhìn của người dùng, quá trình chỉ có hai đầu:
 
 ```text
-AI
-└─ Machine Learning
-   └─ Neural Network
-      └─ Language Model
-         └─ Large Language Model
+câu hỏi
+↓
+câu trả lời
 ```
 
-LLM là một phần của thế giới AI. Nó không đồng nghĩa với toàn bộ AI.
+Cuốn sách này muốn mở phần ở giữa.
 
-## Model là gì?
+Nhưng ta sẽ không mở tất cả cùng lúc.
 
-Trong đời thường, ta có thể gọi “model” là mô hình.
-
-Trong cuốn sách này, **model — mô hình** là một hệ thống đã học được một lượng lớn các con số và cấu trúc để biến đầu vào thành đầu ra.
-
-Đối với một LLM, đầu vào cuối cùng không phải là câu chữ theo cách con người nhìn thấy. Văn bản sẽ được mã hóa thành các đơn vị số, đi qua nhiều phép tính, rồi model tạo điểm cho những token có thể xuất hiện tiếp theo.
-
-Điều rất quan trọng là:
-
-> **Model không phải ứng dụng chat.**
-
-Một ứng dụng như ChatGPT có thể có giao diện, lịch sử hội thoại, công cụ, tìm kiếm, lưu tệp và nhiều lớp khác. Model chỉ là một thành phần bên trong hệ thống lớn hơn.
-
-Ta sẽ dùng ranh giới này rất nhiều:
+Trước tiên, hãy chia hệ thống thành ba vai trò rất đơn giản:
 
 ```text
-Ứng dụng
-   ↓
-Model
-   ↓
-Runtime
-   ↓
-Phần cứng
+1. Thứ chứa những gì máy đã học
+2. Thứ biết cách làm cho nó chạy
+3. Máy móc thật sự thực hiện phép tính
 ```
 
-## Parameter và weight: model đã học cái gì?
+Sau khi hiểu ba vai trò đó, ta mới đặt tên.
 
-Trong quá trình **training — huấn luyện**, model được điều chỉnh để làm tốt hơn một nhiệm vụ. Với LLM, một nhiệm vụ nền tảng là dự đoán token tiếp theo.
+## 1. Mô hình: thứ chứa những gì đã học
 
-Những con số có thể được điều chỉnh trong quá trình học được gọi chung là:
+Hãy tưởng tượng một chiếc máy có hàng tỷ núm nhỏ.
 
-**parameter — tham số học được của model.**
+Trong quá trình học, các núm đó được điều chỉnh rất nhiều lần.
 
-Một loại parameter rất phổ biến là:
+Sau khi học xong, vị trí của những núm ấy được giữ lại.
 
-**weight — trọng số.**
+Khi có câu hỏi mới, máy không học lại từ đầu. Nó dùng những giá trị đã được điều chỉnh để tính phần tiếp theo.
 
-Ở mức nhập môn, bạn có thể hình dung:
+Trong AI, thứ chứa cấu trúc và những con số đã học đó được gọi là **mô hình (model)**.
+
+Đây chỉ là hình dung ban đầu, nhưng đủ để đi tiếp.
+
+Một mô hình không phải là cả ứng dụng chat.
+
+Ứng dụng còn có thể có giao diện, lịch sử trò chuyện, tìm kiếm, công cụ và nhiều phần khác.
+
+Ta có thể tạm vẽ:
 
 ```text
-training
-   ↓
+Ứng dụng AI
+    ↓
+Mô hình
+```
+
+### Những con số đã học được gọi là gì?
+
+Trong quá trình **huấn luyện (training)**, rất nhiều con số bên trong mô hình được điều chỉnh.
+
+Những con số có thể học được gọi chung là **tham số (parameter)**.
+
+Một loại tham số rất phổ biến là **trọng số (weight)**.
+
+Ở mức nhập môn, bạn chỉ cần nhớ:
+
+```text
+huấn luyện
+↓
 điều chỉnh rất nhiều con số
-   ↓
-parameters / weights
-   ↓
-lưu chúng vào model
+↓
+các tham số / trọng số
+↓
+được lưu lại trong mô hình
 ```
 
-Sau khi huấn luyện xong, khi ta dùng model để xử lý một yêu cầu mới, quá trình đó gọi là:
+Khi dùng mô hình đã học để xử lý một câu hỏi mới, ta gọi quá trình đó là **suy luận (inference)**.
 
-**inference — suy luận.**
+ArcLLM chủ yếu nghiên cứu giai đoạn suy luận.
 
-Ta có hai giai đoạn khác nhau:
+## 2. Token: mảnh văn bản mà mô hình xử lý
+
+Bây giờ ta có một câu:
 
 ```text
-TRAINING
-học / điều chỉnh parameters
-        ↓
-model đã huấn luyện
-        ↓
-INFERENCE
-dùng parameters đã học để xử lý đầu vào mới
+Hà Nội rất đẹp.
 ```
 
-ArcLLM tập trung vào **inference**, không phải huấn luyện model từ đầu.
-
-## 1.5B, 7B nghĩa là gì?
-
-Trong tên model, bạn có thể gặp:
+Nếu mới học, bạn có thể **tạm hình dung** mỗi từ là một mảnh:
 
 ```text
-1.5B
-7B
-14B
+Hà | Nội | rất | đẹp | .
 ```
 
-Chữ **B** ở đây là **billion — tỷ**.
+Mô hình không nhất thiết chia đúng như vậy, nhưng cách hình dung này giúp ta hiểu ý tưởng đầu tiên.
 
-Một model “1.5B” thường có khoảng 1,5 tỷ parameter theo cách nhà phát hành đặt tên cho quy mô model.
+Mỗi mảnh văn bản mà mô hình xử lý được gọi là một **token**.
 
-Một model “7B” thường ở cỡ khoảng 7 tỷ parameter.
+Bây giờ ta sửa cách hiểu cho chính xác hơn một chút:
 
-Con số này **không phải kích thước file tính bằng byte**.
+> **Token không nhất thiết là một từ.**
 
-Cùng một model có thể được lưu bằng nhiều cách khác nhau. Cách lưu mỗi parameter bằng bao nhiêu bit sẽ ảnh hưởng rất lớn tới dung lượng file và lượng bộ nhớ cần thiết khi chạy.
+Tùy mô hình, một token có thể là:
 
-Ta sẽ mở chuyện này ở Chương 2.
-
-## Dense là gì?
-
-Một từ rất hay xuất hiện khi nói về model là:
-
-**dense model — model đặc.**
-
-Ở mức cần thiết cho cuốn sách này, hãy hiểu như sau:
-
-> Trong một model dense truyền thống, mỗi token đi qua cùng chuỗi layer chính của model.
-
-Ví dụ:
-
-```text
-token
-  ↓
-Layer 0
-  ↓
-Layer 1
-  ↓
-Layer 2
-  ↓
-...
-```
-
-Một hướng khác là **Mixture of Experts (MoE) — hỗn hợp chuyên gia**. Model có nhiều nhánh “expert”, nhưng mỗi token có thể chỉ được định tuyến qua một phần trong số đó.
-
-Điều cần nhớ là:
-
-```text
-dense / MoE
-→ nói về cách kiến trúc model tổ chức việc tính toán
-
-F32 / Q4 / Q6
-→ nói về cách các con số được biểu diễn và lưu trữ
-```
-
-Hai câu chuyện này khác nhau.
-
-ArcLLM trong hành trình chính của cuốn sách làm việc với một model decoder dạng dense.
-
-## Transformer là gì?
-
-Phần lớn LLM hiện đại thuộc họ kiến trúc **Transformer**.
-
-Ta chưa cần học công thức Transformer.
-
-Ta chỉ cần một bức tranh đủ để không bị lạc khi các chương sau nói tới attention, FFN hay decoder layer.
-
-Một Transformer có thể được xây từ nhiều **layer — lớp xử lý** nối tiếp nhau.
-
-Model mà ArcLLM nghiên cứu thuộc loại:
-
-**decoder-only Transformer — Transformer chỉ dùng khối decoder để sinh token tiếp theo.**
-
-Có thể hình dung:
-
-```text
-token / tín hiệu đầu vào
-        ↓
-Decoder layer 0
-        ↓
-Decoder layer 1
-        ↓
-Decoder layer 2
-        ↓
-...
-        ↓
-Decoder layer N
-        ↓
-điểm cho token tiếp theo
-```
-
-Trong một decoder layer, ta sẽ gặp những khối như:
-
-```text
-tín hiệu vào
-    ↓
-RMSNorm
-    ↓
-Attention
-    ↓
-Residual
-    ↓
-RMSNorm
-    ↓
-FFN
-    ↓
-Residual
-    ↓
-tín hiệu ra
-```
-
-Bạn chưa cần hiểu công thức của từng khối.
-
-Chỉ cần nhớ:
-
-- **RMSNorm — phép chuẩn hóa** giúp giữ tín hiệu ở thang phù hợp.
-- **Attention — cơ chế chú ý** giúp vị trí hiện tại kết hợp thông tin từ các vị trí khác.
-- **FFN — Feed-Forward Network, nhánh biến đổi tín hiệu** xử lý mỗi vị trí qua một nhóm phép biến đổi khác.
-- **Residual — đường cộng tắt** đưa một phần tín hiệu cũ cộng trở lại tín hiệu mới.
-
-Chương 4 và 5 sẽ mở những khối này đúng lúc chúng ta thật sự cần chạy chúng.
-
-## Token là gì?
-
-Con người nhìn thấy:
-
-```text
-Xin chào!
-```
-
-Model không xử lý câu đó như một “ý nghĩa nguyên khối”.
-
-Một **tokenizer — bộ tách và mã hóa văn bản** biến văn bản thành những đơn vị gọi là:
-
-**token — đơn vị mà model dùng để xử lý văn bản.**
-
-Một token không nhất thiết là một từ.
-
-Nó có thể là:
-
-- một ký tự;
-- một phần của từ;
 - cả một từ;
-- dấu câu;
-- hoặc một chuỗi ký tự khác tùy tokenizer.
+- một phần của từ;
+- một dấu câu;
+- một chuỗi ký tự;
+- hoặc một phần có liên quan tới khoảng trắng.
 
-Mỗi token sau đó được gán một con số:
-
-**token ID — mã số của token.**
+Phần mềm chia văn bản thành các token được gọi là **bộ tách và mã hóa văn bản (tokenizer)**.
 
 Ví dụ minh họa:
 
 ```text
-"Xin chào!"
-    ↓
-tokenizer
-    ↓
-["Xin", " chào", "!"]
-    ↓
-[314, 9821, 17]
+"ChatGPT!"
+     ↓
+bộ tách và mã hóa
+     ↓
+"Chat" | "GPT" | "!"
 ```
 
-Các con số trên chỉ là ví dụ. Tokenizer thật của từng model có thể chia khác hoàn toàn.
+Một mô hình khác có thể chia khác.
 
-## Từ token ID tới tensor
+Điều cần nhớ lúc này chỉ là:
 
-Token ID chỉ là một số nguyên.
+> **Con người nhìn thấy câu chữ; mô hình xử lý một chuỗi token.**
 
-Model cần biến nó thành một dãy số mà các layer có thể tính toán.
+## 3. Mỗi token được đổi thành số
 
-Bước đó dùng **embedding — cách biến một ID thành một vector số**.
+Máy tính không làm phép tính trực tiếp trên chữ “Hà” hay “Nội”.
 
-Ví dụ:
+Mỗi token được gán một mã số.
+
+Ta gọi nó là **mã token (token ID)**.
+
+Ví dụ tưởng tượng:
 
 ```text
-token ID = 314
-      ↓
-embedding
-      ↓
-[0.12, -0.08, 0.44, ...]
+"Hà"  → 314
+"Nội" → 982
 ```
 
-Dãy số này là một ví dụ của **tensor — khối số có hình dạng xác định**.
+Các con số này chỉ để minh họa.
 
-Tensor có thể là một dãy một chiều, một bảng hai chiều hoặc có nhiều chiều hơn.
+Sau đó mã token lại được đổi thành một dãy số phù hợp với các phép tính của mô hình.
 
-Trong model, cả:
-
-- trọng số đã học;
-- dữ liệu đang chảy qua model;
-- trạng thái trung gian;
-
-đều có thể được biểu diễn bằng tensor.
-
-Chương 2 sẽ mở file model và nhìn tensor thật nằm trong đó.
-
-## CPU, GPU và bộ nhớ là gì?
-
-Model chứa rất nhiều phép tính.
-
-Nhưng file model nằm trên ổ đĩa không tự tính được.
-
-Ta cần phần cứng.
-
-**CPU — Central Processing Unit, bộ xử lý trung tâm** là bộ xử lý đa dụng của máy tính. Nó rất linh hoạt và giỏi điều phối nhiều loại công việc.
-
-**GPU — Graphics Processing Unit, bộ xử lý đồ họa** ban đầu nổi tiếng nhờ xử lý đồ họa, nhưng cấu trúc của nó cũng rất phù hợp với việc thực hiện nhiều phép toán số học tương tự nhau song song.
-
-LLM phải thực hiện rất nhiều phép nhân và cộng trên những khối số lớn. Vì vậy GPU thường rất quan trọng khi chạy model.
-
-Ta cũng cần phân biệt nơi dữ liệu sống:
-
-- **storage — ổ lưu trữ** như SSD: giữ file lâu dài;
-- **memory — bộ nhớ làm việc** như RAM hoặc vùng bộ nhớ GPU có thể truy cập: giữ dữ liệu đang cần dùng;
-- **cache — bộ nhớ đệm**: giữ lại dữ liệu hoặc kết quả hữu ích để tránh làm lại công việc.
-
-Một bức tranh đơn giản:
-
-```text
-SSD
-giữ file model
-   ↓
-RAM / vùng nhớ runtime
-đưa dữ liệu vào trạng thái làm việc
-   ↓
-CPU / GPU
-thực hiện phép tính
-```
-
-Máy ArcLLM ban đầu dùng GPU tích hợp Intel Arc 140V. Trên loại máy dùng bộ nhớ hợp nhất, CPU và GPU có thể cùng truy cập một phần không gian bộ nhớ vật lý. Những chi tiết chính xác sẽ được nói ở đúng chương cần tới chúng.
-
-## Runtime là gì?
-
-Giữa model và phần cứng cần một lớp tổ chức mọi thứ.
-
-Lớp đó là:
-
-**runtime — hệ thực thi model.**
-
-Runtime phải làm những việc như:
-
-- đọc file model;
-- hiểu tensor nào nằm ở đâu;
-- chuẩn bị bộ nhớ;
-- gửi phép tính xuống CPU hoặc GPU;
-- giữ lại dữ liệu cần dùng tiếp;
-- chạy các layer theo đúng thứ tự;
-- tạo token mới;
-- lặp lại quá trình.
+Bước đổi đó gọi là **nhúng (embedding)**.
 
 Có thể hình dung:
 
 ```text
-MODEL = bản thiết kế + các con số đã học
-
-RUNTIME = bộ máy đọc bản thiết kế
-          và biến nó thành công việc thật
-
-CPU/GPU = nơi phép tính thực sự xảy ra
+token
+↓
+mã token
+↓
+một dãy số
 ```
 
-ArcLLM là câu chuyện xây lớp **runtime** đó từ những nguyên lý đầu tiên.
+Những dãy và bảng số như vậy thường được gọi là **khối số (tensor)**.
 
-## Quantization là gì?
+Từ “tensor” nghe khó, nhưng ở đây chưa cần toán học.
 
-Nếu model có hàng tỷ parameter, cách lưu mỗi con số trở nên rất quan trọng.
+Hãy tạm hiểu:
 
-**quantization — lượng tử hóa** là kỹ thuật biểu diễn trọng số bằng ít bit hơn để giảm dung lượng và lượng dữ liệu phải di chuyển, đổi lại chấp nhận một mức xấp xỉ có kiểm soát.
+> **Khối số là một nhóm các con số được sắp theo một hình dạng để máy tính thực hiện phép tính.**
 
-Ví dụ ở mức trực giác:
+Một hàng số là trường hợp đơn giản.
+
+Một bảng số là một trường hợp khác.
+
+Sau này ta mới cần những hình dạng phức tạp hơn.
+
+## 4. Mô hình xử lý những khối số bằng nhiều lớp
+
+Các khối số không đi thẳng tới câu trả lời.
+
+Chúng đi qua nhiều **lớp xử lý (layer)**.
+
+Bạn có thể hình dung giống một dây chuyền:
 
 ```text
-nhiều bit hơn
-→ mô tả số chi tiết hơn
-→ thường tốn nhiều bộ nhớ hơn
-
-ít bit hơn
-→ lưu gọn hơn
-→ phải có cách mã hóa / giải mã phù hợp
+dữ liệu đầu vào
+↓
+lớp 1
+↓
+lớp 2
+↓
+lớp 3
+↓
+...
+↓
+dữ liệu đầu ra
 ```
 
-Trong sách bạn sẽ gặp F32, Q4_K và Q6_K.
+Phần lớn mô hình ngôn ngữ lớn hiện đại thuộc một họ kiến trúc gọi là **Transformer**.
 
-Chưa cần nhớ chúng ngay. Chương 2 sẽ bắt đầu từ bit và byte rồi giải thích từng bước.
+Ta chưa cần học công thức Transformer.
 
-## Một token đi qua toàn hệ thống như thế nào?
+Chỉ cần biết mô hình ArcLLM nghiên cứu dùng nhiều **lớp giải mã (decoder layer)** nối tiếp nhau để dần biến đổi trạng thái của token.
 
-Bây giờ ta có thể ghép các khái niệm lại.
+Bên trong mỗi lớp có những nhóm phép tính mà sau này ta sẽ gặp như:
 
-Đây là **sơ đồ xuyên suốt của cuốn sách**:
+- chuẩn hóa tín hiệu;
+- cơ chế chú ý (attention);
+- nhánh biến đổi tín hiệu (feed-forward network, FFN);
+- đường cộng lại tín hiệu cũ.
+
+Chúng ta chưa cần hiểu chúng ở đây.
+
+## 5. Mô hình “đặc” nghĩa là gì?
+
+Một từ bạn có thể gặp khi đọc về AI là **mô hình đặc (dense model)**.
+
+Ở mức đơn giản:
+
+> Trong một mô hình đặc truyền thống, mỗi token đi qua cùng chuỗi lớp xử lý chính.
+
+Có thể hình dung:
 
 ```text
-VĂN BẢN NGƯỜI DÙNG
-        ↓
-TOKENIZER
-        ↓
-TOKEN / TOKEN ID
-        ↓
-EMBEDDING → TENSOR
-        ↓
-┌───────────────────────────────────────┐
-│ MODEL: PARAMETERS / WEIGHTS           │
-│                                       │
-│  Decoder layer 0                      │
-│      RMSNorm → Attention → FFN        │
-│               ↓                       │
-│  Decoder layer 1                      │
-│               ↓                       │
-│            ...                        │
-│               ↓                       │
-│  Decoder layer N                      │
-└───────────────────────────────────────┘
-        ↓
-LOGITS — điểm cho các token ứng viên
-        ↓
-CHỌN TOKEN TIẾP THEO
-        ↓
-KV CACHE giữ trạng thái hữu ích
-        ↓
-LẶP LẠI
+token
+↓
+lớp 1
+↓
+lớp 2
+↓
+lớp 3
+↓
+...
+```
 
-Trong toàn bộ đường trên:
+Có những kiến trúc khác, chẳng hạn mô hình có nhiều “chuyên gia” và chỉ chọn một số nhánh cho mỗi token. Nhưng đó chưa phải điều ta cần tập trung trong cuốn sách này.
 
-RUNTIME
-   ↓
-tổ chức tensor + bộ nhớ + thứ tự công việc
-   ↓
+Điều quan trọng là đừng nhầm:
+
+- **đặc hay nhiều chuyên gia** nói về cách tổ chức tính toán;
+- **Q4, Q6, F32** mà ta gặp sau này nói về cách biểu diễn các con số.
+
+## 6. CPU và GPU: nơi phép tính thật sự xảy ra
+
+Tới đây ta có mô hình và rất nhiều con số.
+
+Nhưng một tệp mô hình nằm trên ổ đĩa không tự tính được.
+
+Máy tính cần bộ xử lý.
+
+**CPU — bộ xử lý trung tâm (Central Processing Unit)** là bộ xử lý đa dụng. Nó giỏi làm nhiều loại công việc và điều phối hệ thống.
+
+**GPU — bộ xử lý đồ họa (Graphics Processing Unit)** ban đầu nổi tiếng nhờ xử lý hình ảnh, nhưng nó cũng rất phù hợp với việc thực hiện rất nhiều phép tính số tương tự nhau song song.
+
+Mô hình ngôn ngữ cần vô số phép nhân và cộng trên các khối số lớn. Vì thế GPU thường rất quan trọng.
+
+Ta còn cần **bộ nhớ** để giữ dữ liệu đang được sử dụng.
+
+Một bức tranh đơn giản:
+
+```text
+Ổ lưu trữ
+giữ tệp mô hình lâu dài
+        ↓
+Bộ nhớ
+giữ dữ liệu đang cần dùng
+        ↓
 CPU / GPU
+thực hiện phép tính
+```
+
+## 7. Vậy ai tổ chức tất cả những việc đó?
+
+Đây là chỗ dễ nhầm nhất.
+
+Tệp mô hình không tự biết:
+
+- phải đọc khối số nào trước;
+- đặt dữ liệu ở đâu trong bộ nhớ;
+- phép tính nào gửi cho CPU;
+- phép tính nào gửi cho GPU;
+- kết quả của bước này phải chuyển sang bước nào tiếp theo.
+
+Cần một chương trình đứng giữa mô hình và phần cứng để tổ chức những việc đó.
+
+Chương trình như vậy được gọi là **hệ thực thi (runtime)**.
+
+Có thể dùng một phép so sánh đơn giản:
+
+```text
+Mô hình
+≈ bản thiết kế + những con số đã học
+
+Hệ thực thi
+≈ đội biết đọc bản thiết kế và tổ chức công việc
+
+CPU / GPU
+≈ máy móc thật sự thực hiện các phép tính
+```
+
+Phép so sánh này không hoàn hảo, nhưng đủ để phân biệt ba vai trò.
+
+Đây cũng là lý do một tệp mô hình nằm yên trên ổ đĩa chưa phải một hệ AI đang hoạt động.
+
+## 8. LLM nằm ở đâu trong thế giới AI?
+
+Bây giờ mới cần một bản đồ tên gọi.
+
+**Trí tuệ nhân tạo (Artificial Intelligence, AI)** là chiếc ô rất rộng.
+
+Bên trong đó có **học máy (Machine Learning)**: thay vì chỉ viết sẵn mọi luật, ta để hệ thống học mẫu từ dữ liệu.
+
+Một họ quan trọng của học máy là **mạng nơ-ron nhân tạo (Neural Network)**.
+
+Một mô hình chuyên xử lý ngôn ngữ được gọi là **mô hình ngôn ngữ (Language Model)**.
+
+Khi quy mô của mô hình ngôn ngữ rất lớn, ta thường gọi nó là **mô hình ngôn ngữ lớn (Large Language Model, LLM)**.
+
+Có thể vẽ:
+
+```text
+Trí tuệ nhân tạo
+↓
+Học máy
+↓
+Mạng nơ-ron
+↓
+Mô hình ngôn ngữ
+↓
+Mô hình ngôn ngữ lớn (LLM)
+```
+
+Phần lớn LLM hiện đại dùng kiến trúc Transformer.
+
+Mô hình trong hành trình ArcLLM thuộc loại Transformer chỉ dùng phần giải mã để sinh token tiếp theo.
+
+Tên kỹ thuật đầy đủ là **Transformer chỉ có bộ giải mã (decoder-only Transformer)**.
+
+Bạn không cần nhớ tên đó ngay.
+
+## 9. Một câu đi qua cỗ máy như thế nào?
+
+Bây giờ các từ trong sơ đồ sau đều đã xuất hiện ít nhất một lần:
+
+```text
+Văn bản
    ↓
+Bộ tách và mã hóa
+   ↓
+Token
+   ↓
+Mã token
+   ↓
+Khối số
+   ↓
+Nhiều lớp xử lý của mô hình
+   ↓
+Điểm số cho các token có thể đứng tiếp
+   ↓
+Chọn token tiếp theo
+   ↓
+Lặp lại
+   ↓
+Câu trả lời
+```
+
+Trong toàn bộ quá trình đó:
+
+```text
+Hệ thực thi
+↓
+tổ chức bộ nhớ và thứ tự công việc
+↓
+CPU / GPU
+↓
 thực hiện các phép tính thật
 ```
 
-Và nếu nhìn theo hành trình của ArcLLM:
+Đây là bản đồ nền của cuốn sách.
 
-```text
-model file
-    ↓
-tensor
-    ↓
-runtime / GPU / memory
-    ↓
-RMSNorm / attention / FFN
-    ↓
-một decoder layer
-    ↓
-toàn bộ các decoder layer
-    ↓
-KV cache + sinh nhiều token
-    ↓
-benchmark + tối ưu
-    ↓
-representation + lifecycle
-    ↓
-một runtime có kiến trúc rõ ràng hơn
-```
+Các chương sau không bắt bạn học thêm toàn bộ một bản đồ mới. Chúng chỉ mở từng hộp khi tới lượt.
 
-Từ Chương 1 trở đi, đầu mỗi chương sẽ có một bản rút gọn của sơ đồ này và đánh dấu phần đang được mở.
+## 10. Còn lượng tử hóa là gì?
 
-## Bạn cần nhớ gì trước khi vào Chương 1?
+Một mô hình có hàng tỷ tham số.
 
-Chỉ cần giữ chín ý:
+Nếu mỗi con số đều được lưu bằng nhiều bit, tệp sẽ rất lớn và việc chuyển dữ liệu cũng tốn kém.
 
-1. **AI** là chiếc ô lớn; **LLM** chỉ là một loại model trong thế giới AI.
-2. **Model** chứa cấu trúc và những con số đã học.
-3. Những con số model học được gọi chung là **parameters**; **weights** là một loại parameter quan trọng.
-4. **Dense** mô tả cách kiến trúc dùng các layer; nó không đồng nghĩa với quantization.
-5. **Transformer** là họ kiến trúc; model trong hành trình này là một **decoder-only Transformer**.
-6. Văn bản được đổi thành **token**, rồi thành những **tensor** số.
-7. Tensor đi qua nhiều **decoder layer** chứa các khối như RMSNorm, attention và FFN.
-8. **Runtime** tổ chức việc đọc model, bộ nhớ và thực thi; **CPU/GPU** thực hiện phép tính thật.
-9. ArcLLM nghiên cứu **inference — suy luận**, không phải huấn luyện LLM từ đầu.
+**Lượng tử hóa (quantization)** là cách biểu diễn một số trọng số bằng ít bit hơn để tiết kiệm dung lượng và giảm lượng dữ liệu phải xử lý, đổi lại chấp nhận một mức xấp xỉ có kiểm soát.
 
-Nếu bạn hiểu được bức tranh này dù chưa nhớ hết tên, bạn đã đủ nền để bước vào Chương 1.
+Bạn sẽ gặp những tên như F32, Q4_K và Q6_K.
+
+Chưa cần học chúng ở đây.
+
+Chương 2 sẽ bắt đầu từ bit, byte và kích thước tệp rồi giải thích từng bước.
+
+## Trước khi sang Chương 1, chỉ cần nhớ 7 điều
+
+1. **Mô hình** là phần chứa cấu trúc và những con số đã học.
+2. **Token** là mảnh văn bản mà mô hình xử lý; nó không nhất thiết là một từ.
+3. Token được đổi thành số, rồi thành các **khối số** để tính toán.
+4. Dữ liệu đi qua nhiều **lớp xử lý** của mô hình.
+5. **CPU/GPU** là phần cứng thật sự làm phép tính.
+6. **Hệ thực thi** là chương trình tổ chức việc đọc mô hình, bộ nhớ và các phép tính.
+7. ArcLLM nghiên cứu chính lớp hệ thực thi đó.
+
+Nếu bạn hiểu được bảy ý trên dù chưa nhớ tên tiếng Anh, bạn đã đủ nền để bước vào Chương 1.
 
 **Tiếp theo: [Chương 1 — Bên dưới một câu trả lời AI có gì?](01-khoa-target-truoc-khi-toi-uu.md)**
