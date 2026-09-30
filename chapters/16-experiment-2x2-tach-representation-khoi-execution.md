@@ -1,5 +1,34 @@
 # Chương 16 — Experiment 2×2: tách representation khỏi execution
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: execution / representation / interaction**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** execution / representation / interaction.
+
+
 > **Câu hỏi của chương:** Khi một phép tính đang chậm, làm thế nào biết nó chậm vì cách ta chia công việc cho GPU hay vì cách dữ liệu được tổ chức để GPU đọc?
 
 Phần III kết thúc bằng một nguyên tắc quan trọng:
