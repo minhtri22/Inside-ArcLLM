@@ -17,7 +17,7 @@ Nguồn được ưu tiên theo thứ tự:
 
 Nếu spec sớm và adjudication cuối khác nhau, **adjudication cuối được ưu tiên**. Lỗi build, package, CI hoặc harness chỉ được coi là FAIL khoa học khi chính lineage/adjudication phân loại như vậy.
 
-Bản checklist ban đầu được tạo ở chế độ **review-only**. Sau khi tác giả duyệt, **QA-01 đến QA-07 đã được vá đúng phạm vi và QA lại với cùng source hierarchy**. **QA-08 được ACCEPTED_NO_PATCH** vì Bonus được giữ như một hướng mở, không phải snapshot đầy đủ của latest SIX lineage.
+Bản checklist ban đầu được tạo ở chế độ **review-only**. Sau khi tác giả duyệt, **QA-01 đến QA-07 đã được vá đúng phạm vi và QA lại với cùng source hierarchy**. **QA-08 sau đó được mở lại và vá** để giữ đúng ranh giới xuất bản của phần Bonus.
 
 ## Quy ước
 
@@ -38,10 +38,10 @@ Bản checklist ban đầu được tạo ở chế độ **review-only**. Sau k
 Kết quả sau author review + patch:
 
 - **21 đơn vị QA-CLEAN**
-- **1 đơn vị ACCEPTED_NO_PATCH** — Bonus, vì đây là hướng mở và nội dung hiện tại không mâu thuẫn với root SIX evidence;
+- **Bonus đã được viết lại theo ranh giới xuất bản công khai**: chỉ giữ câu hỏi khái niệm chung, không chứa tên hay chi tiết nghiên cứu nội bộ;
 - **0 finding còn mở**
 - **QA-01 → QA-07: APPROVED_FIXED**
-- **QA-08: ACCEPTED_NO_PATCH**
+- **QA-08: APPROVED_FIXED — PUBLICATION-BOUNDARY CLEANUP**
 - **Không phát hiện số liệu benchmark cốt lõi nào bị chép sai** trong các bảng/kết quả Q2, Q3, SA1, I002, I003 và Q4-down 2×2.
 
 Các bản vá chỉ sửa **tên thuật ngữ, mechanism boundary, claim boundary, causal description và evidence provenance**. Không scientific verdict nào bị viết lại.
@@ -71,7 +71,7 @@ Các bản vá chỉ sửa **tên thuật ngữ, mechanism boundary, claim bound
 | Chương 18 | **QA-CLEAN** | **QA-05 APPROVED_FIXED:** làm rõ P8 total capacity PASS; obstruction là inherited 256 MiB arena/single-tensor contract; P8 Phase2 chỉ là bounded mandatory-feasibility oracle. |
 | Chương 19 | **QA-CLEAN** | **QA-06 APPROVED_FIXED:** mọi claim về mandatory P8 được bound về `bounded P8 oracle`; v4/114.688/Q4 backend result giữ nguyên. |
 | Chương 20 | **QA-CLEAN** | **QA-07 APPROVED_FIXED:** thêm provenance rằng NPU numbers là analytical current-canonical projection + provider timing, không phải fresh full-model NPU benchmark. |
-| Bonus | **ACCEPTED_NO_PATCH** | **QA-08:** tác giả giữ Bonus như hướng mở; root SIX narrative không sai và không cần cập nhật thành latest-research survey. |
+| Bonus | **QA-CLEAN** | **QA-08 APPROVED_FIXED:** viết lại theo ranh giới công khai; giữ hướng gợi mở chung, không công bố tên/kết quả/cơ chế của nghiên cứu nội bộ. |
 
 # Findings cần tác giả duyệt
 
@@ -403,65 +403,31 @@ Giữ nguyên tất cả giá trị số và conclusion: chỉ FFN-down được
 
 ---
 
-## QA-08 — ACCEPTED_NO_PATCH — Bonus — SIX root đúng nhưng chưa phản ánh các replication mới hơn
+## QA-08 — APPROVED_FIXED — Bonus — ranh giới xuất bản công khai
 
-**Mức:** MEDIUM  
-**Loại:** latest-lineage completeness, không phải contradiction
+**Mức:** HIGH  
+**Loại:** publication boundary / confidentiality
 
-### Nội dung hiện tại
+### Finding
 
-Bonus kể đúng kết luận của nhánh SIX gốc:
+Bản Bonus cũ từng dùng trực tiếp tên và kết quả của một số chương trình nghiên cứu nội bộ để minh họa hướng quan sát hệ thống.
 
-- không hỗ trợ intrinsic-frequency interpretation;
-- không thấy abrupt mode switch trong miền đã thử;
-- strong context spectral-modulation claim FAIL;
-- native geometry phần lớn sụp sau matched intervention interface;
-- complete local tangent field được xác nhận trong nhánh gốc;
-- không có token→physical-electrical claim.
+Các chi tiết đó không cần thiết cho mục tiêu của cuốn sách công khai và vượt quá ranh giới xuất bản mong muốn.
 
-Các câu đó **không sai**.
+### Bản vá
 
-### Nhưng latest SIX lineage đã đi tiếp
+Bonus đã được viết lại hoàn toàn theo nguyên tắc:
 
-#### SIX_R1 — structural replication
+- chỉ giữ các khái niệm tổng quát: quan sát khác nguyên nhân, giới hạn của phép đo, sai khác nhỏ có thể đáng kiểm tra, trạng thái hệ thống thay đổi theo thời gian và can thiệp có kiểm soát;
+- không nêu tên dự án nghiên cứu nội bộ;
+- không nêu cây nghiên cứu, cơ chế riêng, kết quả PASS/FAIL hay thông số có thể dùng để suy ngược dự án nội bộ;
+- giữ một cầu nối tự nhiên sang câu hỏi công khai: nếu đi theo một token xuyên qua cỗ máy thì ta sẽ thấy gì?
 
-Formal close:
+**Trạng thái: APPROVED_FIXED.**
 
-> **BOUNDED_TANGENT_MECHANISM_REPLICATED**
+Không verdict khoa học nào của ArcLLM bị thay đổi bởi bản vá này.
 
-Cơ chế tangent-field được replicate qua ít nhất hai họ smooth recurrent dynamics cấu trúc khác nhau ở perturbation hữu hạn |epsilon|=0.25.
-
-#### SIX_R2 — non-smooth switching
-
-Formal close:
-
-> **PASS WITH BOUNDARY REFINEMENT**
-
-Khi crossing switching surface, frozen baseline tangent trở nên stale; một **endogenous branch-aware piecewise response law** tái tạo response trong tested system.
-
-#### SIX_R3 — explicit second-order dynamics
-
-Formal close:
-
-> **AUGMENTED_MARKOV_STATE_REQUIRED_AND_SUFFICIENT**
-
-Current 16-D state FAIL; full augmented 32-D Markov state PASS. Explicit two-lag tangent numerically equivalent với augmented-state tangent, không phải causal law bổ sung.
-
-### Đề nghị vá
-
-Không cần biến Bonus thành một chương SIX dài.
-
-Có thể thêm một box ngắn sau phần root SIX:
-
-> **“Sau nhánh SIX gốc, cơ chế này tiếp tục bị thử phá.”**
-
-Rồi tóm tắt R1/R2/R3 trong ba đoạn ngắn và giữ nguyên non-claims:
-
-- chưa universal;
-- chưa physical hardware dynamics;
-- chưa token-to-electrical encoding.
-
-Nếu tác giả muốn Bonus chỉ kể đúng thời điểm lịch sử của root SIX thì có thể **không vá**, nhưng nên thêm một câu xác định mốc thời gian để tránh người đọc hiểu đây là trạng thái nghiên cứu mới nhất.
+---
 
 # Các số liệu trọng yếu đã đối chiếu và không phát hiện sai lệch
 
@@ -601,6 +567,8 @@ NPU bounded-gate evidence:
 
 # Nguồn QA chính
 
+Các nguồn nghiên cứu nội bộ khác có thể được dùng ở phía tác giả để kiểm tra ranh giới phát biểu, nhưng **không được nêu tên, sao chép cơ chế hoặc tái xuất bản kết quả riêng trong repository công khai này**.
+
 Không chép raw experimental evidence vào repository sách. Các nhóm nguồn đã dùng để đối chiếu:
 
 - ArcLLM append-only lineage.md — P0–P8/Q1/Q2/Q3/P7.
@@ -616,9 +584,6 @@ Không chép raw experimental evidence vào repository sách. Các nhóm nguồn
 - Q4 Vulkan backend v4 revalidation and full-runtime integration QA.
 - Canonical runtime extraction QA + post-commit QA.
 - NPU capability/transfer Amdahl formal adjudication + analysis.
-- Token X-Ray current README for its public capability boundary.
-- SIX root scientific report + append-only lineage.
-- SIX_R1 / R2 / R3 formal branch closures.
 - Official ggml-org/llama.cpp gguf-py/README.md for the GGUF name expansion.
 
 # Patch policy sau checklist
@@ -643,18 +608,18 @@ Patch commits:
 - Chương 19: `1fb183dd35de93dbf7dc5d0014e52b73ee4599a3`
 - Chương 20: `e8d538961512444740bdb882a6c659220101cbc3`
 
-Post-patch QA xác nhận các đoạn đã sửa vẫn khớp final scientific evidence. Bonus không sửa theo quyết định tác giả vì đây là hướng mở; finding QA-08 được giữ lại trong checklist như lịch sử QA thay vì xóa.
+Post-patch QA xác nhận các đoạn đã sửa vẫn khớp bằng chứng khoa học cuối. Bonus sau đó được mở lại vì yêu cầu ranh giới xuất bản công khai và đã được viết lại mà không thay đổi verdict khoa học ArcLLM.
 
 
 ---
 
-# PEDAGOGICAL QA REOPEN — 2026-10-01
+# PEDAGOGICAL QA — 2026-10-01
 
 > **Nguồn kích hoạt QA:** phản hồi độc giả thực tế sau khi đọc hai chương đầu.
 >
 > **Phạm vi:** khả năng đọc của người bắt đầu từ số 0 về công nghệ/AI. Đây là QA sư phạm và ngôn ngữ, **không mở lại các verdict khoa học đã QA ở trên**.
 >
-> **Trạng thái:** **OPEN — REWRITE REQUIRED**
+> **Trạng thái:** **CLOSED — PEDAGOGICAL-QA-CLEAN AFTER FULL REWRITE**
 
 ## Tiêu chuẩn mới
 
@@ -673,7 +638,7 @@ Một đoạn chỉ được coi là đạt cho độc giả số 0 khi đồng 
 
 ## Kết quả tổng quan
 
-**Verdict: FAIL — CURRENT EDITION DOES NOT YET MEET THE CLAIM “BẮT ĐẦU TỪ SỐ 0”.**
+**Kết luận ban đầu: FAIL — bản trước chưa đạt tuyên bố “bắt đầu từ số 0”. Sau vòng viết lại toàn sách, các finding PQA-01 → PQA-10 đã được vá và regression QA đóng sạch.**
 
 Lý do không nằm ở độ sâu khoa học. Vấn đề chính là **cách dựng cầu tới độ sâu đó**.
 
@@ -684,7 +649,7 @@ Vòng sửa trước đã bổ sung Phần 0, glossary nội tuyến, mức đ�
 
 ## Findings
 
-### PQA-01 — HIGH — README tự mâu thuẫn với tuyên bố “không giả định đã biết AI”
+### PQA-01 — APPROVED_FIXED — HIGH — README tự mâu thuẫn với tuyên bố “không giả định đã biết AI”
 
 README nói sách dành cho người bắt đầu từ số 0 nhưng ngay phần giới thiệu và mục lục dùng dày đặc:
 
@@ -706,7 +671,7 @@ README nói sách dành cho người bắt đầu từ số 0 nhưng ngay phần
 
 ---
 
-### PQA-02 — HIGH — Phần 0 đang hoạt động như “từ điển nén”, chưa phải cầu nhập môn
+### PQA-02 — APPROVED_FIXED — HIGH — Phần 0 đang hoạt động như “từ điển nén”, chưa phải cầu nhập môn
 
 Ngay phần mở đầu đã yêu cầu người đọc nhìn đồng thời nhiều tầng:
 
@@ -722,7 +687,7 @@ Bản đồ hiện tại còn hiển thị trước các thuật ngữ như:
 
 ---
 
-### PQA-03 — HIGH — Chương 1 chưa tạo được hình dung chắc chắn về “mô hình” và “hệ thực thi”
+### PQA-03 — APPROVED_FIXED — HIGH — Chương 1 chưa tạo được hình dung chắc chắn về “mô hình” và “hệ thực thi”
 
 Cách giải thích hiện tại đúng về kỹ thuật nhưng vẫn trừu tượng:
 
@@ -748,7 +713,7 @@ Sau khi người đọc hiểu ba vai trò mới gắn nhãn:
 
 ---
 
-### PQA-04 — HIGH — Cần “định nghĩa bậc thang”, không cố chính xác tuyệt đối ngay câu đầu
+### PQA-04 — APPROVED_FIXED — HIGH — Cần “định nghĩa bậc thang”, không cố chính xác tuyệt đối ngay câu đầu
 
 Phản hồi độc giả về token chỉ đúng hướng ở phương pháp, không phải ở định nghĩa literal “mỗi từ cách nhau bằng dấu cách”.
 
@@ -770,7 +735,7 @@ Cách dạy phù hợp:
 
 ---
 
-### PQA-05 — HIGH — “Bản đồ xuyên suốt” hiện tại vi phạm luật không dùng trước khi dạy
+### PQA-05 — APPROVED_FIXED — HIGH — “Bản đồ xuyên suốt” hiện tại vi phạm luật không dùng trước khi dạy
 
 Bản đồ hai cột được đặt ở đầu hầu hết chương và chứa cả các khái niệm của nhiều chương sau.
 
@@ -798,7 +763,7 @@ Nguyên tắc: bản đồ phải thể hiện kiến thức người đọc **�
 
 ---
 
-### PQA-06 — HIGH — Tiêu đề chương dùng tiếng Anh như thể người đọc đã biết
+### PQA-06 — APPROVED_FIXED — HIGH — Tiêu đề chương dùng tiếng Anh như thể người đọc đã biết
 
 Các ví dụ nổi bật:
 
@@ -823,7 +788,7 @@ Ví dụ định hướng, chưa phải title final:
 
 ---
 
-### PQA-07 — HIGH — Tần suất câu Việt–Anh trộn quá cao trên toàn sách
+### PQA-07 — APPROVED_FIXED — HIGH — Tần suất câu Việt–Anh trộn quá cao trên toàn sách
 
 Audit từ Chương 1–20 cho thấy các từ `model`, `runtime`, `token`, `tensor`, `kernel`, `benchmark`, `decode`, `representation`, `execution`, `correctness`, `workload`, `baseline`, `speedup`... xuất hiện lặp lại dày đặc trong câu tiếng Việt.
 
@@ -854,7 +819,7 @@ Không áp dụng thay thế máy móc; câu phải được viết lại tự n
 
 ---
 
-### PQA-08 — MEDIUM/HIGH — PASS/FAIL đang đúng về nghiên cứu nhưng chưa thân thiện với độc giả nhập môn
+### PQA-08 — APPROVED_FIXED — MEDIUM/HIGH — PASS/FAIL đang đúng về nghiên cứu nhưng chưa thân thiện với độc giả nhập môn
 
 PASS/FAIL là ngôn ngữ quản trị thí nghiệm của dự án và có giá trị lịch sử, nhưng xuất hiện dày có thể khiến sách giống báo cáo nghiên cứu.
 
@@ -868,7 +833,7 @@ Trong bảng/tóm tắt kỹ thuật có thể giữ ký hiệu PASS/FAIL sau kh
 
 ---
 
-### PQA-09 — MEDIUM — Các phần nâng cao vẫn cần tiếng Việt, không được dùng nhãn “Nâng cao” để miễn giải thích
+### PQA-09 — APPROVED_FIXED — MEDIUM — Các phần nâng cao vẫn cần tiếng Việt, không được dùng nhãn “Nâng cao” để miễn giải thích
 
 Chương 16–19 có mật độ rất cao của:
 
@@ -891,7 +856,7 @@ Sau đó mới chỉ ra thuật ngữ gốc nếu nó giúp người đọc tra 
 
 ---
 
-### PQA-10 — HIGH — Cần một “zero-reader regression test” cho mọi chương
+### PQA-10 — APPROVED_FIXED — HIGH — Cần một “zero-reader regression test” cho mọi chương
 
 QA hiện tại chủ yếu kiểm factual/scientific correctness. Cần thêm kiểm thử sư phạm.
 
@@ -906,6 +871,34 @@ Mỗi chương phải trả lời được:
 7. “Nhớ 3 điều” cuối chương có viết bằng ngôn ngữ người mới có thể kể lại cho người khác không?
 
 Chỉ khi cả 7 câu đều đạt mới coi chương là **PEDAGOGICAL-QA-CLEAN**.
+
+## Kết quả sau vòng viết lại 2026-10-01
+
+Toàn bộ phạm vi công khai đã được viết lại/QA:
+
+- README;
+- Lời nói đầu;
+- Phần 0;
+- Chương 1–20;
+- Bonus;
+- các sơ đồ giải thích;
+- metadata biên tập công khai.
+
+Regression QA xác nhận:
+
+- tiêu đề chương dùng tiếng Việt dễ hiểu trước;
+- các bản đồ đầu chương được mở dần theo kiến thức người đọc đã học, không còn lặp lại một “bức tường thuật ngữ” đầy đủ;
+- `model/runtime/kernel/benchmark/correctness/representation/execution/workload/baseline/speedup...` không còn đứng trơ trong văn xuôi như kiến thức mặc định; từ gốc chỉ còn khi nằm trong ngoặc tham chiếu hoặc là định danh kỹ thuật cần giữ;
+- các sơ đồ giải thích được Việt hóa; tên biến, tên chuẩn và mã kỹ thuật thật được giữ nguyên khi cần;
+- `ĐẠT (PASS)` / `KHÔNG ĐẠT (FAIL)` được dùng theo hướng tiếng Việt trước;
+- Bonus tuân thủ ranh giới xuất bản công khai;
+- số liệu và scientific verdict của ArcLLM không bị viết lại.
+
+**Pedagogical regression verdict: PASS — PEDAGOGICAL-QA-CLEAN.**
+
+Điều này chỉ có nghĩa bản thảo đã vượt bộ tiêu chí QA sư phạm hiện tại. Phản hồi từ độc giả thật vẫn được ưu tiên để phát hiện những chỗ khó mà checklist không bắt được.
+
+---
 
 ## Thứ tự sửa bắt buộc
 
