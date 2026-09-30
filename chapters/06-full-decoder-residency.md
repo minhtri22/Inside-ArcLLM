@@ -732,7 +732,7 @@ sang:
 2. **tính đúng được kiểm tra ở hai điểm:** final normalized hidden và điểm dự đoán; CPU/GPU cũng đồng ý `top1 = 117612`.
 3. **Full decoder ĐẠT (PASS) chưa phải generation ĐẠT (PASS) và chưa phải hiệu năng ĐẠT (PASS).** Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
 
-**Chương 7 — Bộ nhớ giúp mô hình không phải tính lại từ đầu (KV cache)**
+**Tiếp theo: [Chương 7 — Bộ nhớ giúp mô hình không phải tính lại từ đầu (KV cache)](07-kv-cache-model-bat-dau-nho-token-truoc.md)**
 
 Ta đã cho một token đi xuyên cả mô hình.
 
