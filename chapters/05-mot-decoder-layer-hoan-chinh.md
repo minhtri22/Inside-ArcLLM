@@ -681,7 +681,7 @@ P5 sẽ chuyển câu hỏi từ **“một căn phòng hoạt động chưa?”
 2. **P4 giữ dữ liệu trung gian (intermediate) ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
 3. **P4 chỉ ĐẠT về tính đúng của một lớp, chưa phải của toàn bộ mô hình.** Một lớp thật đã vượt các tiêu chuẩn đã khóa; toàn bộ chuỗi lớp giải mã vẫn là câu hỏi của bước tiếp theo.
 
-**Chương 6 — Giữ toàn bộ các lớp xử lý sẵn trong bộ nhớ GPU**
+**Tiếp theo: [Chương 6 — Giữ toàn bộ các lớp xử lý sẵn trong bộ nhớ GPU](06-full-decoder-residency.md)**
 
 Ta đã xây được một căn phòng hoàn chỉnh.
 
