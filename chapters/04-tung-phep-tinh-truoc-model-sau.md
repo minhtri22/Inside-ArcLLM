@@ -1,5 +1,34 @@
 # Chương 4 — Từng phép tính trước, model sau
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: RMSNorm / attention / FFN**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** RMSNorm / attention / FFN.
+
+
 > **Câu hỏi của chương:** Trước khi ghép cả model lại với nhau, làm thế nào biết GPU đang tính đúng từng phép toán nhỏ bên trong nó?
 
 Ở cuối Chương 3, ArcLLM đã dựng được phần nền của một “nhà máy GPU”.
