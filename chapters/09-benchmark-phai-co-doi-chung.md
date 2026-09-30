@@ -139,11 +139,11 @@ Nếu ép chúng có cùng chương trình GPU, cùng **cách lập lịch** và
 Có thể hình dung:
 
 ```text
-             cùng model bytes
+             cùng byte của tệp mô hình
              cùng input
              cùng output length
              cùng hardware
-             cùng context
+             cùng độ dài ngữ cảnh
              cùng quantization
              cùng quy tắc chọn token
              cùng cách đo
@@ -186,14 +186,14 @@ Chỉ sau khi **feasibility — khả năng chạy thực sự** được thiế
 Đây là một nguyên tắc đáng nhớ:
 
 ```text
-chưa chạy được model thật
+chưa chạy được mô hình thật
         ↓
 không dùng microbenchmark
-để nói về performance toàn hệ
+để nói về hiệu năng toàn hệ
 
-chạy được model thật
+chạy được mô hình thật
         ↓
-mới mở matched benchmark
+mới mở phép đo đối chứng cùng điều kiện
 ```
 
 ## Đối chứng là llama.cpp
@@ -299,7 +299,7 @@ Nhưng nó giúp trả lời câu hỏi hệ thực thi chính xác hơn.
 Q2 giữ cùng:
 
 ```text
-model bytes
+byte của tệp mô hình
 
 Q4_K_M
 
@@ -307,7 +307,7 @@ GPU / máy
 
 Vulkan
 
-context capacity = 4096
+độ dài ngữ cảnh tối đa = 4096
 
 KV cache = F32
 
@@ -317,7 +317,7 @@ greedy generation
 
 output = 32 token
 
-không speculative decode
+không sinh token suy đoán trước
 ```
 
 Ở llama.cpp:
@@ -384,15 +384,15 @@ Tại sao không chỉ chọn một?
 Vì hệ thực thi có thể có hai đặc tính rất khác:
 
 ```text
-xử lý prompt nhanh
-nhưng decode chậm
+xử lý đầu vào nhanh
+nhưng sinh token chậm
 ```
 
 hoặc:
 
 ```text
-prefill chậm
-nhưng decode tốt
+xử lý đầu vào chậm
+nhưng sinh token tốt
 ```
 
 Nếu chỉ đo một bài đo, ta có thể vô tình chọn đúng vùng thuận lợi cho một hệ.
@@ -412,7 +412,7 @@ Q2 đo ba chỉ số hiệu năng chính.
 Ví dụ:
 
 ```text
-bắt đầu prefill: 0 ms
+bắt đầu xử lý đầu vào: 0 ms
 
 token đầu tiên sẵn sàng:
 120 ms
@@ -457,7 +457,7 @@ Nếu 31 token đó mất:
 thì:
 
 ```text
-decode throughput
+thông lượng sinh token
 = 31 / 2,48
 ≈ 12,5 token/giây
 ```
@@ -481,7 +481,7 @@ và token thứ 32 xuất hiện tại:
 thì:
 
 ```text
-E2E latency
+độ trễ toàn lượt
 = 2.600 ms
 = 2,6 giây
 ```
@@ -492,11 +492,11 @@ Ba chỉ số trả lời ba câu khác nhau:
 TTFT
 → bắt đầu phản hồi nhanh không?
 
-decode tok/s
+token sinh ra mỗi giây
 → sau khi bắt đầu, sinh tiếp nhanh không?
 
 E2E
-→ hoàn thành toàn workload mất bao lâu?
+→ hoàn thành toàn bài đo mất bao lâu?
 ```
 
 Vì thế nói:
@@ -594,7 +594,7 @@ số nằm giữa là:
 Vậy:
 
 ```text
-median = 12
+trung vị = 12
 ```
 
 Q2 vì vậy báo trung vị cho các chỉ số chính.
@@ -853,7 +853,7 @@ Q2
 sau đó
 
 Q3
-→ freeze claim cụ thể
+→ đóng băng kết luận cụ thể
 → freeze practical threshold
 → fresh evidence
 → PASS / FAIL
