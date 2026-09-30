@@ -53,7 +53,7 @@ Mục tiêu thấp hơn nhiều:
 
 > **Dựng được một “xưởng” tối thiểu nơi dữ liệu có thể ở lại, GPU có thể nhận một công việc, thực hiện nó và cho hệ thực thi biết công việc đã xong.**
 
-## Thiết bị (thiết bị): trước hết phải biết ta đang nói chuyện với GPU nào
+## Thiết bị (device): trước hết phải biết ta đang nói chuyện với GPU nào
 
 Trong Vulkan, một trong những khái niệm đầu tiên là **thiết bị — thiết bị**.
 
@@ -67,7 +67,7 @@ Nhưng có thiết bị vẫn chưa đủ.
 
 Ta cần một nơi để gửi công việc.
 
-## Hàng đợi (hàng đợi): nơi GPU nhận việc
+## Hàng đợi (queue): nơi GPU nhận việc
 
 Vulkan dùng khái niệm **hàng đợi — hàng đợi công việc**.
 
@@ -166,7 +166,7 @@ Vì vậy P2 giữ toàn bộ payload trong **4 persistent trọng số arenas �
 
 Bốn vùng bộ nhớ lớn là quyết định của hệ thực thi trong **bộ quy tắc kỹ thuật đã khóa ở P2**.
 
-## Một bàn làm việc riêng: vùng nhớ tạm (vùng nhớ tạm)
+## Một bàn làm việc riêng: vùng nhớ tạm (scratch)
 
 Trọng số của mô hình giống nguyên liệu hoặc dụng cụ được giữ lâu dài.
 
@@ -241,7 +241,7 @@ Nhưng một vấn đề khác xuất hiện.
 
 GPU làm việc bất đồng bộ với CPU: CPU có thể giao việc rồi tiếp tục chạy. Vậy làm sao CPU biết lúc nào GPU đã hoàn thành?
 
-## Tín hiệu hoàn thành (tín hiệu hoàn thành): tấm biển “đã làm xong”
+## Tín hiệu hoàn thành (fence): tấm biển “đã làm xong”
 
 P2 dùng một **tín hiệu hoàn thành — tín hiệu đồng bộ cho biết công việc GPU đã hoàn thành**.
 
@@ -323,7 +323,7 @@ Nó chỉ chứng minh **đường đưa và giữ dữ liệu đã hoạt độ
 980.097.536 byte dữ liệu GGUF vẫn ở dạng đóng gói (packed GGUF payload)
 → khoảng 934,7 MiB
 → cư trú (resident) trong 4 vùng lưu giữ trọng số
-  (các vùng trọng số giữ lâu)
+  (persistent weight arenas)
 
 64 MiB vùng nhớ làm việc tạm
 (persistent scratch)
