@@ -1,5 +1,34 @@
 # Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: mô hình runtime sáu chiều**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** mô hình runtime sáu chiều.
+
+
 > **Câu hỏi của chương:** Sáu câu hỏi mà ArcLLM vừa phải tách ra có thể trở thành một mô hình chung cho nhiều kiểu đường thực thi khác nhau hay không — mà không nhét luật riêng của từng trường hợp vào lõi runtime?
 
 Cuối Chương 18, ta có sáu câu hỏi.
