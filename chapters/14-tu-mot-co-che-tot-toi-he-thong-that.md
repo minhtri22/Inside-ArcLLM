@@ -43,11 +43,11 @@ mức tăng tốc cũng đủ lớn.
 
 Q4 vì thế được quyền bước sang chế độ cuối cùng trong chuỗi E/M/C/T:
 
-> **T — Kiểm tra toàn hệ: đưa một cơ chế đã được xác nhận sang bối cảnh thực tế lớn hơn để xem bằng chứng có còn đứng vững hay không.**
+> **T — Kiểm tra khi đưa lên toàn hệ (Transfer)**: đưa một cơ chế đã được xác nhận sang bối cảnh thực tế lớn hơn để xem bằng chứng có còn đứng vững hay không.
 
 Trong nghiên cứu ArcLLM, ta còn dùng từ:
 
-> **khả năng giữ lợi ích khi đi lên toàn hệ — lợi ích có thực sự truyền xuyên qua các tầng của hệ thống hay không.**
+> **khả năng giữ lợi ích khi đi lên toàn hệ (carry-through)** — lợi ích có thực sự truyền xuyên qua các tầng của hệ thống hay không.
 
 Đây không phải là một cách nói hoa mỹ.
 
@@ -503,7 +503,7 @@ Top-1 có thể đổi.
 
 Một token đổi có thể làm toàn bộ chuỗi token sau đó rẽ sang đường khác.
 
-Vì vậy trước khi đo hiệu năng toàn hệ, mô hình phải vượt **semantic guard — hàng rào kiểm tra rằng ý nghĩa đầu ra vẫn được giữ**.
+Vì vậy trước khi đo hiệu năng toàn hệ, mô hình phải vượt **hàng rào bảo toàn ý nghĩa (semantic guard)** — kiểm tra rằng ý nghĩa đầu ra vẫn được giữ.
 
 Trong phép thử này, mốc đối chứng và phương án thử đều sinh:
 
@@ -907,7 +907,7 @@ real system value
 2. **Transfer phải giữ phạm vi hẹp.** Trong phép thử này chỉ 56 gate/up Q4_K node của giai đoạn sinh token được thay. Nếu đồng thời sửa nhiều phần khác, ta sẽ mất khả năng biết cơ chế nào tạo ra kết quả.
 3. **I002 tạo ra một cải thiện ArcLLM nội bộ có ý nghĩa: khoảng `2,20×` giai đoạn sinh token và `2,00×` E2E, đồng thời giữ TTFT guard và token semantics.** Nhưng đây vẫn chưa phải bằng chứng ArcLLM thắng llama.cpp; đối chứng bên ngoài phải được đo lại với kiến trúc mới.
 
-**Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi**
+**Chương 15 — Chỉ có ích khi toàn hệ thực sự được lợi**
 
 Ta đã đi hết một vòng:
 
