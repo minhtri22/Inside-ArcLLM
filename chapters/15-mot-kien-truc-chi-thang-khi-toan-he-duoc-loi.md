@@ -129,7 +129,7 @@ khác biệt hệ thực thi
 khác biệt trạng thái máy
 ```
 
-Vì vậy phép thử dùng **paired measurement — đo theo cặp gần nhau về thời gian**.
+Vì vậy phép thử dùng **đo theo cặp (paired measurement)** — hai phép đo được đặt gần nhau về thời gian.
 
 Một cặp có dạng:
 
@@ -467,7 +467,7 @@ bằng chứng cũ về nút thắt có thể đã lỗi thời
 phải đo lại
 ```
 
-`Stale — đã cũ đến mức không còn đủ an toàn để dùng như trạng thái hiện tại.`
+**lỗi thời (stale)** — đã cũ đến mức không còn đủ an toàn để dùng như trạng thái hiện tại.
 
 Một success vì vậy không chỉ tạo ra hiệu năng.
 
