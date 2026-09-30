@@ -1,49 +1,25 @@
-# Chương 4 — Từng phép tính trước, model sau
+# Chương 4 — Từng phép tính nhỏ trước, cả mô hình sau
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Token → khối số
+>         ↓
+> [ từng phép tính nhỏ ]
+>         ↓
+> GPU
+>         ↓
+> kiểm tra đúng rồi mới ghép
 > ```
->
-> ▶ **Đang mở ở chương này:** RMSNorm / attention / FFN.
 
 
-> **Câu hỏi của chương:** Trước khi ghép cả model lại với nhau, làm thế nào biết GPU đang tính đúng từng phép toán nhỏ bên trong nó?
+> **Câu hỏi của chương:** Trước khi ghép cả mô hình lại với nhau, làm thế nào biết GPU đang tính đúng từng phép toán nhỏ bên trong nó?
 
 Ở cuối Chương 3, ArcLLM đã dựng được phần nền của một “nhà máy GPU”.
 
-Runtime đã mở được thiết bị Vulkan, có hàng đợi để giao việc, có vùng nhớ giữ dữ liệu model, có vùng nhớ tạm để làm việc, và quan trọng nhất: ArcLLM đã gửi một lệnh thật xuống GPU rồi xác nhận GPU thực hiện nó.
+hệ thực thi đã mở được thiết bị Vulkan, có hàng đợi để giao việc, có vùng nhớ giữ dữ liệu mô hình, có vùng nhớ tạm để làm việc, và quan trọng nhất: ArcLLM đã gửi một lệnh thật xuống GPU rồi xác nhận GPU thực hiện nó.
 
 Nhưng có một khoảng cách rất lớn giữa:
 
@@ -51,25 +27,25 @@ Nhưng có một khoảng cách rất lớn giữa:
 
 và:
 
-> “GPU đang tính đúng một model AI.”
+> “GPU đang tính đúng một mô hình AI.”
 
 P2 mới chứng minh điều đầu tiên.
 
 P3 bắt đầu đi vào điều thứ hai.
 
-Một lựa chọn dễ hiểu nhưng nguy hiểm lúc này là ghép luôn cả model, đưa một câu hỏi vào rồi xem nó có trả lời được hay không.
+Một lựa chọn dễ hiểu nhưng nguy hiểm lúc này là ghép luôn cả mô hình, đưa một câu hỏi vào rồi xem nó có trả lời được hay không.
 
 ArcLLM không làm vậy.
 
-Thay vào đó, dự án tách model thành những phép tính nhỏ hơn, kiểm tra từng phép một, rồi chỉ khi những viên gạch đó đủ đáng tin mới bắt đầu xây cả bức tường.
+Thay vào đó, dự án tách mô hình thành những phép tính nhỏ hơn, kiểm tra từng phép một, rồi chỉ khi những viên gạch đó đủ đáng tin mới bắt đầu xây cả bức tường.
 
-## Model lớn nhưng được tạo thành từ những việc nhỏ hơn
+## mô hình lớn nhưng được tạo thành từ những việc nhỏ hơn
 
-Một model ngôn ngữ có thể chứa hàng tỷ trọng số và rất nhiều lớp.
+Một mô hình ngôn ngữ có thể chứa hàng tỷ trọng số và rất nhiều lớp.
 
 Nghe như một hệ thống không thể hiểu nổi.
 
-Nhưng khi runtime thực thi nó, công việc cuối cùng vẫn được phân rã thành những phép toán cụ thể.
+Nhưng khi hệ thực thi thực thi nó, công việc cuối cùng vẫn được phân rã thành những phép toán cụ thể.
 
 Ví dụ, ở P3 ta gặp những nhóm như:
 
@@ -108,19 +84,19 @@ P3 hỏi:
 
 Đó là câu hỏi khoa học của bước này.
 
-## Kernel là gì?
+## chương trình GPU là gì?
 
 Ở Chương 3, GPU mới được yêu cầu điền một giá trị thử vào vùng nhớ.
 
-Bây giờ GPU phải thực hiện những phép toán có ý nghĩa đối với model.
+Bây giờ GPU phải thực hiện những phép toán có ý nghĩa đối với mô hình.
 
-Một chương trình nhỏ chạy trên GPU để thực hiện một loại công việc cụ thể thường được gọi là **kernel — chương trình tính toán nhỏ chạy trên GPU**.
+Một chương trình nhỏ chạy trên GPU để thực hiện một loại công việc cụ thể thường được gọi là **chương trình GPU — chương trình tính toán nhỏ chạy trên GPU**.
 
-Ví dụ, ta có thể có một kernel chuyên chuẩn hóa dữ liệu.
+Ví dụ, ta có thể có một chương trình GPU chuyên chuẩn hóa dữ liệu.
 
-Một kernel khác chuyên nhân dữ liệu đầu vào với trọng số.
+Một chương trình GPU khác chuyên nhân dữ liệu đầu vào với trọng số.
 
-Một kernel khác nữa xử lý attention.
+Một chương trình GPU khác nữa xử lý cơ chế chú ý.
 
 Có thể hình dung:
 
@@ -152,9 +128,9 @@ P3 vì vậy cũng xác nhận nguồn gốc và đúng phiên bản compiler tr
 
 Có một vấn đề thú vị.
 
-Nếu ta vừa tự viết runtime vừa tự viết kernel GPU, làm sao biết kết quả GPU là đúng?
+Nếu ta vừa tự viết hệ thực thi vừa tự viết chương trình GPU GPU, làm sao biết kết quả GPU là đúng?
 
-Không thể hỏi chính kernel đó:
+Không thể hỏi chính chương trình GPU đó:
 
 > “Anh có tính đúng không?”
 
@@ -234,7 +210,7 @@ Nó sử dụng trọng số thật:
 
 `blk.0.attn_norm.weight`
 
-từ model đã được khóa.
+từ mô hình đã được khóa.
 
 GPU tính RMSNorm.
 
@@ -244,19 +220,19 @@ Hai kết quả được so với nhau.
 
 Gate — **cổng kiểm tra** — đạt PASS.
 
-Đây là lần đầu trong chuỗi P3 mà một phép toán thật của model cùng trọng số thật đi qua Vulkan và vượt qua kiểm tra số học.
+Đây là lần đầu trong chuỗi P3 mà một phép toán thật của mô hình cùng trọng số thật đi qua Vulkan và vượt qua kiểm tra số học.
 
 ## Q4_K: không mở hộp trước rồi mới tính
 
 Chương 2 đã dành khá nhiều thời gian cho Q4_K.
 
-Ta biết đây là một dạng **quantization — cách lưu trọng số bằng ít bit hơn**, và ArcLLM cố tình giữ dữ liệu ở dạng đóng gói thay vì bung toàn bộ sang F32.
+Ta biết đây là một dạng **lượng tử hóa — cách lưu trọng số bằng ít bit hơn**, và ArcLLM cố tình giữ dữ liệu ở dạng đóng gói thay vì bung toàn bộ sang F32.
 
 P3 bây giờ phải trả lời câu hỏi khó hơn:
 
 > Giữ Q4_K đóng gói thì tốt cho bộ nhớ, nhưng GPU có thể tính trực tiếp từ dạng đó không?
 
-Kernel P3 sử dụng trọng số thật:
+chương trình GPU P3 sử dụng trọng số thật:
 
 `blk.0.attn_q.weight`
 
@@ -308,11 +284,11 @@ trọng số model đã học
 dữ liệu mới
 ```
 
-Đây là một trong những công việc xuất hiện với số lượng rất lớn trong model.
+Đây là một trong những công việc xuất hiện với số lượng rất lớn trong mô hình.
 
 ## RoPE: cho token biết vị trí
 
-Một model không chỉ cần biết token nào xuất hiện.
+Một mô hình không chỉ cần biết token nào xuất hiện.
 
 Nó còn cần biết chúng nằm ở đâu trong chuỗi.
 
@@ -326,7 +302,7 @@ và:
 
 có cùng ba từ nhưng thứ tự tạo ra ý nghĩa rất khác.
 
-Một cơ chế được model này sử dụng là **RoPE — Rotary Position Embedding**, có thể hiểu ở mức đầu tiên là **cách đưa thông tin vị trí vào dữ liệu bằng một phép biến đổi dạng xoay**.
+Một cơ chế được mô hình này sử dụng là **RoPE — Rotary Position phép nhúng**, có thể hiểu ở mức đầu tiên là **cách đưa thông tin vị trí vào dữ liệu bằng một phép biến đổi dạng xoay**.
 
 Ta chưa cần hiểu hình học phía sau chữ “xoay”.
 
@@ -342,9 +318,9 @@ tín hiệu được biến đổi
 
 P3 kiểm tra phép RoPE trên GPU với một CPU reference độc lập.
 
-Nếu GPU xử lý vị trí sai, model về sau có thể hiểu sai quan hệ thứ tự ngay cả khi các phép nhân khác đều đúng.
+Nếu GPU xử lý vị trí sai, mô hình về sau có thể hiểu sai quan hệ thứ tự ngay cả khi các phép nhân khác đều đúng.
 
-Vì vậy RoPE cũng phải được chứng minh riêng trước khi ghép thành layer.
+Vì vậy RoPE cũng phải được chứng minh riêng trước khi ghép thành lớp.
 
 ## Softmax: từ điểm số thành tỷ lệ
 
@@ -378,7 +354,7 @@ Nhưng ý nghĩa mà người đọc cần giữ ở đây là:
 
 > **Softmax giúp chuyển các điểm số so sánh thành một phân bố trọng số có thể dùng để quyết định phần thông tin nào được chú ý nhiều hơn.**
 
-P3 chưa cần giải cả attention của model để kiểm tra softmax.
+P3 chưa cần giải cả cơ chế chú ý của mô hình để kiểm tra softmax.
 
 Nó có thể kiểm tra phép toán này như một viên gạch riêng.
 
@@ -388,9 +364,9 @@ CPU reference tính.
 
 Rồi hai bên được so.
 
-## Attention: token nhìn lại thông tin liên quan
+## cơ chế chú ý: token nhìn lại thông tin liên quan
 
-Bây giờ ta tới một thuật ngữ nổi tiếng hơn: **attention — cơ chế cho phép model cân nhắc những phần thông tin khác nhau khi xử lý token hiện tại**.
+Bây giờ ta tới một thuật ngữ nổi tiếng hơn: **cơ chế chú ý — cơ chế cho phép mô hình cân nhắc những phần thông tin khác nhau khi xử lý token hiện tại**.
 
 Hãy lấy một câu đơn giản:
 
@@ -398,21 +374,21 @@ Hãy lấy một câu đơn giản:
 
 Từ “nó” có thể cần liên hệ với một phần xuất hiện trước đó.
 
-Model không làm việc này bằng cách “hiểu như con người” theo đúng nghĩa đời thường. Bên dưới vẫn là những phép toán tạo điểm số, chuẩn hóa chúng rồi kết hợp thông tin.
+mô hình không làm việc này bằng cách “hiểu như con người” theo đúng nghĩa đời thường. Bên dưới vẫn là những phép toán tạo điểm số, chuẩn hóa chúng rồi kết hợp thông tin.
 
-P3 sử dụng một bài kiểm tra **bounded GQA attention**.
+P3 sử dụng một bài kiểm tra **bounded GQA cơ chế chú ý**.
 
 Ta tách cụm này ra:
 
-- **attention**: cơ chế kết hợp thông tin theo mức liên quan;
-- **GQA — Grouped Query Attention**: một cách tổ chức attention mà model mục tiêu sử dụng;
-- **bounded**: P3 chỉ kiểm tra trong một phạm vi nhỏ, có kiểm soát, chưa phải toàn bộ model.
+- **cơ chế chú ý**: cơ chế kết hợp thông tin theo mức liên quan;
+- **GQA — Grouped Query cơ chế chú ý**: một cách tổ chức cơ chế chú ý mà mô hình mục tiêu sử dụng;
+- **bounded**: P3 chỉ kiểm tra trong một phạm vi nhỏ, có kiểm soát, chưa phải toàn bộ mô hình.
 
 Từ “bounded” rất quan trọng.
 
-Một phép attention nhỏ PASS không có nghĩa:
+Một phép cơ chế chú ý nhỏ PASS không có nghĩa:
 
-> “Attention của toàn model chắc chắn đúng.”
+> “cơ chế chú ý của toàn mô hình chắc chắn đúng.”
 
 Nó chỉ cho phép nói:
 
@@ -420,7 +396,7 @@ Nó chỉ cho phép nói:
 
 ## SwiGLU và residual: biến đổi rồi cộng trở lại
 
-Một decoder layer còn có một nhánh thường được gọi là FFN — **Feed-Forward Network, nhánh biến đổi tín hiệu sau attention**.
+Một lớp giải mã còn có một nhánh thường được gọi là FFN — **Feed-Forward Network, nhánh biến đổi tín hiệu sau cơ chế chú ý**.
 
 P3 kiểm tra một phần quan trọng của nhánh này bằng **SwiGLU**.
 
@@ -438,7 +414,7 @@ một nhánh điều tiết nhánh còn lại
 kết quả
 ```
 
-Sau đó model còn sử dụng **residual — đường cộng tắt**, tức kết quả mới được cộng trở lại với tín hiệu cũ.
+Sau đó mô hình còn sử dụng **residual — đường cộng tắt**, tức kết quả mới được cộng trở lại với tín hiệu cũ.
 
 Ẩn dụ đơn giản:
 
@@ -455,11 +431,11 @@ tín hiệu ban đầu ───────────────────
 
 Residual giúp thông tin có một đường đi trực tiếp qua các lớp thay vì mọi thứ đều phải bị thay thế hoàn toàn ở mỗi bước.
 
-P3 kiểm tra cả nhóm **SwiGLU + residual** như một primitive — **phép toán nền tảng** — trước khi nó được ghép vào decoder layer hoàn chỉnh.
+P3 kiểm tra cả nhóm **SwiGLU + residual** như một phép tính nền tảng — **phép toán nền tảng** — trước khi nó được ghép vào lớp giải mã hoàn chỉnh.
 
-## Bảy cổng, nhưng chưa có một model
+## Bảy cổng, nhưng chưa có một mô hình
 
-Tổng cộng P3 đóng **bảy Vulkan kernel gates — bảy cổng kiểm tra cho các phép tính GPU**.
+Tổng cộng P3 đóng **bảy Vulkan chương trình GPU gates — bảy cổng kiểm tra cho các phép tính GPU**.
 
 Chúng bao phủ các nhóm phép toán cần thiết ở bước này:
 
@@ -489,7 +465,7 @@ Cả bảy gate đều PASS khi so với **independent CPU references — cách 
 
 Nhưng nó vẫn chưa cho phép nói:
 
-> “ArcLLM đã chạy được model.”
+> “ArcLLM đã chạy được mô hình.”
 
 P3 chỉ nói:
 
@@ -497,15 +473,15 @@ P3 chỉ nói:
 
 Một đống gạch tốt chưa phải một ngôi nhà.
 
-Bước tiếp theo phải kiểm tra xem khi ghép chúng theo đúng thứ tự của model, toàn bộ một layer có còn đúng hay không.
+Bước tiếp theo phải kiểm tra xem khi ghép chúng theo đúng thứ tự của mô hình, toàn bộ một lớp có còn đúng hay không.
 
-## Hai lần dừng trước đó vẫn không phải kernel FAIL
+## Hai lần dừng trước đó vẫn không phải chương trình GPU FAIL
 
 P3 cũng từng có những lần chưa tới được phép thử thật.
 
 Một lần package thiếu file cấu hình.
 
-Một lần khác shader đã compile nhưng quá trình build dừng vì những source cần thiết từ GGUF/tensor store chưa được đóng gói cùng.
+Một lần khác shader đã compile nhưng quá trình build dừng vì những source cần thiết từ GGUF/kho các khối số chưa được đóng gói cùng.
 
 Trong cả hai trường hợp:
 
@@ -557,28 +533,28 @@ SwiGLU + residual
 
 Nhưng vẫn phải nhắc ngay điều P3 **chưa chứng minh**:
 
-- chưa có một decoder layer hoàn chỉnh;
-- chưa chạy 28 layer;
+- chưa có một lớp giải mã hoàn chỉnh;
+- chưa chạy 28 lớp;
 - chưa sinh token;
 - chưa chứng minh tốc độ;
-- chưa chứng minh model end-to-end đúng.
+- chưa chứng minh mô hình end-to-end đúng.
 
 P3 PASS chỉ mở quyền đi sang câu hỏi mới:
 
-> **Nếu từng viên gạch đều đúng riêng lẻ, khi ghép chúng thành một decoder layer thật với trọng số thật, kết quả cuối layer có còn đúng không?**
+> **Nếu từng viên gạch đều đúng riêng lẻ, khi ghép chúng thành một lớp giải mã thật với trọng số thật, kết quả cuối lớp có còn đúng không?**
 
 Đó là P4.
 
 ### Nhớ 3 điều
 
-1. **Kernel — chương trình tính toán nhỏ trên GPU — phải được kiểm tra riêng trước khi được tin tưởng trong một model lớn.**
+1. **chương trình GPU — chương trình tính toán nhỏ trên GPU — phải được kiểm tra riêng trước khi được tin tưởng trong một mô hình lớn.**
 2. **CPU reference — cách tính tham chiếu độc lập trên CPU — đóng vai trò “đáp án” để kiểm tra GPU, và ngưỡng sai số phải được khóa trước khi nhìn kết quả.**
-3. **P3 PASS là PASS của các primitive — những phép toán nền tảng — chứ chưa phải PASS của decoder layer hay toàn model.**
+3. **P3 PASS là PASS của các phép tính nền tảng — những phép toán nền tảng — chứ chưa phải PASS của lớp giải mã hay toàn mô hình.**
 
-**Chương 5 — Một decoder layer hoàn chỉnh**
+**Chương 5 — Một lớp giải mã hoàn chỉnh**
 
 Ở P3, ta đã đặt từng viên gạch lên bàn và thử riêng từng viên.
 
 P4 sẽ làm điều nguy hiểm hơn nhiều:
 
-**ghép chúng lại theo đúng đường đi của một decoder layer thật, sử dụng trọng số thật, giữ các kết quả trung gian trên GPU, rồi kiểm tra xem kết quả cuối cùng còn khớp với CPU hay không.**
+**ghép chúng lại theo đúng đường đi của một lớp giải mã thật, sử dụng trọng số thật, giữ các kết quả trung gian trên GPU, rồi kiểm tra xem kết quả cuối cùng còn khớp với CPU hay không.**
