@@ -720,3 +720,6 @@ Mà bắt đầu hỏi:
 > **Phần III kết thúc tại đây.**
 >
 > Ta đã học cách nghĩ ra nhiều phương án mà không chạy tất cả, chấp nhận KHÔNG ĐẠT (FAIL) mà không cứu kết quả, chuyển một ĐẠT (PASS) nhỏ vào hệ thống thật, và cuối cùng đặt chính thành công đó trở lại trước một phép đối chứng mới.
+
+
+**Tiếp theo: [Chương 16 — Tách cách sắp dữ liệu khỏi cách thực hiện phép tính](16-experiment-2x2-tach-representation-khoi-execution.md)**
