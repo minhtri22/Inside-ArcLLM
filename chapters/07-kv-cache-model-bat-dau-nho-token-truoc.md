@@ -14,7 +14,7 @@
 
 > **Câu hỏi của chương:** Sau khi một token đã đi xuyên toàn bộ mô hình, làm thế nào để token tiếp theo sử dụng lại những gì GPU vừa tính thay vì bắt đầu lại từ đầu?
 
-Ở cuối Chương 6, ArcLLM đã đi xuyên toàn bộ decoder.
+Ở cuối Chương 6, ArcLLM đã đi xuyên toàn bộ sinh tokenr.
 
 Một token ID được biến thành phép nhúng, đi qua 28 lớp giải mã, qua phép chuẩn hóa cuối, tới lớp tạo điểm đầu ra (LM head) và tạo ra điểm dự đoán — **điểm số mà mô hình gán cho các token có thể đứng tiếp theo**.
 
@@ -197,16 +197,16 @@ Mỗi bước như vậy được gọi là **giai đoạn sinh token — pha x�
 Hình dung:
 
 ```text
-Prompt:
+Đầu vào:
 A B C D
 │ │ │ │
-└─┴─┴─┴── prefill
+└─┴─┴─┴── xử lý đầu vào
            ↓
         KV cache
            ↓
 sinh E
            │
-           └──── decode
+           └──── sinh token
                   ↓
                cập nhật cache
 ```
@@ -215,10 +215,10 @@ P6 khóa một bài thử rất nhỏ và rõ:
 
 ```text
 4 token đầu vào
-→ prefill
+→ xử lý đầu vào
 
 sau đó
-→ 1 bước autoregressive decode
+→ 1 bước sinh token nối tiếp
 ```
 
 **Autoregressive — tự hồi quy** ở đây chỉ có nghĩa:
@@ -282,17 +282,17 @@ Thay vào đó, chúng được ghi vào:
 Ta có thể hình dung mỗi lớp có một cuốn sổ:
 
 ```text
-Layer 0
+Lớp 0
 K cache: [...]
 V cache: [...]
 
-Layer 1
+Lớp 1
 K cache: [...]
 V cache: [...]
 
 ...
 
-Layer 27
+Lớp 27
 K cache: [...]
 V cache: [...]
 ```
@@ -324,19 +324,19 @@ P6 chỉ cần một quy tắc cố định để trả lời câu hỏi tính �
 Chuỗi trở thành:
 
 ```text
-4 token prompt
+4 token đầu vào
       ↓
-prefill trên GPU
+xử lý đầu vào trên GPU
       ↓
 K/V cache được ghi
       ↓
-logits
+điểm dự đoán
       ↓
 CPU lấy top1
       ↓
 token mới
       ↓
-decode trên GPU
+sinh token trên GPU
 ```
 
 Nhưng điểm quan trọng nhất là trong bước giai đoạn sinh token:
@@ -360,11 +360,11 @@ Có một ranh giới điều phối đã được khóa.
 CPU vẫn làm ba việc:
 
 ```text
-đọc logits
+đọc điểm dự đoán
 ↓
 tìm token có logit cao nhất
 ↓
-ghi token ID được chọn cho bước decode tiếp theo
+ghi token ID được chọn cho bước sinh token tiếp theo
 ```
 
 Nói cách khác:
@@ -377,7 +377,7 @@ CPU
 → quyết định top1 theo luật đã khóa
 
 GPU
-→ tiếp tục decode
+→ tiếp tục sinh token
 ```
 
 Đây là **orchestration boundary — ranh giới điều phối giữa CPU và GPU** của P6.
@@ -605,15 +605,15 @@ P6 không đánh đổi bộ nhớ đệm KV bằng cách phá trạng thái cư
 Bây giờ có hai loại dữ liệu cần phân biệt:
 
 ```text
-MODEL WEIGHTS
-→ những gì model đã học
-→ gần như cố định trong inference
+TRỌNG SỐ MÔ HÌNH
+→ những gì mô hình đã học
+→ gần như cố định trong suy luận
 → resident từ trước
 
 KV CACHE
-→ trạng thái sinh ra từ prompt/token hiện tại
+→ trạng thái sinh ra từ đầu vào/token hiện tại
 → thay đổi khi generation tiến lên
-→ persistent qua các bước decode
+→ được giữ lại qua các bước sinh token
 ```
 
 Đây là lần đầu kiến trúc hệ thực thi bắt đầu có “trí nhớ theo phiên chạy”.
@@ -623,10 +623,10 @@ KV CACHE
 Tóm tắt:
 
 ```text
-prompt
+đầu vào
 → 4 token IDs: [1, 17, 42, 256]
 
-prefill
+xử lý đầu vào
 → chạy bốn token
 → ghi K/V vào persistent GPU buffers
   trên cả 28 layer
@@ -636,21 +636,21 @@ KV cache
 → không có intermediate host round-trip
 
 CPU orchestration
-→ đọc logits
+→ đọc điểm dự đoán
 → chọn top1 bằng greedy argmax
 → ghi token ID cho bước tiếp
 
-decode
+sinh token
 → dùng trực tiếp chính GPU KV cache
 
 greedy output tokens
 CPU = [6228, 17]
 GPU = [6228, 17]
 
-prefill logits
+xử lý đầu vào điểm dự đoán
 → PASS
 
-decode logits
+sinh token điểm dự đoán
 → PASS
 
 K cache
@@ -687,15 +687,15 @@ Nó đã **giữ trạng thái từ quá khứ để tính bước tiếp theo**
 P0 tới P6 đã trả lời một chuỗi câu hỏi ngày càng lớn:
 
 ```text
-đọc đúng model?
+đọc đúng mô hình?
       ↓
 đưa dữ liệu lên GPU?
       ↓
 từng phép tính đúng?
       ↓
-một layer đúng?
+một lớp đúng?
       ↓
-28 layer đúng?
+28 lớp đúng?
       ↓
 giữ được KV cache?
       ↓
