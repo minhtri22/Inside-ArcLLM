@@ -1,5 +1,34 @@
 # Chương 2 — GGUF không còn là một file, nó trở thành tensor store
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: model file / tensor**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** model file / tensor.
+
+
 > **Câu hỏi của chương:** Một model có hàng tỷ con số được đặt trong file như thế nào, và runtime có phải bung tất cả chúng ra trước khi dùng không?
 
 Ở cuối Chương 1, ArcLLM đã làm được một việc rất cơ bản nhưng quan trọng: xác nhận đúng file model, đọc được định dạng GGUF và nhìn thấy bên trong có **338 tensor**.
