@@ -24,15 +24,15 @@ ArcLLM đã chạy được mô hình 7B thật.
 Nó đã có:
 
 ```text
-28 layer thật
+28 lớp xử lý thật
 ↓
-GPU-resident KV
+bộ nhớ đệm KV giữ trên GPU
 ↓
-autoregressive generation
+sinh token nối tiếp
 ↓
-production kernels
+các chương trình GPU của đường chạy thật
 ↓
-matched benchmark với llama.cpp
+phép đo đối chứng cùng điều kiện với llama.cpp
 ```
 
 Nhưng bảng Q2 không đẹp.
@@ -43,11 +43,11 @@ Một phản xạ rất tự nhiên lúc này là:
 
 > “Tối ưu thêm đi.”
 
-Có thể fuse thêm chương trình GPU.
+Có thể gộp thêm các chương trình GPU.
 
 Đổi khối xử lý.
 
-Đổi scheduler.
+Đổi cách lập lịch.
 
 Tìm bài đo khác.
 
@@ -388,7 +388,7 @@ Ngoài ra mỗi cell vẫn có warmup trước measurement.
 
 ## Hai phiên đo còn đảo thứ tự chạy
 
-phiên đo A:
+Phiên đo A:
 
 ```text
 ArcLLM W-S
@@ -400,7 +400,7 @@ llama.cpp W-C
 ArcLLM W-C
 ```
 
-phiên đo B đảo lại:
+Phiên đo B đảo lại:
 
 ```text
 llama.cpp W-S
@@ -436,7 +436,7 @@ AC power
 cùng workloads
 ```
 
-phiên đo A và phiên đo B là hai process/run độc lập.
+Phiên đo A và phiên đo B là hai process/run độc lập.
 
 Không phải cùng một process chạy hai vòng rồi gọi là reproduction.
 
@@ -544,7 +544,7 @@ Blocking-harm guard KHÔNG ĐẠT (FAIL).
 
 ## phiên đo B có đảo kết luận không?
 
-phiên đo B là fresh reproduction.
+Phiên đo B là fresh reproduction.
 
 W-S:
 
