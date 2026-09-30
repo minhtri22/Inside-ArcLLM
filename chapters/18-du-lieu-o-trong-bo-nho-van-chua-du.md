@@ -226,11 +226,11 @@ headroom
 
 Tức **capacity tổng thể ĐẠT (PASS)**.
 
-KHÔNG ĐẠT (FAIL) nằm ở một contract hẹp hơn đã được kế thừa từ kiến trúc trước:
+Kết quả **KHÔNG ĐẠT** nằm ở một **giới hạn kỹ thuật hẹp hơn** được kế thừa từ kiến trúc trước:
 
-> **mỗi physical arena / khối số piece không được vượt 256 MiB.**
+> **mỗi vùng bộ nhớ vật lý chứa một phần khối số không được vượt 256 MiB.**
 
-Hai khối số vocab đơn lẻ vi phạm contract đó:
+Hai khối số từ vựng đơn lẻ vi phạm giới hạn đó:
 
 ```text
 token_embd.weight
@@ -238,7 +238,7 @@ token_embd.weight
 output.weight
 ```
 
-P8-A2 không nới arena cap, không đổi lượng tử hóa, context hay KV precision để cứu kết quả.
+P8-A2 không nới giới hạn vùng nhớ, không đổi lượng tử hóa, **độ dài ngữ cảnh** hay **độ chính xác của KV** để cứu kết quả.
 
 Nó thay cách **biểu diễn vật lý** của đúng hai logical khối số lớn đó:
 
@@ -258,7 +258,7 @@ Tổng dữ liệu logic không đổi.
 
 Tổng công thức bộ nhớ không được cứu bằng cách làm nhỏ mô hình.
 
-Chỉ cách cùng khối số logic được ánh xạ thành các physical piece thay đổi để contract arena vẫn được giữ.
+Chỉ cách cùng khối số logic được ánh xạ thành các **mảnh vật lý** thay đổi để giới hạn vùng nhớ vẫn được giữ.
 
 Trong nghiên cứu Phase2 về semantics của hệ thực thi, chính trường hợp P8 có giới hạn này được dùng như một:
 
