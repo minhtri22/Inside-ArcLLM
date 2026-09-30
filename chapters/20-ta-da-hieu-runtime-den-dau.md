@@ -1,5 +1,34 @@
 # Chương 20 — Ta đã hiểu runtime đến đâu?
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: toàn bộ cỗ máy / ranh giới bằng chứng**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** toàn bộ cỗ máy / ranh giới bằng chứng.
+
+
 > **Câu hỏi của chương:** Sau tất cả những PASS, FAIL, phép đo, cơ chế và lớp trừu tượng đã đi qua, ArcLLM thực sự đã trở thành một runtime tới mức nào — và điều gì ta vẫn chưa được phép tuyên bố?
 
 Chúng ta bắt đầu cuốn sách bằng một câu hỏi rất đơn giản:
