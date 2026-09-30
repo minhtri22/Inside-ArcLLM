@@ -289,7 +289,7 @@ I002 đã loại bỏ X% khoảng cách với llama.cpp
 
 nếu experiment không được thiết kế để đo đúng quantity đó.
 
-Đây là một ví dụ khác về kỷ luật claim.
+Đây là một ví dụ khác về **kỷ luật khi đưa ra kết luận**.
 
 ## Một chỉ số tốt cũng không cứu toàn bộ bức tranh
 
@@ -525,7 +525,7 @@ Hãy tưởng tượng ta giao mục tiêu:
 
 > “Làm ArcLLM nhanh nhất có thể.”
 
-Một AI có khả năng code tốt có thể chạy một vòng rất hấp dẫn:
+Một AI có khả năng **viết mã** tốt có thể chạy một vòng rất hấp dẫn:
 
 ```text
 profile
@@ -715,7 +715,7 @@ Mà bắt đầu hỏi:
 
 1. **Nhanh hơn chính mình không đồng nghĩa đã gần đối chứng.** Sau khả năng giữ lợi ích khi đi lên toàn hệ khoảng `2,20×` giai đoạn sinh token và `2,00×` E2E, phép đối chứng mới vẫn cho thấy ArcLLM có giai đoạn sinh token độ trễ khoảng `10,38×` và E2E độ trễ khoảng `9,97×` đối chứng trong các cell đã đo.
 2. **Một tối ưu lớn làm evidence cũ về nút thắt có thể hết hạn.** Sau khi gate/up thay đổi mạnh, không được dùng ranking lịch sử để tự động chọn chương trình GPU tiếp theo; phải profile lại hệ thống mới.
-3. **E/M/C/T là một vòng, không phải đường chạy tới ĐẠT (PASS) rồi kết thúc.** Khi Transfer thay đổi hệ thống, measurement mới mở lại Explore. Con người giữ quyền quyết định câu hỏi, phạm vi claim và lúc dừng; AI giúp mở rộng năng lực thực thi và kiểm tra.
+3. **E/M/C/T là một vòng, không phải đường chạy tới ĐẠT rồi kết thúc.** Khi bước kiểm tra toàn hệ làm hệ thống thay đổi, **phép đo mới** lại mở một vòng **Khám phá** mới. Con người giữ quyền quyết định câu hỏi, phạm vi kết luận và lúc dừng; AI giúp mở rộng năng lực thực thi và kiểm tra.
 
 > **Phần III kết thúc tại đây.**
 >
