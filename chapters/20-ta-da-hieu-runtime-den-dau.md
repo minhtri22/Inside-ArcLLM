@@ -1,53 +1,31 @@
-# Chương 20 — Ta đã hiểu runtime đến đâu?
+# Chương 20 — Ta đã hiểu cỗ máy đến đâu?
 
 > **Mức đọc: Nâng cao**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở câu hỏi nào?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Thí nghiệm
+>    ↓
+> hệ thực thi thật
+>    ↓
+> điều đã chứng minh
+>    ↓
+> điều đã thất bại
+>    ↓
+> điều vẫn chưa biết
 > ```
->
-> ▶ **Đang mở ở chương này:** toàn bộ cỗ máy / ranh giới bằng chứng.
 
 
-> **Câu hỏi của chương:** Sau tất cả những PASS, FAIL, phép đo, cơ chế và lớp trừu tượng đã đi qua, ArcLLM thực sự đã trở thành một runtime tới mức nào — và điều gì ta vẫn chưa được phép tuyên bố?
+> **Câu hỏi của chương:** Sau tất cả những ĐẠT (PASS), KHÔNG ĐẠT (FAIL), phép đo, cơ chế và lớp trừu tượng đã đi qua, ArcLLM thực sự đã trở thành một hệ thực thi tới mức nào — và điều gì ta vẫn chưa được phép tuyên bố?
 
 Chúng ta bắt đầu cuốn sách bằng một câu hỏi rất đơn giản:
 
 > **Bên dưới một câu trả lời AI thực sự có gì?**
 
-Lúc đó chưa có runtime.
+Lúc đó chưa có hệ thực thi.
 
-Chỉ có một file model.
+Chỉ có một file mô hình.
 
 Rồi từng lớp xuất hiện.
 
@@ -83,11 +61,11 @@ một mô hình runtime tổng quát hơn
 
 Nhưng đến đây vẫn còn một câu hỏi rất quan trọng.
 
-Tất cả những thứ vừa xây có thực sự trở thành **một runtime**, hay chúng vẫn chỉ là một tập hợp chương trình thí nghiệm được nối với nhau?
+Tất cả những thứ vừa xây có thực sự trở thành **một hệ thực thi**, hay chúng vẫn chỉ là một tập hợp chương trình thí nghiệm được nối với nhau?
 
 ArcLLM phải trả lời câu hỏi đó trước khi cuốn sách có thể kết thúc.
 
-## Một chương trình thí nghiệm chạy được chưa chắc đã là runtime
+## Một chương trình thí nghiệm chạy được chưa chắc đã là hệ thực thi thật
 
 Trong quá trình nghiên cứu, rất nhiều chương trình được tạo ra cho một mục đích cực kỳ cụ thể.
 
@@ -129,7 +107,7 @@ ngưỡng hiệu năng
 các kiểm tra dành riêng cho thí nghiệm
 ```
 
-Một runtime thực không nên cần biết:
+Một hệ thực thi thực không nên cần biết:
 
 > “Đây là W-S.”
 
@@ -141,7 +119,7 @@ Hay:
 
 > “Hôm nay ta đang chạy nhánh B của thí nghiệm.”
 
-Nó phải nhận một yêu cầu rồi thực hiện công việc của runtime.
+Nó phải nhận một yêu cầu rồi thực hiện công việc của hệ thực thi.
 
 Vì vậy bước hội tụ cuối cùng không phải một thí nghiệm khoa học mới.
 
@@ -153,7 +131,7 @@ Nó là:
 
 Đến thời điểm này, một số mảnh quan trọng đã đứng vững.
 
-Có cơ chế Split-K32 cho gate/up đã sống sót tới model thật.
+Có cơ chế Split-K32 cho gate/up đã sống sót tới mô hình thật.
 
 Có cách biểu diễn EXEC148 cho Q4-down.
 
@@ -179,7 +157,7 @@ Nhưng các kết quả nghiên cứu này vẫn phải hội tụ thành một 
 
 Mục tiêu lúc này là tạo một:
 
-> **runtime chuẩn đã hội tụ (canonical runtime)**.
+> **hệ thực thi chuẩn đã hội tụ (canonical hệ thực thi)**.
 
 Từ “chuẩn” ở đây không có nghĩa:
 
@@ -187,7 +165,7 @@ Từ “chuẩn” ở đây không có nghĩa:
 
 Nó chỉ có nghĩa:
 
-> **Đây là đường runtime hiện tại được chọn làm mốc chính thức sau khi những cơ chế đã được kiểm tra và hội tụ.**
+> **Đây là đường hệ thực thi hiện tại được chọn làm mốc chính thức sau khi những cơ chế đã được kiểm tra và hội tụ.**
 
 Người gọi chỉ cần cung cấp:
 
@@ -199,7 +177,7 @@ các token đầu vào
 số token muốn sinh
 ```
 
-Runtime chịu trách nhiệm cho phần còn lại.
+Hệ thực thi chịu trách nhiệm cho phần còn lại.
 
 Người gọi không cần biết:
 
@@ -215,15 +193,15 @@ thí nghiệm nào đã sinh ra kernel đang chạy
 
 Đây là một ranh giới rất quan trọng.
 
-> **Nghiên cứu tạo ra cơ chế. Runtime sử dụng cơ chế, nhưng không mang theo phòng thí nghiệm bên trong nó.**
+> **Nghiên cứu tạo ra cơ chế. hệ thực thi sử dụng cơ chế, nhưng không mang theo phòng thí nghiệm bên trong nó.**
 
 ## Nhưng dọn kiến trúc cũng có thể làm hỏng bằng chứng cũ
 
-Tách code ra khỏi vỏ thí nghiệm nghe giống một việc thuần kỹ thuật.
+Tách mã ra khỏi vỏ thí nghiệm nghe giống một việc thuần kỹ thuật.
 
 Nhưng nếu làm sai, ta có thể vô tình thay đổi hành vi đã được xác nhận.
 
-Vì vậy runtime mới phải chạy lại các **đối chứng đã đóng băng**.
+Vì vậy hệ thực thi mới phải chạy lại các **đối chứng đã đóng băng**.
 
 Ở hai hồ sơ lịch sử, nó vẫn phải giữ đúng:
 
@@ -247,7 +225,7 @@ Với đường Q4-down, mỗi lượt vẫn có:
 
 Chuỗi token đầu ra cũng phải giữ nguyên.
 
-Cả hai hồ sơ đều PASS.
+Cả hai hồ sơ đều ĐẠT (PASS).
 
 Nói cách khác:
 
@@ -255,7 +233,7 @@ Nói cách khác:
 
 Nhưng nếu chỉ chạy lại hai phép thử lịch sử thì vẫn còn một nghi ngờ.
 
-Có thể runtime mới vẫn chỉ là một chương trình được viết riêng để vượt hai bài kiểm tra đó.
+Có thể hệ thực thi mới vẫn chỉ là một chương trình được viết riêng để vượt hai bài kiểm tra đó.
 
 Vì vậy cần thêm một câu hỏi.
 
@@ -273,7 +251,7 @@ và yêu cầu sinh:
 2 token
 ```
 
-Runtime trả:
+Hệ thực thi trả:
 
 ```text
 [2718, 2718]
@@ -283,11 +261,11 @@ Kết quả là các số hữu hạn.
 
 Đường chạy hoàn tất.
 
-Không có logic W-S/W-C trong runtime.
+Không có logic W-S/W-C trong hệ thực thi.
 
 Không có hash kết quả cố định được nhúng vào đường thực thi.
 
-Không có logic phân xử hiệu năng của thí nghiệm nằm bên trong runtime.
+Không có logic phân xử hiệu năng của thí nghiệm nằm bên trong hệ thực thi.
 
 Những chương trình nghiên cứu lịch sử cũng không còn nằm trên đường biên dịch đang hoạt động.
 
@@ -299,13 +277,13 @@ Thậm chí yêu cầu này nằm ngoài phạm vi khoa học đã được xác
 
 Phép thử chỉ cho phép một kết luận hẹp hơn:
 
-> **Runtime thật sự có thể nhận dữ liệu do người gọi cung cấp, thay vì chỉ phát lại những trường hợp thí nghiệm được viết sẵn.**
+> **hệ thực thi thật sự có thể nhận dữ liệu do người gọi cung cấp, thay vì chỉ phát lại những trường hợp thí nghiệm được viết sẵn.**
 
-Đây là một PASS về kiến trúc.
+Đây là một ĐẠT (PASS) về kiến trúc.
 
-Không phải PASS về chất lượng model.
+Không phải ĐẠT (PASS) về chất lượng mô hình.
 
-## Vậy ArcLLM đã thật sự là một runtime chưa?
+## Vậy ArcLLM đã thật sự là một hệ thực thi chưa?
 
 Trong nghĩa thực dụng mà cuốn sách này đặt ra:
 
@@ -335,17 +313,17 @@ quản lý vòng đời
 trả token cho người gọi
 ```
 
-Quan trọng hơn, đường runtime này đã được tách khỏi vỏ thí nghiệm từng tạo ra các cơ chế bên trong nó.
+Quan trọng hơn, đường hệ thực thi này đã được tách khỏi vỏ thí nghiệm từng tạo ra các cơ chế bên trong nó.
 
 Đây chính là thứ Chương 1 chưa có.
 
 Nhưng từ:
 
-> **“ArcLLM đã trở thành một runtime.”**
+> **“ArcLLM đã trở thành một hệ thực thi.”**
 
 không được nhảy thành:
 
-> **“Bài toán runtime LLM đã được giải quyết.”**
+> **“Bài toán hệ thực thi LLM đã được giải quyết.”**
 
 Khoảng cách giữa hai câu rất lớn.
 
@@ -434,7 +412,7 @@ Mỗi câu hỏi cần một loại bằng chứng khác nhau.
 
 Đó có lẽ là kết quả quan trọng hơn bất kỳ một con số tăng tốc riêng lẻ nào.
 
-## Một PASS về tính đúng không phải PASS về hiệu năng
+## Một kết quả ĐẠT về tính đúng không phải kết quả ĐẠT về hiệu năng
 
 Cuốn sách liên tục buộc ta giữ các tầng kết luận tách biệt.
 
@@ -454,7 +432,7 @@ tính đúng
 → FAIL
 ```
 
-Khi tính đúng FAIL:
+Khi tính đúng KHÔNG ĐẠT (FAIL):
 
 ```text
 hiệu năng
@@ -475,7 +453,7 @@ toàn hệ thống
 → chưa biết
 ```
 
-Rồi Q4 gate/up sống sót qua bước chuyển vào model thật:
+Rồi Q4 gate/up sống sót qua bước chuyển vào mô hình thật:
 
 ```text
 decode
@@ -509,9 +487,9 @@ Chúng trả lời hai câu hỏi khác nhau.
 
 Một cơ chế có thể tạo **giá trị thật bên trong ArcLLM** trong khi ArcLLM **vẫn còn khoảng cách lớn với đối chứng bên ngoài**.
 
-## Một lớp trừu tượng PASS cũng không phải PASS về hiệu năng
+## Một lớp trừu tượng vượt kiểm tra cũng không đồng nghĩa hiệu năng đã tốt
 
-Chương 17 đến 19 chuyển trọng tâm khỏi việc chỉ viết kernel nhanh hơn.
+Chương 17 đến 19 chuyển trọng tâm khỏi việc chỉ viết chương trình GPU nhanh hơn.
 
 Ta có sáu chiều:
 
@@ -550,7 +528,7 @@ không cần cách biểu diễn phụ
 
 và một lớp Vulkan thật có thể tuân theo cùng các ranh giới đó.
 
-Đó là bằng chứng có giá trị về **cấu trúc runtime**.
+Đó là bằng chứng có giá trị về **cấu trúc hệ thực thi**.
 
 Nhưng không có phép suy luận:
 
@@ -561,7 +539,7 @@ v4 PASS
 
 Không có bằng chứng đó.
 
-Lớp trừu tượng được tạo ra để runtime mô tả và quản lý đúng những cơ chế mà nghiên cứu đã tìm thấy.
+Lớp trừu tượng được tạo ra để hệ thực thi mô tả và quản lý đúng những cơ chế mà nghiên cứu đã tìm thấy.
 
 Nó không phải một thủ thuật tăng token/giây.
 
@@ -608,9 +586,9 @@ Mà để quyết định:
 
 Có một ranh giới bằng chứng cần khóa ngay trước các con số tiếp theo:
 
-> **Các số NPU dưới đây là phép chiếu phân tích từ evidence exact-target hiện có của ArcLLM kết hợp với timing của NPU provider. Chúng không phải một fresh full-model benchmark có NPU, và ở thời điểm này chưa có NPU backend được tích hợp vào canonical runtime.**
+> **Các số NPU dưới đây là phép chiếu phân tích từ evidence exact-target hiện có của ArcLLM kết hợp với đo thời gian của NPU provider. Chúng không phải một fresh full-mô hình benchmark có NPU, và ở thời điểm này chưa có NPU lớp thực thi phần cứng được tích hợp vào canonical hệ thực thi.**
 
-Cụ thể, phần current-canonical được ước tính bằng cách lấy evidence hậu-I002 rồi áp tỷ lệ B/0 đã đo của Q4-down vào phần Q4_K FFN-down trước khi chuẩn hóa lại các family share. Vì vậy những con số này dùng để quyết định **có đáng mở một bounded transfer study hay không**, không phải để tuyên bố production speedup.
+Cụ thể, phần current-canonical được ước tính bằng cách lấy evidence hậu-I002 rồi áp tỷ lệ B/0 đã đo của Q4-down vào phần Q4_K FFN-down trước khi chuẩn hóa lại các family share. Vì vậy những con số này dùng để quyết định **có đáng mở một có giới hạn transfer study hay không**, không phải để tuyên bố production speedup.
 
 ## Cơ chế từng thành công lớn có thể trở thành nơi không đáng chuyển tiếp
 
@@ -640,7 +618,7 @@ Thành công của chính ArcLLM đã làm một câu hỏi cũ hết hạn.
 
 FFN-down cho tín hiệu khác.
 
-Theo phân tích trên runtime hiện tại, ngân sách thời gian còn lại ước tính khoảng:
+Theo phân tích trên hệ thực thi hiện tại, ngân sách thời gian còn lại ước tính khoảng:
 
 ```text
 W-S
@@ -658,7 +636,7 @@ Con số này đủ để cho phép mở:
 
 Chỉ FFN-down.
 
-Không phải toàn model.
+Không phải toàn mô hình.
 
 Không phải mọi phép GEMM.
 
@@ -670,7 +648,7 @@ Không phải:
 
 ## Và ngay câu hỏi đó cũng bị ràng buộc bởi vòng đời
 
-Để FFN-down đi qua đường NPU đang khả thi, trọng số lượng tử hóa cần được tạo thành một cách biểu diễn FP16 ở thời điểm nạp model hoặc từ một bản đã được lưu sẵn.
+Để FFN-down đi qua đường NPU đang khả thi, trọng số lượng tử hóa cần được tạo thành một cách biểu diễn FP16 ở thời điểm nạp mô hình hoặc từ một bản đã được lưu sẵn.
 
 Tổng dữ liệu FP16 cho 28 layer FFN-down vào khoảng:
 
@@ -719,7 +697,7 @@ Nó còn là:
 
 > **Dữ liệu phải đổi dạng không? Đổi khi nào? Chi phí ban đầu là bao nhiêu? Và thứ vừa tạo sẽ sống bao lâu?**
 
-## Vì vậy NPU vẫn đứng ngoài runtime chuẩn
+## Vì vậy NPU vẫn đứng ngoài hệ thực thi chuẩn
 
 Điều bằng chứng cho phép nói là:
 
@@ -753,7 +731,7 @@ Không có kết luận nào trong số đó.
 
 Đây là một điểm kết rất phù hợp.
 
-Một runtime trưởng thành không phải runtime nhét mọi khả năng phần cứng vào bên trong.
+Một hệ thực thi trưởng thành không phải hệ thực thi nhét mọi khả năng phần cứng vào bên trong.
 
 Nó phải biết:
 
@@ -761,13 +739,13 @@ Nó phải biết:
 
 ## Vậy điều gì vẫn chưa được chứng minh?
 
-Runtime chuẩn đã PASS việc tách khỏi vỏ thí nghiệm.
+Hệ thực thi chuẩn đã ĐẠT (PASS) việc tách khỏi vỏ thí nghiệm.
 
 Nhưng chính bằng chứng đóng băng vẫn giữ những ranh giới rất cụ thể.
 
 ### Chất lượng trên đầu vào tùy ý
 
-Phép thử ngoài bộ dữ liệu kiểm thử cố định cho thấy giao diện runtime thực sự nhận được token do người gọi cung cấp.
+Phép thử ngoài bộ dữ liệu kiểm thử cố định cho thấy giao diện hệ thực thi thực sự nhận được token do người gọi cung cấp.
 
 Nó không chứng minh:
 
@@ -775,21 +753,21 @@ Nó không chứng minh:
 
 Hai chuyện khác nhau.
 
-### Phiên model sống lâu
+### Phiên mô hình sống lâu
 
-Runtime hiện tại chưa chứng minh một mô hình dịch vụ trong đó model được giữ sống lâu và phục vụ nhiều yêu cầu như một phiên bền vững.
+Hệ thực thi hiện tại chưa chứng minh một mô hình dịch vụ trong đó mô hình được giữ sống lâu và phục vụ nhiều yêu cầu như một phiên bền vững.
 
 Điều này đặc biệt quan trọng với những cách biểu diễn có chi phí tạo lớn.
 
 ### NPU
 
-NPU chưa được tích hợp vào runtime chuẩn.
+NPU chưa được tích hợp vào hệ thực thi chuẩn.
 
 Mới chỉ có một nhánh nghiên cứu giới hạn được cho phép mở.
 
-### Đối chứng bên ngoài sau lần tách runtime cuối cùng
+### Đối chứng bên ngoài sau lần tách hệ thực thi cuối cùng
 
-Việc tách runtime chuẩn không tạo một kết luận hiệu năng mới.
+Việc tách hệ thực thi chuẩn không tạo một kết luận hiệu năng mới.
 
 Vì vậy không được lấy nó làm bằng chứng rằng khoảng cách với llama.cpp đã thay đổi.
 
@@ -848,7 +826,7 @@ Nhưng:
 
 > **“Hiểu sâu hơn” không có nghĩa “đã biết mọi thứ xảy ra bên trong.”**
 
-## Nếu chỉ giữ PASS, cuốn sách sẽ kể sai lịch sử
+## Nếu chỉ giữ ĐẠT (PASS), cuốn sách sẽ kể sai lịch sử
 
 Ta có thể viết lại ArcLLM thành một câu chuyện rất đẹp:
 
@@ -931,11 +909,11 @@ Ta mất:
 
 Tên cuốn sách là:
 
-> **Inside ArcLLM — Xây dựng một runtime LLM từ những nguyên lý đầu tiên**
+> **Inside ArcLLM — Xây dựng một hệ thực thi LLM từ những nguyên lý đầu tiên**
 >
-> *Building an LLM Runtime from First Principles*
+> *Building an LLM hệ thực thi from First Principles*
 
-Ta thực sự đã xây một runtime.
+Ta thực sự đã xây một hệ thực thi.
 
 Nhưng thứ có giá trị không chỉ là mã nguồn của nó.
 
@@ -1050,7 +1028,7 @@ Nếu thay vì chỉ đo từng vùng mà ta đã biết phải nhìn, ta muốn
 
 Không chỉ hỏi:
 
-> “Kernel này mất bao nhiêu mili-giây?”
+> “chương trình GPU này mất bao nhiêu mili-giây?”
 
 Mà hỏi:
 
@@ -1064,15 +1042,15 @@ Và cánh cửa đó chỉ xuất hiện bởi cỗ máy đã được xây đ�
 
 ### Nhớ 3 điều
 
-1. **ArcLLM đã hội tụ thành một runtime tách khỏi vỏ thí nghiệm.** Các đối chứng đóng băng, cấu trúc dispatch và hành vi vòng đời được giữ nguyên, đồng thời runtime có thể nhận token đầu vào ngoài những bộ dữ liệu kiểm thử lịch sử.
-2. **“Có runtime” không có nghĩa “đã giải xong runtime”.** Khoảng cách với đối chứng trưởng thành vẫn lớn; chất lượng trên đầu vào tùy ý, phiên model sống lâu, NPU và tính phổ quát của mô hình v4 đều còn những ranh giới chưa được chứng minh.
-3. **Kết quả quan trọng không chỉ nằm ở những PASS.** Những FAIL đã loại các giả thuyết yếu, xác định biên giới và buộc kiến trúc chỉ xuất hiện khi bằng chứng thực sự yêu cầu nó.
+1. **ArcLLM đã hội tụ thành một hệ thực thi tách khỏi vỏ thí nghiệm.** Các đối chứng đóng băng, cấu trúc lần giao việc cho GPU và hành vi vòng đời được giữ nguyên, đồng thời hệ thực thi có thể nhận token đầu vào ngoài những bộ dữ liệu kiểm thử lịch sử.
+2. **“Có hệ thực thi” không có nghĩa “đã giải xong hệ thực thi”.** Khoảng cách với đối chứng trưởng thành vẫn lớn; chất lượng trên đầu vào tùy ý, phiên mô hình sống lâu, NPU và tính phổ quát của mô hình v4 đều còn những ranh giới chưa được chứng minh.
+3. **Kết quả quan trọng không chỉ nằm ở những ĐẠT (PASS).** Những KHÔNG ĐẠT (FAIL) đã loại các giả thuyết yếu, xác định biên giới và buộc kiến trúc chỉ xuất hiện khi bằng chứng thực sự yêu cầu nó.
 
 ---
 
 ## Inside ArcLLM kết thúc tại đây
 
-Ta bắt đầu với một file model và một câu hỏi:
+Ta bắt đầu với một file mô hình và một câu hỏi:
 
 > **“Bên dưới một câu trả lời AI có gì?”**
 
@@ -1092,7 +1070,7 @@ Loại bỏ những cách giải thích không đứng vững.
 
 Giữ cả những con đường thất bại.
 
-Và cuối cùng đưa những phần còn sống sót trở lại thành một runtime thật.
+Và cuối cùng đưa những phần còn sống sót trở lại thành một hệ thực thi thật.
 
 Câu trả lời cuối cùng vì vậy không phải một sơ đồ.
 
