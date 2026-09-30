@@ -1,5 +1,34 @@
 # Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: đối chứng toàn hệ / đo lại**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** đối chứng toàn hệ / đo lại.
+
+
 > **Câu hỏi của chương:** Sau khi một cơ chế đã giúp ArcLLM nhanh hơn khoảng hai lần ở cấp toàn hệ nội bộ, làm thế nào biết cải thiện đó thực sự đã đưa runtime tới gần một hệ thống trưởng thành hơn hay chưa?
 
 Chương 14 kết thúc bằng một kết quả rất đáng kể.
