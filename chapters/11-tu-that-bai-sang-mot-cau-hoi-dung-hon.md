@@ -29,7 +29,7 @@ Dịch cẩn thận:
 
 Đó không phải là một lỗi kỹ thuật.
 
-Không phải experiment chưa chạy xong.
+Không phải thí nghiệm chưa chạy xong.
 
 Không phải vì thiếu dữ liệu.
 
@@ -37,7 +37,7 @@ Q3 đã hoàn thành đủ 40/40 lần đo mới.
 
 Hai phiên chạy độc lập cùng đi tới một kết luận.
 
-Vì vậy stop rule đã khóa trước buộc ta phải:
+Vì vậy quy tắc dừng đã khóa trước buộc ta phải:
 
 > **đóng kiến trúc ArcLLM hiện tại.**
 
