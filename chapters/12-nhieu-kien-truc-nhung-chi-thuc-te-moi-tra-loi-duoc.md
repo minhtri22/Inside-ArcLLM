@@ -2,28 +2,38 @@
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt — đang mở: E/M/C/T / chọn cơ chế**
+> **Bản đồ xuyên suốt**
 >
 > ```text
-> văn bản → token → tensor
->                     ↓
->          model / parameters
->                     ↓
->                  runtime
->                     ↓
->            CPU / GPU / bộ nhớ
->                     ↓
->      RMSNorm / attention / FFN
->                     ↓
->              decoder layer
->                     ↓
->             nhiều decoder layer
->                     ↓
->          KV cache / sinh token
->                     ↓
->        benchmark / tối ưu
->                     ↓
-> representation / lifecycle / kiến trúc runtime
+> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
+> 
+> AI                                   Văn bản
+> ↓                                    ↓
+> Machine Learning                     Tokenizer
+> ↓                                    ↓
+> Neural Network                       Token / token ID
+> ↓                                    ↓
+> Language Model                       Embedding → tensor
+> ↓                                           +
+> LLM                                  parameters / weights từ model
+> ↓                                           ↓
+> Transformer                          Runtime
+> ↓                                           ↓
+> Decoder-only Transformer             CPU / GPU / bộ nhớ
+> ↓                                           ↓
+> Nhiều decoder layer                  RMSNorm / Attention / FFN
+> ↓ chứa                                      ↓
+> Parameters / Weights                 một decoder layer
+>                                             ↓
+>                                      nhiều decoder layer
+>                                             ↓
+>                                      logits → token tiếp theo
+>                                             ↓
+>                                      KV cache / lặp lại
+>                                             ↓
+>                                      benchmark / tối ưu
+>                                             ↓
+>                                      representation / lifecycle
 > ```
 >
 > ▶ **Đang mở ở chương này:** E/M/C/T / chọn cơ chế.
