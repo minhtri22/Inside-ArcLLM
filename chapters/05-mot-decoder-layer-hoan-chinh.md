@@ -1,45 +1,19 @@
-# Chương 5 — Một decoder layer hoàn chỉnh
+# Chương 5 — Ghép các phép tính thành một lớp giải mã
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Các phép tính nhỏ
+>         ↓
+> [ một lớp giải mã ]
+>         ↓
+> kiểm tra đầu ra
 > ```
->
-> ▶ **Đang mở ở chương này:** một decoder layer.
 
 
-> **Câu hỏi của chương:** Nếu từng phép tính đã đúng khi đứng riêng, khi nối chúng thành một lớp thật của model thì cả chuỗi có còn đúng không?
+> **Câu hỏi của chương:** Nếu từng phép tính đã đúng khi đứng riêng, khi nối chúng thành một lớp thật của mô hình thì cả chuỗi có còn đúng không?
 
 Ở Chương 4, ArcLLM đã thử từng viên gạch.
 
@@ -47,11 +21,11 @@ RMSNorm được kiểm tra riêng.
 
 Phép nhân với trọng số Q4_K được kiểm tra riêng.
 
-RoPE, softmax, attention, SwiGLU và residual cũng lần lượt được đưa xuống GPU rồi so với cách tính tham chiếu trên CPU.
+RoPE, softmax, cơ chế chú ý, SwiGLU và residual cũng lần lượt được đưa xuống GPU rồi so với cách tính tham chiếu trên CPU.
 
 Từng phép đều PASS trong phạm vi đã khóa.
 
-Nhưng đó chưa phải một decoder layer.
+Nhưng đó chưa phải một lớp giải mã.
 
 Có một khác biệt quan trọng giữa:
 
@@ -72,13 +46,13 @@ Một chiếc đồng hồ có thể gồm hàng trăm bánh răng tốt. Nhưng
 
 P4 là lúc ArcLLM bắt đầu **lắp các bánh răng lại với nhau**.
 
-## Decoder layer là gì?
+## lớp giải mã là gì?
 
-Ở mức đơn giản nhất, một model ngôn ngữ không xử lý văn bản bằng một phép tính duy nhất.
+Ở mức đơn giản nhất, một mô hình ngôn ngữ không xử lý văn bản bằng một phép tính duy nhất.
 
-Dữ liệu đi qua nhiều **layer — lớp xử lý** liên tiếp.
+Dữ liệu đi qua nhiều **lớp — lớp xử lý** liên tiếp.
 
-Mỗi layer nhận tín hiệu từ lớp trước, thực hiện một chuỗi phép biến đổi rồi chuyển kết quả sang layer tiếp theo.
+Mỗi lớp nhận tín hiệu từ lớp trước, thực hiện một chuỗi phép biến đổi rồi chuyển kết quả sang lớp tiếp theo.
 
 Có thể hình dung:
 
@@ -94,15 +68,15 @@ Layer 2
 ...
 ```
 
-Trong loại model mà ArcLLM đang xây runtime, mỗi layer có hai khu vực lớn mà ta đã làm quen ở Chương 4.
+Trong loại mô hình mà ArcLLM đang xây hệ thực thi, mỗi lớp có hai khu vực lớn mà ta đã làm quen ở Chương 4.
 
-Một phía là **attention — phần giúp model kết hợp thông tin giữa các vị trí token**.
+Một phía là **cơ chế chú ý — phần giúp mô hình kết hợp thông tin giữa các vị trí token**.
 
-Phía còn lại là **FFN — Feed-Forward Network, nhánh biến đổi tín hiệu sau attention**.
+Phía còn lại là **FFN — Feed-Forward Network, nhánh biến đổi tín hiệu sau cơ chế chú ý**.
 
 Giữa các phần ấy còn có chuẩn hóa và những đường residual — **đường cộng tắt đưa tín hiệu cũ cộng trở lại kết quả mới**.
 
-Nếu bỏ bớt chi tiết toán học, ta có thể nhìn một layer như thế này:
+Nếu bỏ bớt chi tiết toán học, ta có thể nhìn một lớp như thế này:
 
 ```text
 tín hiệu đi vào
@@ -126,49 +100,49 @@ P3 đã thử các bộ phận.
 
 P4 hỏi:
 
-> **Nếu cho dữ liệu đi hết con đường này bằng trọng số thật của model, GPU có tạo ra kết quả cuối layer đủ gần với CPU hay không?**
+> **Nếu cho dữ liệu đi hết con đường này bằng trọng số thật của mô hình, GPU có tạo ra kết quả cuối lớp đủ gần với CPU hay không?**
 
 ## Lần này không còn dùng những mảnh rời
 
-P4 dùng **`blk.0` — layer đầu tiên thật của model Qwen2 đã được khóa từ P0**.
+P4 dùng **`blk.0` — lớp đầu tiên thật của mô hình Qwen2 đã được khóa từ P0**.
 
 Điều này rất quan trọng.
 
-Ta không dựng một layer đồ chơi có kích thước nhỏ rồi suy luận rằng layer thật chắc cũng đúng.
+Ta không dựng một lớp đồ chơi có kích thước nhỏ rồi suy luận rằng lớp thật chắc cũng đúng.
 
-P4 lấy các trọng số thật của layer đó từ chính GGUF mà P1 đã lập bản đồ.
+P4 lấy các trọng số thật của lớp đó từ chính GGUF mà P1 đã lập bản đồ.
 
 Có những trọng số ở dạng Q4_K.
 
 Có những trọng số ở dạng Q6_K.
 
-Q4_K và Q6_K đều là các dạng **quantization — cách đóng gói trọng số bằng ít bit hơn để giảm lượng dữ liệu phải lưu và di chuyển**.
+Q4_K và Q6_K đều là các dạng **lượng tử hóa — cách đóng gói trọng số bằng ít bit hơn để giảm lượng dữ liệu phải lưu và di chuyển**.
 
 Ta đã gặp Q4_K nhiều lần.
 
-Ở P4, Q6_K bắt đầu trở nên bắt buộc vì các tensor thật của layer không sử dụng chỉ một kiểu lượng tử hóa.
+Ở P4, Q6_K bắt đầu trở nên bắt buộc vì các khối số thật của lớp không sử dụng chỉ một kiểu lượng tử hóa.
 
-Cụ thể, tensor V của attention và tensor `FFN-down` của layer này dùng Q6_K.
+Cụ thể, khối số V của cơ chế chú ý và khối số `FFN-down` của lớp này dùng Q6_K.
 
 Điều đó có nghĩa ArcLLM không thể nói:
 
 > “Q4_K đã chạy được rồi, vậy cứ giả sử phần còn lại cũng giống thế.”
 
-Muốn chạy layer thật, runtime phải đọc và tính được **cả Q4_K lẫn Q6_K ở dạng đóng gói thật**.
+Muốn chạy lớp thật, hệ thực thi phải đọc và tính được **cả Q4_K lẫn Q6_K ở dạng đóng gói thật**.
 
 Đây là lần đầu ta nhìn thấy một nguyên tắc sẽ lặp lại nhiều lần trong hành trình ArcLLM:
 
-> **Model thật thường phá những giả định quá đẹp được hình thành từ một phép thử nhỏ.**
+> **mô hình thật thường phá những giả định quá đẹp được hình thành từ một phép thử nhỏ.**
 
-## Một layer không chỉ là toán — còn là đường đi của dữ liệu
+## Một lớp không chỉ là toán — còn là đường đi của dữ liệu
 
 Giả sử phép A cho ra một kết quả đúng.
 
 Phép B cũng đúng nếu ta đưa cho nó đầu vào đúng.
 
-Nhưng trong layer thật, kết quả của A chính là đầu vào của B.
+Nhưng trong lớp thật, kết quả của A chính là đầu vào của B.
 
-Nếu A ghi dữ liệu sai chỗ, hoặc B đọc nhầm buffer — **vùng chứa dữ liệu** — thì cả hai kernel có thể đúng riêng lẻ mà hệ thống vẫn sai.
+Nếu A ghi dữ liệu sai chỗ, hoặc B đọc nhầm vùng nhớ — **vùng chứa dữ liệu** — thì cả hai chương trình GPU có thể đúng riêng lẻ mà hệ thống vẫn sai.
 
 Ta có thể hình dung:
 
@@ -195,17 +169,17 @@ P4 thêm một câu hỏi mới:
 
 Ta bắt đầu kiểm tra cả **computation — phép tính** lẫn **dataflow — đường đi của dữ liệu**.
 
-## 15 dispatch trong một chuỗi thật
+## 15 lần giao việc cho GPU trong một chuỗi thật
 
-Layer `blk.0` của P4 được thực thi bằng:
+lớp `blk.0` của P4 được thực thi bằng:
 
 ```text
 15 Vulkan dispatches
 ```
 
-Nhắc lại, **dispatch — một lần runtime giao một công việc tính toán cụ thể cho GPU**.
+Nhắc lại, **lần giao việc cho GPU — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU**.
 
-Có thể hình dung mỗi dispatch là một công đoạn trong dây chuyền:
+Có thể hình dung mỗi lần giao việc cho GPU là một công đoạn trong dây chuyền:
 
 ```text
 dispatch 1
@@ -219,11 +193,11 @@ dispatch 3
 dispatch 15
 ```
 
-Con số 15 không có nghĩa một decoder layer nói chung luôn phải có đúng 15 dispatch.
+Con số 15 không có nghĩa một lớp giải mã nói chung luôn phải có đúng 15 lần giao việc cho GPU.
 
 Nó chỉ mô tả implementation P4 đã được kiểm tra.
 
-Điều quan trọng hơn là cả 15 công việc này được ghi vào **một command buffer — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
+Điều quan trọng hơn là cả 15 công việc này được ghi vào **một command vùng nhớ — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
 
 ```text
 1 command buffer
@@ -267,7 +241,7 @@ Một điều được khóa rất rõ trong P4 là:
 
 **Host** ở đây là phía CPU và bộ nhớ mà chương trình trên CPU sử dụng trực tiếp.
 
-**Intermediate — dữ liệu trung gian —** là kết quả đang nằm giữa đầu vào và đầu ra cuối cùng của layer.
+**Intermediate — dữ liệu trung gian —** là kết quả đang nằm giữa đầu vào và đầu ra cuối cùng của lớp.
 
 Nói đơn giản, P4 không cho phép đường thực thi:
 
@@ -309,19 +283,19 @@ CPU
 GPU
 ```
 
-Điều này quan trọng vì nếu CPU chen vào giữa từng phép, ta chưa thật sự chứng minh được một layer GPU-resident — **một layer có dữ liệu trung gian được giữ ở phía GPU trong suốt chuỗi thực thi**.
+Điều này quan trọng vì nếu CPU chen vào giữa từng phép, ta chưa thật sự chứng minh được một lớp GPU-resident — **một lớp có dữ liệu trung gian được giữ ở phía GPU trong suốt chuỗi thực thi**.
 
 P4 yêu cầu các intermediate — **kết quả tạm giữa các phép toán** — tiếp tục cư trú ở phía GPU.
 
-Chỉ khi cả layer hoàn thành, kết quả cuối mới được đem ra để so với CPU reference.
+Chỉ khi cả lớp hoàn thành, kết quả cuối mới được đem ra để so với CPU reference.
 
-## Nhưng làm sao biết cả layer đúng?
+## Nhưng làm sao biết cả lớp đúng?
 
 Ta quay lại nguyên tắc của P3.
 
 GPU không được tự chấm bài cho chính mình.
 
-ArcLLM có một **independent CPU reference — cách tính tham chiếu độc lập trên CPU** cho cả layer.
+ArcLLM có một **independent CPU reference — cách tính tham chiếu độc lập trên CPU** cho cả lớp.
 
 Cùng một đầu vào.
 
@@ -333,7 +307,7 @@ Một bên tính độc lập trên CPU.
 
 Sau đó so hai đầu ra.
 
-Nhưng lần này chỉ nhìn một con số chênh lệch là chưa đủ, bởi đầu ra của layer là cả một dãy giá trị.
+Nhưng lần này chỉ nhìn một con số chênh lệch là chưa đủ, bởi đầu ra của lớp là cả một dãy giá trị.
 
 P4 dùng hai thước đo:
 
@@ -451,7 +425,7 @@ max_abs <= 0,02
 RMSE    <= 0,005
 ```
 
-Nghĩa là layer chỉ được PASS nếu:
+Nghĩa là lớp chỉ được PASS nếu:
 
 - không có phần tử nào lệch quá 0,02 theo max_abs;
 - sai số tổng thể theo RMSE không vượt 0,005.
@@ -474,7 +448,7 @@ Ta chỉ đang chỉnh luật để kết quả mình muốn thắng.
 
 ## Kết quả P4
 
-Khi layer thật `blk.0` chạy xong, kết quả đo được là:
+Khi lớp thật `blk.0` chạy xong, kết quả đo được là:
 
 ```text
 max_abs
@@ -500,7 +474,7 @@ Vì vậy P4 PASS.
 
 Ta nên đọc kết quả bằng câu tiếng Việt trước khi nhìn vào nhiều số:
 
-> **Đầu ra của decoder layer chạy trên GPU đủ gần với đầu ra của cách tính tham chiếu độc lập trên CPU theo cả hai tiêu chuẩn đã định trước.**
+> **Đầu ra của lớp giải mã chạy trên GPU đủ gần với đầu ra của cách tính tham chiếu độc lập trên CPU theo cả hai tiêu chuẩn đã định trước.**
 
 Không cần biến những con số nhỏ này thành tuyên bố lớn hơn.
 
@@ -542,25 +516,25 @@ Dĩ nhiên một PASS không chứng minh từng dòng implementation là hoàn 
 
 Nhưng nó loại bỏ được một lớp rủi ro lớn hơn nhiều so với P3.
 
-Ta không còn chỉ có một bộ sưu tập primitive tốt.
+Ta không còn chỉ có một bộ sưu tập phép tính nền tảng tốt.
 
-Ta đã có **một decoder layer thật hoạt động end-to-end trong phạm vi layer**.
+Ta đã có **một lớp giải mã thật hoạt động end-to-end trong phạm vi lớp**.
 
-## Một lần dừng trước execution — và lần đầu xuất hiện “sổ nghiên cứu”
+## Một lần dừng trước thực thi — và lần đầu xuất hiện “sổ nghiên cứu”
 
-P4 cũng có một lần dừng trước khi GPU thực sự chạy layer.
+P4 cũng có một lần dừng trước khi GPU thực sự chạy lớp.
 
 Trong lần dừng đó xuất hiện một tên file mà người đọc chưa gặp trước đây: `lineage.md`.
 
-Đây là lúc cần tách thật rõ **quản trị nghiên cứu** khỏi **thực thi model**.
+Đây là lúc cần tách thật rõ **quản trị nghiên cứu** khỏi **thực thi mô hình**.
 
 `lineage.md` chỉ là **một file văn bản dùng như sổ lịch sử nghiên cứu**. Dự án ghi vào đó những mốc như: câu hỏi đang kiểm tra là gì, evidence nào đã có, quyết định nào được đưa ra và bước tiếp theo là gì.
 
 Nó **không tham gia vào phép tính GPU**.
 
-Nó không chứa tensor.
+Nó không chứa khối số.
 
-Nó không được Vulkan đọc để chạy decoder layer.
+Nó không được Vulkan đọc để chạy lớp giải mã.
 
 Nó xuất hiện ở đây chỉ vì trước khi cho phép package chạy, một bài QA — **kiểm tra chất lượng của gói thực thi** — có bước kiểm tra tính nhất quán của tài liệu nghiên cứu này.
 
@@ -588,9 +562,9 @@ Vulkan layer execution
 P4 scientific FAIL
 ```
 
-Bởi decoder layer chưa hề được thực thi.
+Bởi lớp giải mã chưa hề được thực thi.
 
-Lỗi được sửa ở lớp package/audit bằng cách làm encoding rõ ràng hơn. Contract khoa học không thay đổi. Các kernel, trọng số và ngưỡng sai số cũng không được sửa để chiều theo outcome.
+Lỗi được sửa ở lớp package/audit bằng cách làm encoding rõ ràng hơn. Contract khoa học không thay đổi. Các chương trình GPU, trọng số và ngưỡng sai số cũng không được sửa để chiều theo outcome.
 
 Sau đó P4 mới được chạy thật và PASS.
 
@@ -598,9 +572,9 @@ Chi tiết `lineage.md` được giữ lại trong sách vì nó mở ra một l
 
 Tạm thời người đọc chỉ cần nhớ:
 
-> **`lineage.md` là sổ ghi lịch sử nghiên cứu, không phải một phần của runtime.**
+> **`lineage.md` là sổ ghi lịch sử nghiên cứu, không phải một phần của hệ thực thi.**
 
-Cách quản trị sâu hơn — gồm các chế độ dùng để loại nhanh giả thuyết, đào sâu hoặc chuyển cách nghiên cứu — sẽ chỉ xuất hiện về sau, khi chính câu chuyện ArcLLM buộc chúng ta phải dùng chúng. Ở đây chưa cần mang toàn bộ hệ quản trị vào một chương đang nói về decoder layer.
+Cách quản trị sâu hơn — gồm các chế độ dùng để loại nhanh giả thuyết, đào sâu hoặc chuyển cách nghiên cứu — sẽ chỉ xuất hiện về sau, khi chính câu chuyện ArcLLM buộc chúng ta phải dùng chúng. Ở đây chưa cần mang toàn bộ hệ quản trị vào một chương đang nói về lớp giải mã.
 
 Điểm cần giữ lúc này chỉ là:
 
@@ -646,26 +620,26 @@ RMSE = 0,00003027076833
 Nhưng P4 vẫn **chưa** chứng minh:
 
 - toàn bộ decoder chạy đúng;
-- tất cả layer đều đúng;
-- model sinh token;
-- runtime nhanh;
-- ArcLLM tốt hơn một runtime khác.
+- tất cả lớp đều đúng;
+- mô hình sinh token;
+- hệ thực thi nhanh;
+- ArcLLM tốt hơn một hệ thực thi khác.
 
 P4 chỉ cho phép ta nói:
 
-> **Một decoder layer thật, dùng trọng số thật Q4_K và Q6_K, đã chạy trọn chuỗi trên Vulkan với các kết quả trung gian giữ ở phía GPU và đầu ra cuối vượt qua hai cổng sai số đã khóa.**
+> **Một lớp giải mã thật, dùng trọng số thật Q4_K và Q6_K, đã chạy trọn chuỗi trên Vulkan với các kết quả trung gian giữ ở phía GPU và đầu ra cuối vượt qua hai cổng sai số đã khóa.**
 
 Đủ để đi tiếp.
 
 Không hơn.
 
-## Từ một layer tới cả decoder
+## Từ một lớp tới cả decoder
 
 Bây giờ ta gặp một câu hỏi rất tự nhiên.
 
-Một layer đã chạy được.
+Một lớp đã chạy được.
 
-Nếu model có nhiều layer nối tiếp nhau, liệu ta có thể giữ toàn bộ phần decoder trong bộ nhớ và cho tín hiệu đi xuyên qua hết chuỗi mà không phải liên tục quay về CPU hay không?
+Nếu mô hình có nhiều lớp nối tiếp nhau, liệu ta có thể giữ toàn bộ phần decoder trong bộ nhớ và cho tín hiệu đi xuyên qua hết chuỗi mà không phải liên tục quay về CPU hay không?
 
 Đây là bước nhảy tiếp theo.
 
@@ -703,11 +677,11 @@ P5 sẽ chuyển câu hỏi từ **“một căn phòng hoạt động chưa?”
 
 ### Nhớ 3 điều
 
-1. **Primitive PASS chưa bảo đảm composition PASS.** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, buffer hoặc đường đi dữ liệu.
-2. **P4 giữ intermediate — dữ liệu trung gian — ở phía GPU suốt layer.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
-3. **P4 PASS là một-layer correctness PASS, không phải full-model PASS.** Một layer thật đã đúng trong contract; cả decoder vẫn là câu hỏi của bước tiếp theo.
+1. **phép tính nền tảng PASS chưa bảo đảm composition PASS.** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, vùng nhớ hoặc đường đi dữ liệu.
+2. **P4 giữ intermediate — dữ liệu trung gian — ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
+3. **P4 PASS là một-lớp tính đúng PASS, không phải full-mô hình PASS.** Một lớp thật đã đúng trong contract; cả decoder vẫn là câu hỏi của bước tiếp theo.
 
-**Chương 6 — Full decoder residency**
+**Chương 6 — giữ toàn bộ khối giải mã sẵn trong bộ nhớ**
 
 Ta đã xây được một căn phòng hoàn chỉnh.
 
