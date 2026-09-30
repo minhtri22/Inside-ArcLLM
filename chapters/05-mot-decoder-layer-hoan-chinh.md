@@ -23,7 +23,7 @@ Phép nhân với trọng số Q4_K được kiểm tra riêng.
 
 RoPE, softmax, cơ chế chú ý, SwiGLU và residual cũng lần lượt được đưa xuống GPU rồi so với cách tính tham chiếu trên CPU.
 
-Từng phép đều PASS trong phạm vi đã khóa.
+Từng phép đều ĐẠT (PASS) trong phạm vi đã khóa.
 
 Nhưng đó chưa phải một lớp giải mã.
 
@@ -46,7 +46,7 @@ Một chiếc đồng hồ có thể gồm hàng trăm bánh răng tốt. Nhưng
 
 P4 là lúc ArcLLM bắt đầu **lắp các bánh răng lại với nhau**.
 
-## lớp giải mã là gì?
+## Lớp giải mã là gì?
 
 Ở mức đơn giản nhất, một mô hình ngôn ngữ không xử lý văn bản bằng một phép tính duy nhất.
 
@@ -197,7 +197,7 @@ Con số 15 không có nghĩa một lớp giải mã nói chung luôn phải có
 
 Nó chỉ mô tả implementation P4 đã được kiểm tra.
 
-Điều quan trọng hơn là cả 15 công việc này được ghi vào **một command vùng nhớ — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
+Điều quan trọng hơn là cả 15 công việc này được ghi vào **một bộ lệnh — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
 
 ```text
 1 command buffer
@@ -208,8 +208,8 @@ Nó chỉ mô tả implementation P4 đã được kiểm tra.
 Nhắc lại:
 
 - **submit**: đưa danh sách công việc vào hàng đợi GPU;
-- **fence**: tín hiệu để CPU biết GPU đã thực hiện xong chuỗi công việc;
-- **fence wait**: CPU chờ tín hiệu hoàn tất trước khi kiểm tra kết quả cuối.
+- **tín hiệu hoàn thành**: tín hiệu để CPU biết GPU đã thực hiện xong chuỗi công việc;
+- **tín hiệu hoàn thành wait**: CPU chờ tín hiệu hoàn tất trước khi kiểm tra kết quả cuối.
 
 Bức tranh bây giờ khác hẳn P3.
 
@@ -231,7 +231,7 @@ P4 muốn cả chuỗi chạy liền mạch.
 
 Một điều được khóa rất rõ trong P4 là:
 
-> **không có vòng lặp tính toán trung gian quay ngược về CPU (intermediate host round-trip).**
+> **không có vòng lặp tính toán trung gian quay ngược về CPU (vòng đi-về trung gian qua CPU).**
 
 Đây là thuật ngữ chúng ta sẽ dùng từ đây về sau.
 
@@ -247,7 +247,7 @@ Nói đơn giản, P4 không cho phép đường thực thi:
 
 > **GPU tạo dữ liệu trung gian → đưa về CPU để đọc hoặc sửa → rồi gửi xuống GPU trở lại trước khi tiếp tục.**
 
-Đó chính là **intermediate host round-trip — vòng lặp tính toán trung gian quay ngược về CPU** mà P4 muốn loại bỏ.
+Đó chính là **vòng đi-về trung gian qua CPU — vòng lặp tính toán trung gian quay ngược về CPU** mà P4 muốn loại bỏ.
 
 Dữ liệu đi theo hướng:
 
@@ -315,7 +315,7 @@ P4 dùng hai thước đo:
 
 Tên hơi khó, nhưng ý nghĩa có thể hiểu rất trực tiếp.
 
-## max_abs: điểm sai nhiều nhất là bao nhiêu?
+## Sai số lớn nhất (max_abs): điểm lệch nhiều nhất là bao nhiêu?
 
 Giả sử CPU cho:
 
@@ -353,7 +353,7 @@ Nhưng nó chỉ nhìn phần tử tệ nhất.
 
 Ta cần thêm một góc nhìn khác.
 
-## RMSE: nhìn sai số của cả dãy
+## Sai số tổng thể (RMSE): nhìn cả dãy thay vì một điểm
 
 **RMSE — Root Mean Square Error — căn trung bình bình phương sai số** nghe khá toán học.
 
@@ -425,7 +425,7 @@ max_abs <= 0,02
 RMSE    <= 0,005
 ```
 
-Nghĩa là lớp chỉ được PASS nếu:
+Nghĩa là lớp chỉ được ĐẠT (PASS) nếu:
 
 - không có phần tử nào lệch quá 0,02 theo max_abs;
 - sai số tổng thể theo RMSE không vượt 0,005.
@@ -470,7 +470,7 @@ ngưỡng
 
 Cả hai đều nằm trong cổng đã khóa trước.
 
-Vì vậy P4 PASS.
+Vì vậy P4 ĐẠT (PASS).
 
 Ta nên đọc kết quả bằng câu tiếng Việt trước khi nhìn vào nhiều số:
 
@@ -512,7 +512,7 @@ intermediate nằm đúng nơi
 cả chuỗi cuối cùng đúng
 ```
 
-Dĩ nhiên một PASS không chứng minh từng dòng implementation là hoàn hảo.
+Dĩ nhiên một ĐẠT (PASS) không chứng minh từng dòng implementation là hoàn hảo.
 
 Nhưng nó loại bỏ được một lớp rủi ro lớn hơn nhiều so với P3.
 
@@ -524,11 +524,11 @@ Ta đã có **một lớp giải mã thật hoạt động end-to-end trong ph�
 
 P4 cũng có một lần dừng trước khi GPU thực sự chạy lớp.
 
-Trong lần dừng đó xuất hiện một tên file mà người đọc chưa gặp trước đây: `lineage.md`.
+Trong lần dừng đó xuất hiện một tên tệp mà người đọc chưa gặp trước đây: `lineage.md`.
 
 Đây là lúc cần tách thật rõ **quản trị nghiên cứu** khỏi **thực thi mô hình**.
 
-`lineage.md` chỉ là **một file văn bản dùng như sổ lịch sử nghiên cứu**. Dự án ghi vào đó những mốc như: câu hỏi đang kiểm tra là gì, evidence nào đã có, quyết định nào được đưa ra và bước tiếp theo là gì.
+`lineage.md` chỉ là **một tệp văn bản dùng như sổ lịch sử nghiên cứu**. Dự án ghi vào đó những mốc như: câu hỏi đang kiểm tra là gì, evidence nào đã có, quyết định nào được đưa ra và bước tiếp theo là gì.
 
 Nó **không tham gia vào phép tính GPU**.
 
@@ -538,7 +538,7 @@ Nó không được Vulkan đọc để chạy lớp giải mã.
 
 Nó xuất hiện ở đây chỉ vì trước khi cho phép package chạy, một bài QA — **kiểm tra chất lượng của gói thực thi** — có bước kiểm tra tính nhất quán của tài liệu nghiên cứu này.
 
-Lần đó, bài kiểm tra package đọc `lineage.md` bằng encoding mặc định của Windows. Trong file có một ký tự dấu gạch dài Unicode, khiến phép so sánh text bị lỗi.
+Lần đó, bài kiểm tra package đọc `lineage.md` bằng encoding mặc định của Windows. Trong tệp có một ký tự dấu gạch dài Unicode, khiến phép so sánh text bị lỗi.
 
 Kết quả thực tế là:
 
@@ -566,7 +566,7 @@ Bởi lớp giải mã chưa hề được thực thi.
 
 Lỗi được sửa ở lớp package/audit bằng cách làm encoding rõ ràng hơn. Contract khoa học không thay đổi. Các chương trình GPU, trọng số và ngưỡng sai số cũng không được sửa để chiều theo outcome.
 
-Sau đó P4 mới được chạy thật và PASS.
+Sau đó P4 mới được chạy thật và ĐẠT (PASS).
 
 Chi tiết `lineage.md` được giữ lại trong sách vì nó mở ra một lớp câu chuyện khác: **kết quả khoa học không chỉ cần được tạo ra, mà còn phải được ghi nhận sao cho sau này có thể truy lại được ta đã biết gì ở từng thời điểm**.
 
@@ -580,7 +580,7 @@ Cách quản trị sâu hơn — gồm các chế độ dùng để loại nhanh
 
 > **Phải biết thất bại xảy ra ở tầng nào trước khi quyết định nó phủ định điều gì.**
 
-## P4 PASS cho phép kết luận gì?
+## P4 ĐẠT cho phép kết luận gì?
 
 Tóm tắt P4:
 
@@ -633,7 +633,7 @@ P4 chỉ cho phép ta nói:
 
 Không hơn.
 
-## Từ một lớp tới cả decoder
+## Từ một lớp tới toàn bộ khối giải mã
 
 Bây giờ ta gặp một câu hỏi rất tự nhiên.
 
@@ -677,9 +677,9 @@ P5 sẽ chuyển câu hỏi từ **“một căn phòng hoạt động chưa?”
 
 ### Nhớ 3 điều
 
-1. **phép tính nền tảng PASS chưa bảo đảm composition PASS.** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, vùng nhớ hoặc đường đi dữ liệu.
+1. **phép tính nền tảng ĐẠT (PASS) chưa bảo đảm composition ĐẠT (PASS).** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, vùng nhớ hoặc đường đi dữ liệu.
 2. **P4 giữ intermediate — dữ liệu trung gian — ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
-3. **P4 PASS là một-lớp tính đúng PASS, không phải full-mô hình PASS.** Một lớp thật đã đúng trong contract; cả decoder vẫn là câu hỏi của bước tiếp theo.
+3. **P4 ĐẠT (PASS) là một-lớp tính đúng ĐẠT (PASS), không phải full-mô hình ĐẠT (PASS).** Một lớp thật đã đúng trong contract; cả decoder vẫn là câu hỏi của bước tiếp theo.
 
 **Chương 6 — giữ toàn bộ khối giải mã sẵn trong bộ nhớ**
 
