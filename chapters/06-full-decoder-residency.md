@@ -23,13 +23,13 @@ Không còn là một chương trình GPU riêng lẻ.
 
 Không còn là một phép RMSNorm hay một phép nhân Q4_K đứng một mình.
 
-Một lớp giải mã thật của Qwen2 đã chạy từ đầu đến cuối bằng 15 Vulkan lần giao việc cho GPU — **15 công việc tính toán GPU** — với các kết quả trung gian tiếp tục nằm ở phía GPU.
+Một lớp giải mã thật của Qwen2 đã chạy từ đầu đến cuối bằng 15 lần giao việc cho GPU qua Vulkan — **15 công việc tính toán GPU** — với các kết quả trung gian tiếp tục nằm ở phía GPU.
 
-P4 PASS.
+P4 ĐẠT (PASS).
 
 Nhưng mô hình không chỉ có một lớp.
 
-mô hình đang được ArcLLM sử dụng có **28 các lớp giải mã**.
+Mô hình đang được ArcLLM sử dụng có **28 lớp giải mã**.
 
 Nếu coi một lớp là một căn phòng, P4 mới chứng minh rằng một căn phòng có thể được xây đúng.
 
@@ -37,7 +37,7 @@ P5 hỏi:
 
 > **Ta có thể dựng cả tòa nhà, giữ toàn bộ những phần cần thiết trong bộ nhớ và cho tín hiệu đi xuyên từ tầng đầu tới tầng cuối mà không phải liên tục quay về CPU giữa chừng hay không?**
 
-Đây là bước chuyển từ **one-lớp tính đúng — tính đúng của một lớp** sang **full-decoder tính đúng — tính đúng của toàn bộ chuỗi decoder**.
+Đây là bước chuyển từ **tính đúng của một lớp** sang **tính đúng của toàn bộ chuỗi lớp giải mã**.
 
 ## Trước hết: dữ liệu đi vào mô hình bằng cách nào?
 
@@ -49,7 +49,7 @@ Nhưng mô hình thật không nhận trực tiếp chữ:
 
 Nó nhận token ID — **mã số của token**.
 
-Giả sử tokenizer biến một token nào đó thành:
+Giả sử bộ tách và mã hóa văn bản biến một token nào đó thành:
 
 ```text
 token ID = 1234
@@ -57,7 +57,7 @@ token ID = 1234
 
 Con số `1234` tự nó chưa mang đủ thông tin để đi qua 28 lớp.
 
-mô hình cần biến token ID ấy thành một dãy số dài hơn.
+Mô hình cần biến token ID ấy thành một dãy số dài hơn.
 
 Công việc đó được gọi là **phép nhúng — biến mã token thành một vector số mà mô hình có thể xử lý**.
 
@@ -144,7 +144,7 @@ Nhưng P5 đi xa hơn.
 
 Không chỉ “có bốn vùng nhớ”.
 
-hệ thực thi giờ phải biết khối số nào thuộc đâu và giữ được toàn bộ tập trọng số cần cho mô hình thật.
+Hệ thực thi giờ phải biết khối số nào thuộc đâu và giữ được toàn bộ tập trọng số cần cho mô hình thật.
 
 P5 giữ:
 
@@ -160,7 +160,7 @@ trong:
 
 Ta tách cụm này:
 
-- **trọng số arena**: vùng lưu trọng số lớn;
+- **trọng số vùng bộ nhớ lớn**: vùng lưu trọng số lớn;
 - **packed**: trọng số vẫn giữ dạng đóng gói Q4_K/Q6_K;
 - **khối số-aware**: hệ thực thi vẫn biết ranh giới và vị trí của từng khối số bên trong các vùng đó.
 
@@ -184,13 +184,13 @@ Arena 2
 
 Không phải chỉ ném 934,7 MiB byte vào GPU rồi hy vọng tìm lại được.
 
-hệ thực thi phải biết:
+Hệ thực thi phải biết:
 
 > “khối số tôi cần cho lớp 17 nằm ở đâu?”
 
 Đây là khác biệt giữa **có dữ liệu trong bộ nhớ** và **có một mô hình có thể thực thi**.
 
-## “Resident” lần này có nghĩa mạnh hơn
+## “Giữ sẵn trong bộ nhớ” (resident) lần này có nghĩa mạnh hơn
 
 Ta đã gặp từ **resident — cư trú, tức dữ liệu được giữ sẵn trong vùng nhớ cần dùng**.
 
@@ -263,7 +263,7 @@ Còn hai bước quan trọng.
 
 Ta đã gặp RMSNorm ở Chương 4. Nhắc lại ngắn gọn: nó điều chỉnh độ lớn của tín hiệu về một thang phù hợp trước khi bước sang phần tiếp theo.
 
-Sau đó là **LM head — lớp đầu ra biến trạng thái cuối của mô hình thành điểm số cho các token có thể được chọn tiếp theo**.
+Sau đó là **lớp tạo điểm đầu ra (LM head) — lớp đầu ra biến trạng thái cuối của mô hình thành điểm số cho các token có thể được chọn tiếp theo**.
 
 Có thể hình dung:
 
@@ -293,11 +293,11 @@ token C : 0,7
 Token B có logit cao nhất.
 
 Trong P5, ArcLLM chỉ cần kiểm tra xem CPU và GPU có đồng ý về **token đứng đầu — top1** hay không. Cách một hệ thống hoàn chỉnh lựa chọn token để sinh văn bản là một lớp khác và không phải câu hỏi của bước này.
-## “Tied” phép nhúng và LM head
+## Dùng chung trọng số giữa phép nhúng và lớp đầu ra
 
 P5 có một chi tiết thú vị:
 
-phép nhúng đầu vào và LM head đầu ra dùng chung khối số trọng số:
+phép nhúng đầu vào và lớp tạo điểm đầu ra (LM head) đầu ra dùng chung khối số trọng số:
 
 ```text
 token_embd.weight
@@ -323,17 +323,17 @@ cùng bảng trọng số
 logits
 ```
 
-P5 dùng chính khối số Q6_K đóng gói đó cho cả phép nhúng và LM head theo cấu trúc mô hình đã khóa.
+P5 dùng chính khối số Q6_K đóng gói đó cho cả phép nhúng và lớp tạo điểm đầu ra (LM head) theo cấu trúc mô hình đã khóa.
 
 Điều này cũng tạo thêm một bài kiểm tra gián tiếp tốt: cùng một khối dữ liệu phải được dùng đúng trong hai vai trò khác nhau của graph.
 
-## LM head quá lớn để xử lý như một cục duy nhất
+## Lớp tạo điểm đầu ra (lớp tạo điểm đầu ra (LM head)) quá lớn để xử lý như một cục duy nhất
 
-LM head phải tạo điểm cho rất nhiều token trong vocabulary — **tập các token mà mô hình biết**.
+lớp tạo điểm đầu ra (LM head) phải tạo điểm cho rất nhiều token trong vocabulary — **tập các token mà mô hình biết**.
 
 Nếu cố làm tất cả trong một lần giao việc cho GPU khổng lồ, hệ thực thi có thể đụng phải những giới hạn thực thi không cần thiết.
 
-P5 vì vậy chia các hàng của LM head thành những **chunk — phần nhỏ có kích thước được giới hạn**.
+P5 vì vậy chia các hàng của lớp tạo điểm đầu ra (LM head) thành những **chunk — phần nhỏ có kích thước được giới hạn**.
 
 Có thể hình dung:
 
@@ -348,11 +348,11 @@ chunk 3
 ghép thành logits cuối
 ```
 
-Điều quan trọng là việc chia chunk này vẫn diễn ra mà không có **intermediate host round-trip — vòng lặp tính toán trung gian quay ngược về CPU**.
+Điều quan trọng là việc chia chunk này vẫn diễn ra mà không có **vòng đi-về trung gian qua CPU — vòng lặp tính toán trung gian quay ngược về CPU**.
 
 P5 tiếp tục giữ nguyên ranh giới đã được đặt ở P4: dữ liệu trung gian không được kéo về CPU giữa chuỗi chỉ để rồi lại gửi xuống GPU.
 
-## 441 lần giao việc cho GPU trong một command vùng nhớ
+## 441 lần giao việc cho GPU trong một bộ lệnh
 
 Toàn bộ đường thực thi P5 tạo ra:
 
@@ -388,7 +388,7 @@ Nhưng điều đáng chú ý hơn là:
 → 1 fence wait
 ```
 
-Tức toàn bộ chuỗi được ghi vào **một command vùng nhớ — một danh sách lệnh GPU**, rồi được gửi xuống queue một lần.
+Tức toàn bộ chuỗi được ghi vào **một bộ lệnh — một danh sách lệnh GPU**, rồi được gửi xuống hàng đợi một lần.
 
 CPU không đứng giữa từng lớp để điều phối bằng cách đọc kết quả lên rồi quyết định bước tiếp.
 
@@ -417,7 +417,7 @@ CPU mới kiểm tra kết quả
 
 ## Hai checkpoint tính đúng thay vì chỉ một
 
-P5 không chỉ kiểm tra kết quả ở cuối LM head.
+P5 không chỉ kiểm tra kết quả ở cuối lớp tạo điểm đầu ra (LM head).
 
 Có hai tầng được kiểm tra.
 
@@ -427,13 +427,13 @@ Thứ nhất:
 
 Thứ hai:
 
-**điểm dự đoán — các điểm đầu ra sau LM head**.
+**điểm dự đoán — các điểm đầu ra sau lớp tạo điểm đầu ra (LM head)**.
 
 Việc kiểm tra hai tầng giúp khoanh vùng tốt hơn.
 
 Nếu hidden state cuối đã sai, lỗi có thể nằm trong 28 lớp.
 
-Nếu hidden state đúng nhưng điểm dự đoán sai, ta có lý do nhìn gần hơn vào LM head.
+Nếu hidden state đúng nhưng điểm dự đoán sai, ta có lý do nhìn gần hơn vào lớp tạo điểm đầu ra (LM head).
 
 P5 khóa trước các gate:
 
@@ -460,7 +460,7 @@ Nhắc lại:
 
 Ngoài ra, tất cả giá trị phải **finite — hữu hạn**, tức không được xuất hiện những giá trị vô nghĩa như vô cực hoặc `NaN`.
 
-## Kết quả thật nhỏ hơn gate rất nhiều
+## Kết quả thật nhỏ hơn ngưỡng kiểm tra rất nhiều
 
 P5 chạy xong với kết quả final norm:
 
@@ -624,7 +624,7 @@ ArcLLM chọn thứ tự:
 tối ưu sau nữa
 ```
 
-## P5 PASS thực sự có nghĩa gì?
+## P5 ĐẠT thực sự có nghĩa gì?
 
 Tóm tắt P5 bằng ngôn ngữ đã quen:
 
@@ -676,11 +676,11 @@ GPU top1 = 117612
 → cùng lựa chọn đứng đầu
 ```
 
-Vì vậy P5 PASS.
+Vì vậy P5 ĐẠT (PASS).
 
 Nhưng chỉ nên diễn giải thành:
 
-> **Toàn bộ decoder của mô hình đã chạy trên Vulkan với toàn bộ trọng số cư trú, không có intermediate host round-trip, và cả trạng thái cuối lẫn điểm dự đoán đều vượt qua các cổng tính đúng đã khóa.**
+> **Toàn bộ decoder của mô hình đã chạy trên Vulkan với toàn bộ trọng số cư trú, không có vòng đi-về trung gian qua CPU, và cả trạng thái cuối lẫn điểm dự đoán đều vượt qua các cổng tính đúng đã khóa.**
 
 P5 chưa chứng minh tốc độ.
 
@@ -730,7 +730,7 @@ sang:
 
 1. **P5 mở rộng từ một lớp lên toàn bộ 28-lớp decoder.** 338 khối số và khoảng 934,7 MiB payload đóng gói được giữ resident trong bốn vùng trọng số.
 2. **tính đúng được kiểm tra ở hai điểm:** final normalized hidden và điểm dự đoán; CPU/GPU cũng đồng ý `top1 = 117612`.
-3. **Full decoder PASS chưa phải generation PASS và chưa phải performance PASS.** Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
+3. **Full decoder ĐẠT (PASS) chưa phải generation ĐẠT (PASS) và chưa phải hiệu năng ĐẠT (PASS).** Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
 
 **Chương 7 — bộ nhớ đệm KV và token đầu tiên được sinh liên tục**
 
