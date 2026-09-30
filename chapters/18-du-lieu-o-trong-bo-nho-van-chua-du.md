@@ -44,7 +44,7 @@ Nhưng một đường thực thi có thể dùng Q4_K gốc, còn đường kh�
 Vì vậy chỉ biết:
 
 ```text
-tensor đang ở trong bộ nhớ
+khối số đang ở trong bộ nhớ
 ```
 
 không còn đủ.
@@ -214,7 +214,7 @@ Sau đó ArcLLM gặp một họ bài toán khác trong nhánh P8.
 Với exact mô hình 7B, P8-A tính được:
 
 ```text
-tổng residency dự kiến
+tổng dung lượng dự kiến phải giữ trong bộ nhớ
 = 5.347.770.372 byte
 
 usable budget đã khóa
@@ -243,7 +243,7 @@ P8-A2 không nới arena cap, không đổi lượng tử hóa, context hay KV p
 Nó thay cách **biểu diễn vật lý** của đúng hai logical khối số lớn đó:
 
 ```text
-một logical tensor lớn
+một khối số logic lớn
 ↓
 nhiều physical segment
 ↓
@@ -269,12 +269,12 @@ Không có một đường dự phòng đã được xác nhận tương đươn
 Hình ảnh gần với:
 
 ```text
-representation bắt buộc chưa có
+cách biểu diễn bắt buộc chưa có
 ↓
-nếu có acquisition hợp lệ
-→ tạo / thu nhận representation
+nếu có cách thu nhận hợp lệ
+→ tạo / thu nhận cách biểu diễn dữ liệu
 
-nếu hiện không thể acquisition
+nếu hiện tại không thể thu nhận
 → NOT_READY
 ```
 
@@ -311,11 +311,11 @@ với:
 ```text
 TRƯỜNG HỢP 2
 
-representation bắt buộc chưa có
+cách biểu diễn bắt buộc chưa có
 ↓
 không có đường dự phòng đã xác nhận
 ↓
-phải acquisition
+phải thu nhận
 hoặc NOT_READY
 ```
 
@@ -435,7 +435,7 @@ Giả sử khối chức năng đó chỉ được xác nhận với:
 
 ```text
 Q4_K
-một hình dạng tensor cụ thể
+một hình dạng khối số cụ thể
 một mô hình cụ thể
 một phạm vi công việc cụ thể
 ```
@@ -489,7 +489,7 @@ Q4_K gate/up
 ↓
 Split-K32
 ↓
-56 node decode
+56 nút của giai đoạn sinh token
 ```
 
 Cơ chế này thay **cách thực thi**.
@@ -531,13 +531,13 @@ Nó cũng có thể diễn tả họ biểu diễn bắt buộc.
 Nhưng với cơ chế Split-K32 của Chương 14:
 
 ```text
-không có representation phụ
+không có cách biểu diễn phụ
 ```
 
 nên câu hỏi:
 
 ```text
-representation có đang resident không?
+cách biểu diễn có đang nằm sẵn trong bộ nhớ không?
 ```
 
 thậm chí không có ý nghĩa.
@@ -607,7 +607,7 @@ Từ đây có bốn câu hỏi tách biệt:
 
 2. đường đó có sẵn sàng chạy yêu cầu này ngay không?
 
-3. representation phụ có đang ở trong bộ nhớ không?
+3. cách biểu diễn phụ có đang ở trong bộ nhớ không?
 
 4. nếu chưa có, có con đường nào để tạo hoặc thu nhận nó không?
 ```
@@ -633,7 +633,7 @@ Một đường có thể tồn tại trong hệ thực thi nhưng tạm thời 
 sẵn sàng thực thi
 → có
 
-representation phụ
+cách biểu diễn phụ
 → không có và không cần
 
 bước tạo biểu diễn
@@ -748,7 +748,7 @@ SẴN SÀNG THỰC THI
 có chạy được yêu cầu hiện tại ngay không?
 
 TRẠNG THÁI CƯ TRÚ
-representation phụ có đang ở trong bộ nhớ không?
+cách biểu diễn phụ có đang ở trong bộ nhớ không?
 
 QUÁ TRÌNH THU NHẬN
 nếu thiếu, có thể lấy hoặc tạo bằng cách nào?
@@ -838,13 +838,13 @@ Ví dụ:
 
 ```text
 dỡ mô hình khỏi bộ nhớ
-→ representation đi kèm không còn cần thiết
+→ cách biểu diễn đi kèm không còn cần thiết
 ```
 
 Hoặc:
 
 ```text
-representation không còn đúng danh tính
+cách biểu diễn không còn đúng danh tính
 → bỏ
 ```
 
@@ -852,7 +852,7 @@ Hoặc:
 
 ```text
 áp lực bộ nhớ vượt chính sách
-→ có thể loại representation tùy chọn
+→ có thể loại cách biểu diễn tùy chọn
 ```
 
 Thao tác loại cách biểu diễn dữ liệu khỏi bộ nhớ thường được gọi là:
@@ -874,7 +874,7 @@ Vì vậy:
 ```text
 tạm thời chưa sẵn sàng thực thi
 ≠
-tự động loại representation khỏi bộ nhớ
+tự động loại cách biểu diễn khỏi bộ nhớ
 ```
 
 Trạng thái thực thi và vòng đời dữ liệu phải tiếp tục tách nhau.
@@ -929,14 +929,14 @@ Sau khi các khái niệm được tách, ArcLLM còn phải hỏi:
 
 > **Một lớp kết nối Vulkan thật có tuân theo những ranh giới đó được không?**
 
-`Backend` trong ngữ cảnh này có thể hiểu là:
+**Lớp thực thi phần cứng (backend)** trong ngữ cảnh này có thể hiểu là:
 
 > **lớp kết nối các quyết định chung của hệ thực thi với cơ chế thực thi cụ thể trên phần cứng.**
 
 Khi gắn mô hình vào đường Q4 thật, các trường hợp sau đã được kiểm tra:
 
 ```text
-A không cần tạo representation phụ
+A không cần tạo cách biểu diễn phụ
 → PASS
 ```
 
@@ -1032,7 +1032,7 @@ cần biết cách tạo + vòng đời
 sau đó:
 
 ```text
-representation bắt buộc
+cách biểu diễn bắt buộc
 ↓
 không phải lúc nào cũng được quyết định bằng ngưỡng tái sử dụng
 ```
@@ -1068,7 +1068,7 @@ Tới đây, cách hệ thực thi nhìn một khối số đã thay đổi rấ
 Ban đầu:
 
 ```text
-tensor
+khối số
 ↓
 hình dạng
 kiểu dữ liệu
@@ -1078,7 +1078,7 @@ các byte
 Rồi:
 
 ```text
-tensor
+khối số
 ↓
 đang ở trong vùng bộ nhớ GPU có thể dùng
 ```
@@ -1086,7 +1086,7 @@ tensor
 Bây giờ:
 
 ```text
-tensor logic
+khối số logic
 ↓
 có thể có nhiều cách biểu diễn
 ↓
