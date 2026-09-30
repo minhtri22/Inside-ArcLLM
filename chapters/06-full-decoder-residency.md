@@ -1,5 +1,34 @@
 # Chương 6 — Full decoder residency: giữ cả “tòa nhà” trên GPU
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: nhiều decoder layer**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** nhiều decoder layer.
+
+
 > **Câu hỏi của chương:** Một decoder layer đã chạy đúng. Nhưng nếu giữ toàn bộ 28 layer cùng trọng số của model trong đường thực thi GPU, kết quả cuối cùng có còn đúng không?
 
 Ở Chương 5, ArcLLM đã đi được một bước khá xa.
