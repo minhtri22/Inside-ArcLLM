@@ -1,61 +1,34 @@
-# Chương 7 — KV cache: model bắt đầu nhớ token trước
+# Chương 7 — Bộ nhớ giúp mô hình không phải tính lại từ đầu (KV cache)
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Token cũ ─┐
+> Token cũ ─┼→ [ bộ nhớ đệm KV ]
+> Token mới ─┘          ↓
+>                  token tiếp theo
 > ```
->
-> ▶ **Đang mở ở chương này:** KV cache / sinh token.
 
 
-> **Câu hỏi của chương:** Sau khi một token đã đi xuyên toàn bộ model, làm thế nào để token tiếp theo sử dụng lại những gì GPU vừa tính thay vì bắt đầu lại từ đầu?
+> **Câu hỏi của chương:** Sau khi một token đã đi xuyên toàn bộ mô hình, làm thế nào để token tiếp theo sử dụng lại những gì GPU vừa tính thay vì bắt đầu lại từ đầu?
 
 Ở cuối Chương 6, ArcLLM đã đi xuyên toàn bộ decoder.
 
-Một token ID được biến thành embedding, đi qua 28 decoder layer, qua phép chuẩn hóa cuối, tới LM head và tạo ra logits — **điểm số mà model gán cho các token có thể đứng tiếp theo**.
+Một token ID được biến thành phép nhúng, đi qua 28 lớp giải mã, qua phép chuẩn hóa cuối, tới LM head và tạo ra điểm dự đoán — **điểm số mà mô hình gán cho các token có thể đứng tiếp theo**.
 
 CPU và GPU thậm chí còn đồng ý về token có điểm cao nhất.
 
 Nhưng P5 vẫn chỉ giống như chụp một bức ảnh.
 
-Model nhận một đầu vào.
+mô hình nhận một đầu vào.
 
-Model tính.
+mô hình tính.
 
-Model cho một đầu ra.
+mô hình cho một đầu ra.
 
-Trong thực tế, model ngôn ngữ phải làm điều gì đó động hơn:
+Trong thực tế, mô hình ngôn ngữ phải làm điều gì đó động hơn:
 
 ```text
 đọc các token ban đầu
@@ -72,11 +45,11 @@ P6 là bước ArcLLM bắt đầu làm việc này.
 
 Và để hiểu P6, chúng ta cần làm quen với một khái niệm rất quan trọng:
 
-**KV cache — vùng nhớ giữ lại một phần kết quả attention của các token đã xử lý để có thể tái sử dụng ở bước sau.**
+**bộ nhớ đệm KV — vùng nhớ giữ lại một phần kết quả cơ chế chú ý của các token đã xử lý để có thể tái sử dụng ở bước sau.**
 
-## Nếu không nhớ, model phải làm lại rất nhiều việc
+## Nếu không nhớ, mô hình phải làm lại rất nhiều việc
 
-Giả sử model đang xử lý bốn token:
+Giả sử mô hình đang xử lý bốn token:
 
 ```text
 A B C D
@@ -88,7 +61,7 @@ Sau đó nó sinh thêm token:
 E
 ```
 
-Đến bước tiếp theo, model cần xử lý:
+Đến bước tiếp theo, mô hình cần xử lý:
 
 ```text
 A B C D E
@@ -122,15 +95,15 @@ A B C D E F
 
 Phần bên trái cứ bị tính đi tính lại.
 
-Đó là nơi KV cache xuất hiện.
+Đó là nơi bộ nhớ đệm KV xuất hiện.
 
-Thay vì quên sạch sau mỗi token, runtime giữ lại những phần của attention có thể tái sử dụng.
+Thay vì quên sạch sau mỗi token, hệ thực thi giữ lại những phần của cơ chế chú ý có thể tái sử dụng.
 
 ## K và V là gì?
 
-Ở Chương 4, chúng ta đã gặp attention — **cơ chế cho phép token hiện tại kết hợp thông tin từ những vị trí khác trong chuỗi**.
+Ở Chương 4, chúng ta đã gặp cơ chế chú ý — **cơ chế cho phép token hiện tại kết hợp thông tin từ những vị trí khác trong chuỗi**.
 
-Bên trong attention thường xuất hiện ba nhóm dữ liệu:
+Bên trong cơ chế chú ý thường xuất hiện ba nhóm dữ liệu:
 
 ```text
 Q — Query
@@ -138,7 +111,7 @@ K — Key
 V — Value
 ```
 
-Ta chưa cần học công thức attention.
+Ta chưa cần học công thức cơ chế chú ý.
 
 Có thể dùng một phép ví von rất thô nhưng hữu ích.
 
@@ -174,17 +147,17 @@ kết hợp các Value tương ứng
 
 Ta có thể giữ chúng.
 
-Đó chính là KV cache.
+Đó chính là bộ nhớ đệm KV.
 
-## Cache nghĩa là “giữ thứ đã tính rồi”
+## bộ nhớ đệm nghĩa là “giữ thứ đã tính rồi”
 
-Từ **cache — bộ nhớ đệm/tái sử dụng** xuất hiện rất nhiều trong máy tính.
+Từ **bộ nhớ đệm — bộ nhớ đệm/tái sử dụng** xuất hiện rất nhiều trong máy tính.
 
 Ý tưởng chung rất đơn giản:
 
 > Nếu một kết quả đã được tạo ra, còn cần dùng lại và việc tính lại nó tốn công, hãy giữ nó ở nơi có thể lấy lại nhanh hơn.
 
-KV cache áp dụng nguyên tắc này vào attention.
+bộ nhớ đệm KV áp dụng nguyên tắc này vào cơ chế chú ý.
 
 Thay vì:
 
@@ -205,19 +178,19 @@ token mới
 → attention dùng lại cache cũ
 ```
 
-P6 là lần đầu ArcLLM kiểm tra con đường này xuyên qua toàn bộ 28 layer.
+P6 là lần đầu ArcLLM kiểm tra con đường này xuyên qua toàn bộ 28 lớp.
 
 ## Hai pha: prefill và decode
 
-Khi một người gửi cho model một prompt, ví dụ:
+Khi một người gửi cho mô hình một prompt, ví dụ:
 
 > “Hôm nay trời…”
 
-model trước hết phải xử lý những token đã có.
+mô hình trước hết phải xử lý những token đã có.
 
 Giai đoạn đó thường được gọi là **prefill — pha xử lý toàn bộ các token đầu vào ban đầu để xây trạng thái cần thiết cho việc sinh tiếp**.
 
-Sau đó model bắt đầu sinh từng token mới.
+Sau đó mô hình bắt đầu sinh từng token mới.
 
 Mỗi bước như vậy được gọi là **decode — pha xử lý token mới nhất dựa trên trạng thái đã tích lũy trước đó**.
 
@@ -270,11 +243,11 @@ P6 không nghiên cứu tokenizer.
 
 Không nghiên cứu chất lượng câu trả lời.
 
-Không nghiên cứu model “nói hay” hay “nói dở”.
+Không nghiên cứu mô hình “nói hay” hay “nói dở”.
 
 Câu hỏi duy nhất là:
 
-> **Đường KV cache + generation có đúng về mặt số học và trạng thái hay không?**
+> **Đường bộ nhớ đệm KV + generation có đúng về mặt số học và trạng thái hay không?**
 
 Dùng token ID cố định giúp loại bỏ những biến không liên quan.
 
@@ -290,23 +263,23 @@ Nhắc lại:
 - **RoPE position — vị trí dùng trong phép mã hóa vị trí**;
 - **max_ctx — giới hạn số vị trí ngữ cảnh được cấp cho bài test này**.
 
-Các giá trị này không phải thông số tối ưu cho mọi model.
+Các giá trị này không phải thông số tối ưu cho mọi mô hình.
 
 Chúng chỉ là contract của phép thử P6.
 
 ## Prefill bắt đầu ghi “trí nhớ”
 
-Trong pha prefill, bốn token đầu vào cùng đi qua model.
+Trong pha prefill, bốn token đầu vào cùng đi qua mô hình.
 
-Ở mỗi một trong 28 layer, attention tạo ra K và V tương ứng.
+Ở mỗi một trong 28 lớp, cơ chế chú ý tạo ra K và V tương ứng.
 
 P6 không mang những dữ liệu này về CPU.
 
 Thay vào đó, chúng được ghi vào:
 
-> **persistent Vulkan buffers — những vùng nhớ Vulkan được giữ lại để dùng ở bước tiếp theo.**
+> **persistent Vulkan các vùng nhớ — những vùng nhớ Vulkan được giữ lại để dùng ở bước tiếp theo.**
 
-Ta có thể hình dung mỗi layer có một cuốn sổ:
+Ta có thể hình dung mỗi lớp có một cuốn sổ:
 
 ```text
 Layer 0
@@ -336,17 +309,17 @@ Không bị đọc ngược về CPU.
 
 Ở P6, bây giờ cả **trạng thái phát sinh theo chuỗi token** cũng bắt đầu được giữ lại.
 
-## Decode đọc lại chính cache ấy
+## Decode đọc lại chính bộ nhớ đệm ấy
 
-Sau prefill, model có logits.
+Sau prefill, mô hình có điểm dự đoán.
 
-ArcLLM đọc logits về phía CPU để tìm token đứng đầu.
+ArcLLM đọc điểm dự đoán về phía CPU để tìm token đứng đầu.
 
 P6 cố tình dùng cách đơn giản và hoàn toàn xác định:
 
 **greedy argmax — chọn token có logit cao nhất.**
 
-P6 chỉ cần một quy tắc cố định để trả lời câu hỏi correctness.
+P6 chỉ cần một quy tắc cố định để trả lời câu hỏi tính đúng.
 
 Chuỗi trở thành:
 
@@ -368,15 +341,15 @@ decode trên GPU
 
 Nhưng điểm quan trọng nhất là trong bước decode:
 
-> **attention đọc trực tiếp K/V cache mà prefill vừa để lại trên GPU.**
+> **cơ chế chú ý đọc trực tiếp K/V bộ nhớ đệm mà prefill vừa để lại trên GPU.**
 
-Không có **intermediate host round-trip** đối với KV cache.
+Không có **intermediate host round-trip** đối với bộ nhớ đệm KV.
 
 CPU không đọc K/V.
 
 CPU không ghi K/V.
 
-Cache tồn tại và được tiêu thụ trực tiếp trong đường GPU.
+bộ nhớ đệm tồn tại và được tiêu thụ trực tiếp trong đường GPU.
 
 ## Nhưng CPU vẫn còn tham gia
 
@@ -411,23 +384,23 @@ GPU
 
 Một điều rất quan trọng cần phân biệt:
 
-CPU đọc **logits**.
+CPU đọc **điểm dự đoán**.
 
-CPU không đọc **KV cache**.
+CPU không đọc **bộ nhớ đệm KV**.
 
 Hai chuyện không giống nhau.
 
-P6 muốn chứng minh trạng thái attention có thể ở lại GPU xuyên qua các bước generation, chứ chưa cố loại CPU khỏi mọi phần của runtime.
+P6 muốn chứng minh trạng thái cơ chế chú ý có thể ở lại GPU xuyên qua các bước generation, chứ chưa cố loại CPU khỏi mọi phần của hệ thực thi.
 
-## CPU reference cũng có KV cache riêng
+## CPU reference cũng có bộ nhớ đệm KV riêng
 
-Làm sao biết cache GPU đúng?
+Làm sao biết bộ nhớ đệm GPU đúng?
 
 Như các chương trước, GPU không tự chấm bài.
 
 P6 chạy một **independent CPU reference — cách tính tham chiếu độc lập trên CPU**.
 
-Nhưng lần này CPU reference cũng phải có KV cache riêng của nó.
+Nhưng lần này CPU reference cũng phải có bộ nhớ đệm KV riêng của nó.
 
 Không thể để:
 
@@ -452,13 +425,13 @@ sau đó
 → so kết quả
 ```
 
-Hai con đường nhận cùng input và cùng model nhưng duy trì trạng thái của riêng mình.
+Hai con đường nhận cùng input và cùng mô hình nhưng duy trì trạng thái của riêng mình.
 
 Đến cuối, ta kiểm tra chúng có hội tụ hay không.
 
 ## Không chỉ so token cuối
 
-Nếu CPU và GPU vô tình cùng chọn một token nhưng KV cache bên trong đã sai, lỗi có thể bộc lộ ở bước sau.
+Nếu CPU và GPU vô tình cùng chọn một token nhưng bộ nhớ đệm KV bên trong đã sai, lỗi có thể bộc lộ ở bước sau.
 
 Vì vậy P6 không chỉ hỏi:
 
@@ -466,7 +439,7 @@ Vì vậy P6 không chỉ hỏi:
 
 Nó đặt nhiều cổng hơn.
 
-Hai checkpoint logits phải đạt:
+Hai checkpoint điểm dự đoán phải đạt:
 
 ```text
 max_abs <= 0,10
@@ -480,7 +453,7 @@ Nhắc lại:
 
 Ngoài ra token greedy — **token đứng đầu theo logit** — phải giống hệt giữa CPU và GPU.
 
-Sau đó P6 còn kiểm tra trực tiếp phần K và V cache đã thật sự được sử dụng.
+Sau đó P6 còn kiểm tra trực tiếp phần K và V bộ nhớ đệm đã thật sự được sử dụng.
 
 Gate:
 
@@ -526,7 +499,7 @@ CPU và GPU cùng chọn token:
 
 Đây là output token đầu tiên của phép thử.
 
-Prefill logits có:
+Prefill điểm dự đoán có:
 
 ```text
 max_abs
@@ -542,7 +515,7 @@ Token `6228` sau đó được đưa trở lại để thực hiện bước dec
 
 ## Và token tiếp theo cũng khớp
 
-Decode sử dụng chính KV cache đã được tạo ở prefill.
+Decode sử dụng chính bộ nhớ đệm KV đã được tạo ở prefill.
 
 Sau bước này, CPU và GPU tiếp tục đồng ý:
 
@@ -558,7 +531,7 @@ Toàn bộ hai token đầu ra của bài thử vì vậy là:
 
 Đây là **exact agreement — khớp chính xác token ID**, không phải chỉ gần nhau về điểm số.
 
-Decode logits cũng PASS:
+Decode điểm dự đoán cũng PASS:
 
 ```text
 max_abs
@@ -570,13 +543,13 @@ RMSE
 
 Nhưng vẫn còn câu hỏi quan trọng:
 
-> Cache mà GPU đang giữ có thực sự giống cache tham chiếu hay không?
+> bộ nhớ đệm mà GPU đang giữ có thực sự giống bộ nhớ đệm tham chiếu hay không?
 
 ## Mở “trí nhớ” ra kiểm tra sau cùng
 
-Sau generation, P6 so phần K và V cache thực sự đã được dùng.
+Sau generation, P6 so phần K và V bộ nhớ đệm thực sự đã được dùng.
 
-K cache:
+K bộ nhớ đệm:
 
 ```text
 max_abs
@@ -586,7 +559,7 @@ RMSE
 = 0,000235098343
 ```
 
-V cache:
+V bộ nhớ đệm:
 
 ```text
 max_abs
@@ -614,11 +587,11 @@ GPU token = 17
 
 rồi tuyên bố mọi thứ đúng.
 
-Ta còn có bằng chứng rằng **trạng thái K/V được giữ và sử dụng bên trong GPU cũng nằm trong giới hạn correctness đã định trước**.
+Ta còn có bằng chứng rằng **trạng thái K/V được giữ và sử dụng bên trong GPU cũng nằm trong giới hạn tính đúng đã định trước**.
 
-## 338 tensor vẫn không rời chỗ
+## 338 khối số vẫn không rời chỗ
 
-Trong toàn bộ P6, các trọng số model vẫn giữ đúng trạng thái đã chứng minh ở P5:
+Trong toàn bộ P6, các trọng số mô hình vẫn giữ đúng trạng thái đã chứng minh ở P5:
 
 ```text
 338 tensors
@@ -627,7 +600,7 @@ Trong toàn bộ P6, các trọng số model vẫn giữ đúng trạng thái đ
 
 tất cả vẫn resident — **cư trú sẵn trong bốn vùng trọng số**.
 
-P6 không đánh đổi KV cache bằng cách phá residency của weights.
+P6 không đánh đổi bộ nhớ đệm KV bằng cách phá trạng thái cư trú trong bộ nhớ của trọng số.
 
 Bây giờ có hai loại dữ liệu cần phân biệt:
 
@@ -643,7 +616,7 @@ KV CACHE
 → persistent qua các bước decode
 ```
 
-Đây là lần đầu kiến trúc runtime bắt đầu có “trí nhớ theo phiên chạy”.
+Đây là lần đầu kiến trúc hệ thực thi bắt đầu có “trí nhớ theo phiên chạy”.
 
 ## P6 PASS thực sự cho phép nói gì?
 
@@ -691,21 +664,21 @@ P6 vì vậy CLOSED với PASS.
 
 Nhưng ranh giới vẫn phải giữ.
 
-P6 **chưa chứng minh runtime nhanh**.
+P6 **chưa chứng minh hệ thực thi nhanh**.
 
-P6 không benchmark throughput.
+P6 không phép đo so sánh thông lượng.
 
 P6 không chứng minh sequence dài.
 
 P6 không chứng minh mọi chiến lược chọn token.
 
-Và P6 chưa phải production path.
+Và P6 chưa phải đường chạy thực tế.
 
 Điều nó chứng minh là:
 
-> **ArcLLM đã có một đường generation tối thiểu trong đó prefill tạo KV cache trên GPU, decode tái sử dụng trực tiếp cache đó, CPU và GPU cho cùng các token greedy, và bản thân K/V cache cũng vượt qua các cổng correctness đã khóa.**
+> **ArcLLM đã có một đường generation tối thiểu trong đó prefill tạo bộ nhớ đệm KV trên GPU, decode tái sử dụng trực tiếp bộ nhớ đệm đó, CPU và GPU cho cùng các token greedy, và bản thân K/V bộ nhớ đệm cũng vượt qua các cổng tính đúng đã khóa.**
 
-Lần đầu tiên trong hành trình này, model không chỉ tính một lượt.
+Lần đầu tiên trong hành trình này, mô hình không chỉ tính một lượt.
 
 Nó đã **giữ trạng thái từ quá khứ để tính bước tiếp theo**.
 
@@ -729,24 +702,24 @@ giữ được KV cache?
 sinh bước token tiếp theo đúng?
 ```
 
-Đến đây một runtime tối thiểu đã hình thành.
+Đến đây một hệ thực thi tối thiểu đã hình thành.
 
-Nhưng nó vẫn còn là một con đường được xây chủ yếu để chứng minh correctness.
+Nhưng nó vẫn còn là một con đường được xây chủ yếu để chứng minh tính đúng.
 
 Câu hỏi tiếp theo thay đổi:
 
-> **Làm thế nào biến những mảnh đã chứng minh này thành một đường chạy Q4_K_M gần với cách model thực tế sẽ được sử dụng hơn?**
+> **Làm thế nào biến những mảnh đã chứng minh này thành một đường chạy Q4_K_M gần với cách mô hình thực tế sẽ được sử dụng hơn?**
 
 Đó là P7.
 
 ### Nhớ 3 điều
 
-1. **Prefill — xử lý prompt ban đầu — tạo K/V; decode — xử lý token mới — tái sử dụng K/V đã có.** Đó là lý do KV cache tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
-2. **KV cache của P6 nằm ở GPU xuyên qua generation.** Không có intermediate host round-trip đối với K/V.
-3. **P6 PASS là generation-correctness PASS, chưa phải performance hay production PASS.** Hai token greedy `[6228, 17]`, logits và chính K/V cache đều vượt qua các gate đã khóa.
+1. **Prefill — xử lý prompt ban đầu — tạo K/V; decode — xử lý token mới — tái sử dụng K/V đã có.** Đó là lý do bộ nhớ đệm KV tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
+2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có intermediate host round-trip đối với K/V.
+3. **P6 PASS là generation-tính đúng PASS, chưa phải performance hay production PASS.** Hai token greedy `[6228, 17]`, điểm dự đoán và chính K/V bộ nhớ đệm đều vượt qua các gate đã khóa.
 
-**Chương 8 — Production path không đến từ một kernel thần kỳ**
+**Chương 8 — đường chạy thực tế không đến từ một chương trình GPU thần kỳ**
 
-Runtime giờ đã có thể nhớ.
+hệ thực thi giờ đã có thể nhớ.
 
-Bước tiếp theo là làm cho con đường đó giống một runtime sử dụng thực tế hơn.
+Bước tiếp theo là làm cho con đường đó giống một hệ thực thi sử dụng thực tế hơn.
