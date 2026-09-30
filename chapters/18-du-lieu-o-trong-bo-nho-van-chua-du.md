@@ -1145,7 +1145,7 @@ Bằng chứng không cho phép nói vậy.
 2. **Không phải mọi cách tạo cách biểu diễn dữ liệu đều giống nhau.** EXEC148 là cách biểu diễn dữ liệu tùy chọn có thể chỉ đáng tạo khi tái sử dụng đủ lâu; một cách biểu diễn dữ liệu cần để phép tính khả thi thì phải được tạo bất kể mức tái sử dụng thấp hay chưa biết.
 3. **Vòng đời là một quyết định độc lập.** cách biểu diễn dữ liệu đã tạo có thể được giữ để tái sử dụng, bị loại khi hết hiệu lực hoặc khi chính sách bộ nhớ yêu cầu; việc đường thực thi tạm thời chưa sẵn sàng không tự động có nghĩa phải xóa dữ liệu.
 
-**Chương 19 — Từ ArcLLM tới một cách mô tả hệ thực thi tổng quát hơn**
+**Tiếp theo: [Chương 19 — Từ ArcLLM tới một cách mô tả hệ thực thi tổng quát hơn](19-tu-arcllm-cu-the-toi-mo-hinh-runtime-tong-quat-hon.md)**
 
 Ta đã có sáu câu hỏi riêng:
 
