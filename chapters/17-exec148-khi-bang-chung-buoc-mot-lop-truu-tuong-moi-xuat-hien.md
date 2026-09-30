@@ -25,9 +25,9 @@ Ta xuất phát từ một câu hỏi rất cụ thể:
 
 Thí nghiệm 2×2 trả lời rằng cả hai đều có giá trị độc lập.
 
-Split-K32 thay đổi **cách thực thi (cách thực thi)** — tức cách GPU chia công việc — và giảm độ trễ rõ rệt.
+Split-K32 thay đổi **cách thực thi (execution)** — tức cách GPU chia công việc — và giảm độ trễ rõ rệt.
 
-EXEC148 thay đổi **cách biểu diễn dữ liệu (cách biểu diễn dữ liệu)** — tức cách cùng dữ liệu Q4_K được sắp xếp để đường thực thi đọc nó — và cũng giảm độ trễ rõ rệt.
+EXEC148 thay đổi **cách biểu diễn dữ liệu (representation)** — tức cách cùng dữ liệu Q4_K được sắp xếp để đường thực thi đọc nó — và cũng giảm độ trễ rõ rệt.
 
 Nhưng khi ghép hai thay đổi lại, lợi ích không cộng đẹp với nhau.
 
@@ -36,11 +36,11 @@ Kết quả đó tạo ra một vấn đề kiến trúc mới.
 Trước đây, hệ thực thi có thể nghĩ đơn giản:
 
 ```text
-tensor
+khối số
 ↓
-các byte của tensor
+các byte của khối số
 ↓
-kernel đọc trực tiếp các byte đó
+chương trình GPU đọc trực tiếp các byte đó
 ```
 
 Sau EXEC148, hình ảnh ấy không còn đủ nữa.
@@ -136,7 +136,7 @@ Không phải vài block mẫu.
 Mà toàn bộ block của cả:
 
 ```text
-14 tensor Q4_K
+14 khối số Q4_K
 ```
 
 trong họ FFN-down đang nghiên cứu.
@@ -150,7 +150,7 @@ Kết quả:
 ```text
 cách biểu diễn khác nhau
 ≠
-tensor logic khác nhau
+khối số logic khác nhau
 ```
 
 Ta đã thay **cách mang dữ liệu**.
@@ -534,7 +534,7 @@ Về lý thuyết có thể là một bộ xử lý khác nếu nó thực sự 
 Trước đây:
 
 ```text
-tensor
+khối số
 → con trỏ tới các byte
 ```
 
@@ -543,7 +543,7 @@ là đủ cho nhiều trường hợp.
 Bây giờ hệ thực thi bắt đầu cần:
 
 ```text
-tensor logic
+khối số logic
 ↓
 có thể có nhiều cách biểu diễn
 ↓
@@ -585,7 +585,7 @@ có cần sao chép thêm không?
 
 chi phí bàn giao là bao nhiêu?
 
-nó có tranh tài nguyên với prefill hoặc decode không?
+nó có tranh tài nguyên với giai đoạn xử lý đầu vào hoặc sinh token không?
 ```
 
 Nếu ngay cả **giới hạn lạc quan nhất (optimistic bound)** cũng không thể làm phương án đó có lợi, thì không cần triển khai.
@@ -619,13 +619,13 @@ thì về nguyên tắc có thể tạo nó từ trước.
 Ví dụ:
 
 ```text
-model Q4_K
+Mô hình Q4_K
 +
 file EXEC148 đi kèm
 ↓
 nạp dữ liệu
 ↓
-xác minh đúng model và đúng phiên bản
+xác minh đúng mô hình và đúng phiên bản
 ↓
 thực thi
 ```
@@ -694,7 +694,7 @@ nhưng có chi phí tạo + bộ nhớ
 ↓
 quyết định phụ thuộc vào mức tái sử dụng và trạng thái tài nguyên
 ↓
-runtime buộc phải hiểu cách biểu diễn như một đối tượng riêng
+Hệ thực thi buộc phải hiểu cách biểu diễn như một đối tượng riêng
 ```
 
 Lớp trừu tượng không xuất hiện từ sở thích thiết kế.
