@@ -235,7 +235,7 @@ Một điều được khóa rất rõ trong P4 là:
 
 Đây là thuật ngữ chúng ta sẽ dùng từ đây về sau.
 
-Ở cấp contract kỹ thuật, P4 ghi điều này dưới dạng:
+Ở cấp **tiêu chuẩn kỹ thuật đã khóa**, P4 ghi điều này dưới dạng:
 
 > **zero intermediate host read/write**
 
@@ -480,7 +480,7 @@ Không cần biến những con số nhỏ này thành tuyên bố lớn hơn.
 
 P4 không chứng minh GPU “chính xác tuyệt đối”.
 
-Nó chứng minh sai số nằm trong contract đã đăng ký.
+Nó chứng minh sai số nằm trong **ngưỡng đã đăng ký trước**.
 
 ## Đây là bước tiến lớn hơn P3 ở đâu?
 
@@ -564,7 +564,7 @@ P4 scientific FAIL
 
 Bởi lớp giải mã chưa hề được thực thi.
 
-Lỗi được sửa ở lớp package/audit bằng cách làm encoding rõ ràng hơn. Contract khoa học không thay đổi. Các chương trình GPU, trọng số và ngưỡng sai số cũng không được sửa để chiều theo outcome.
+Lỗi được sửa ở lớp **đóng gói và kiểm tra** bằng cách làm cách mã hóa rõ ràng hơn. Tiêu chuẩn khoa học đã khóa không thay đổi. Các chương trình GPU, trọng số và ngưỡng sai số cũng không được sửa để chiều theo kết quả.
 
 Sau đó P4 mới được chạy thật và ĐẠT (PASS).
 
@@ -679,7 +679,7 @@ P5 sẽ chuyển câu hỏi từ **“một căn phòng hoạt động chưa?”
 
 1. **phép tính nền tảng ĐẠT (PASS) chưa bảo đảm composition ĐẠT (PASS).** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, vùng nhớ hoặc đường đi dữ liệu.
 2. **P4 giữ intermediate — dữ liệu trung gian — ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
-3. **P4 ĐẠT (PASS) là một-lớp tính đúng ĐẠT (PASS), không phải full-mô hình ĐẠT (PASS).** Một lớp thật đã đúng trong contract; cả decoder vẫn là câu hỏi của bước tiếp theo.
+3. **P4 chỉ ĐẠT về tính đúng của một lớp, chưa phải của toàn bộ mô hình.** Một lớp thật đã vượt các tiêu chuẩn đã khóa; toàn bộ chuỗi lớp giải mã vẫn là câu hỏi của bước tiếp theo.
 
 **Chương 6 — giữ toàn bộ khối giải mã sẵn trong bộ nhớ**
 
