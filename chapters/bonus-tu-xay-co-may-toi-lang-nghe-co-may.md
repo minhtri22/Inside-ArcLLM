@@ -1,5 +1,34 @@
 # Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: quan sát cỗ máy / hướng mở**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** quan sát cỗ máy / hướng mở.
+
+
 > **Nếu đã đọc tới đây, hẳn bạn là người thích tìm hiểu những điều mới lạ. Vì vậy, thay vì kết thúc bằng một dấu chấm, phần Bonus này muốn để lại cho bạn vài cánh cửa mở — những gợi ý về một tương lai của AI có thể vượt ra ngoài việc tạo văn bản, hình ảnh hay trò chuyện với con người.**
 
 Hai mươi chương trước tập trung vào một mục tiêu rất cụ thể:
