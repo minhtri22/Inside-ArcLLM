@@ -469,7 +469,7 @@ K64?
 
 K128?
 
-thêm subgroup?
+thêm subgroup — một nhóm nhỏ các lane GPU có thể phối hợp thực thi?
 
 ...
 ```
@@ -519,7 +519,7 @@ Ví dụ:
 
 Hoặc:
 
-> “Nếu gate và up dùng chung activation tile trong một fused kernel, có giảm đủ công việc không?”
+> “Nếu gate và up dùng chung **activation — dữ liệu trung gian đang chảy qua model —** theo cùng một **tile — khối dữ liệu nhỏ được xử lý cùng nhau —** trong một fused kernel, có giảm đủ công việc không?”
 
 Không mở năm ý tưởng cùng lúc.
 
