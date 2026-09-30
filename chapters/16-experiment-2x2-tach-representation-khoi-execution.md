@@ -298,7 +298,7 @@ Nếu phải materialize lại mỗi token thì đó là một bài toán hoàn 
 
 Một thí nghiệm 2×2 vô nghĩa nếu mỗi ô đang tính một thứ hơi khác nhau.
 
-Vì vậy correctness phải được khóa trước.
+Vì vậy **tính đúng** phải được khóa trước.
 
 Đặc biệt với cách biểu diễn dữ liệu mới, ArcLLM còn kiểm tra:
 
@@ -339,9 +339,9 @@ RMSE    = 0
 
 B vẫn giữ Serial-K và thứ tự cộng cũ.
 
-cách biểu diễn dữ liệu thay đổi nhưng kết quả phép tính vẫn bit-for-bit theo phép kiểm tra component này.
+cách biểu diễn dữ liệu thay đổi nhưng kết quả phép tính vẫn bit-for-bit theo phép kiểm tra **thành phần** này.
 
-Quan trọng hơn, ở hai workload:
+Quan trọng hơn, ở hai **bài đo**:
 
 ```text
 W-S
@@ -399,7 +399,7 @@ Mục tiêu là làm cho câu hỏi:
 
 ## Kết quả đầu tiên: cả A lẫn B đều có hiệu ứng
 
-Ở workload W-S, median độ trễ của họ Q4-down là:
+Ở bài đo W-S, **trung vị độ trễ** của họ Q4-down là:
 
 ```text
 0   100,58 ms
@@ -418,7 +418,7 @@ So A với mốc đối chứng:
 ≈ 2,62×
 ```
 
-Tức chỉ thay cách thực thi sang Split-K32 đã tạo speedup khoảng:
+Tức chỉ thay cách thực thi sang Split-K32 đã tạo **mức tăng tốc** khoảng:
 
 ```text
 2,62×
@@ -431,7 +431,7 @@ B:
 ≈ 4,16×
 ```
 
-Chỉ thay cách biểu diễn dữ liệu, vẫn giữ Serial-K, thậm chí tốt hơn A ở workload này.
+Chỉ thay cách biểu diễn dữ liệu, vẫn giữ Serial-K, thậm chí tốt hơn A ở **bài đo** này.
 
 Ở W-C:
 
@@ -445,7 +445,7 @@ B    31,41 ms
 AB   34,24 ms
 ```
 
-Speedup của A:
+Mức tăng tốc của A:
 
 ```text
 213,33 / 37,84
@@ -638,11 +638,11 @@ Tức khi cách biểu diễn dữ liệu mới đã xử lý một phần vấn
 
 Hai cơ chế đang giải quyết những phần **không hoàn toàn độc lập** của chi phí.
 
-Đây là tri thức kiến trúc mà một benchmark A/B đơn giản không thể cho ta.
+Đây là tri thức kiến trúc mà một **phép đo A/B đơn giản** không thể cho ta.
 
 ## “Nhanh nhất” vẫn chưa chắc là kiến trúc nên chọn
 
-Nhìn bảng đo thời gian, B nhanh nhất ở cả hai workload.
+Nhìn bảng đo thời gian, B nhanh nhất ở cả hai **bài đo**.
 
 Có phải B mặc nhiên thắng?
 
@@ -798,7 +798,7 @@ AB bị B dominate:
 
 - cùng phải có cách biểu diễn dữ liệu mới;
 - cùng chịu lớp chi phí bộ nhớ/materialization;
-- nhưng B nhanh hơn ở cả hai workload.
+- nhưng B nhanh hơn ở cả hai **bài đo**.
 
 Còn lại:
 
@@ -924,7 +924,7 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 ### Nhớ 3 điều
 
 1. **cách biểu diễn dữ liệu và cách thực thi là hai biến khác nhau.** Một cái quyết định dữ liệu được bố trí thế nào; cái kia quyết định GPU chia và thực hiện công việc thế nào. Thí nghiệm 2×2 cho phép thay từng yếu tố riêng rồi mới thử kết hợp.
-2. **Hai optimization tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai workload; tương tác được phân loại là đối kháng.
+2. **Hai **cách tối ưu** tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai workload; tương tác được phân loại là đối kháng.
 3. **Kiến trúc không chỉ được chọn bằng độ trễ.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident bộ nhớ. Kết quả đúng có thể là một frontier, không phải một phương án thắng duy nhất.
 
 **Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**
