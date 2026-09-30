@@ -22,24 +22,24 @@ Cơ chế Q4 Split-K không chỉ nhanh trong một phép thử nhỏ.
 Nó đã sống sót qua:
 
 ```text
-fixture
+bài thử cố định
 ↓
-trọng số và activation thật
+trọng số và dữ liệu trung gian thật
 ↓
-semantics toàn model
+ngữ nghĩa của toàn mô hình
 ↓
-decode
+giai đoạn sinh token
 ↓
-E2E
+toàn bộ lượt chạy
 ```
 
-giai đoạn sinh token cải thiện trung bình hình học khoảng:
+Độ trễ ở giai đoạn sinh token cải thiện theo trung bình hình học khoảng:
 
 ```text
 2,20×
 ```
 
-E2E khoảng:
+Toàn bộ lượt chạy cải thiện khoảng:
 
 ```text
 2,00×
@@ -559,7 +559,7 @@ Nó cần biết:
 
 Đó là phần con người không nên giao đi một cách vô điều kiện.
 
-## Vai trò của con người không phải cạnh tranh viết code với AI
+## Vai trò của con người không phải cạnh tranh viết mã với AI
 
 Qua bốn chương của Phần III, ta có thể nhìn vai trò hai phía rõ hơn.
 
