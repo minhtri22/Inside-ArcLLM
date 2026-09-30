@@ -124,7 +124,7 @@ Một phép đo so sánh có ý nghĩa phải cố giữ những thứ không ph
 
 Trong ArcLLM, từ được dùng là:
 
-**phép đo đối chứng cùng điều kiện — phép đo so sánh ghép cặp, trong đó hai hệ được đặt dưới một tập điều kiện chung đã khóa trước.**
+**phép đo đối chứng cùng điều kiện (matched benchmark)** — phép so sánh ghép cặp trong đó hai hệ được đặt dưới một tập điều kiện chung đã khóa trước.
 
 ## “Cùng điều kiện” không có nghĩa hai hệ thực thi phải giống nhau
 
@@ -171,7 +171,7 @@ Nhưng phép đo so sánh matched sau đó không còn dùng mô hình đó.
 
 Trước khi Q2 được phép mở, ArcLLM đã phải vượt qua một gate riêng:
 
-> **Q1 — mô hình 7B thật có chạy end-to-end trên máy mục tiêu hay không?**
+> **Q1 — mô hình 7B thật có chạy từ đầu đến cuối (end-to-end) trên máy mục tiêu hay không?**
 
 Chi tiết về những trở ngại kiến trúc của bước 7B sẽ còn xuất hiện ở phần sau của sách, vì chúng tạo ra những bài học quan trọng về cách biểu diễn dữ liệu và abstraction.
 
@@ -181,7 +181,7 @@ Chi tiết về những trở ngại kiến trúc của bước 7B sẽ còn xu�
 
 Hai thực thi độc lập của Q1 cho cùng chuỗi token, cùng điểm dự đoán hash và cùng final-hidden hash.
 
-Chỉ sau khi **feasibility — khả năng chạy thực sự** được thiết lập, phép đo so sánh hiệu năng mới được mở.
+Chỉ sau khi **khả năng chạy thực sự (feasibility)** được thiết lập, phép đo so sánh hiệu năng mới được mở.
 
 Đây là một nguyên tắc đáng nhớ:
 
@@ -268,7 +268,7 @@ Q2 loại biến đó.
 
 ## Bộ tách văn bản cũng được đưa ra ngoài phép đo
 
-Cả hai hệ nhận trực tiếp cùng **raw token IDs — chính các mã token đã được khóa trước**.
+Cả hai hệ nhận trực tiếp cùng **mã token thô (raw token IDs)** — chính các mã token đã được khóa trước.
 
 Không để ArcLLM tokenizer một kiểu còn llama.cpp tokenizer kiểu khác.
 
@@ -407,7 +407,7 @@ Q2 đo ba chỉ số hiệu năng chính.
 
 Đầu tiên là:
 
-**TTFT — thời gian tới token đầu tiên (Time To First Token)**: thời gian từ lúc bắt đầu xử lý đầu vào tới khi token đầu tiên sẵn sàng.
+**thời gian tới token đầu tiên (Time To First Token, TTFT)**: thời gian từ lúc bắt đầu xử lý đầu vào tới khi token đầu tiên sẵn sàng.
 
 Ví dụ:
 
@@ -430,7 +430,7 @@ Một mô hình có thể sinh token sau đó rất nhanh, nhưng nếu mất n�
 
 chỉ số thứ hai:
 
-**giai đoạn sinh token thông lượng — tốc độ sinh các token sau khi giai đoạn xử lý đầu vào đã xong.**
+**thông lượng sinh token (decode throughput)** — tốc độ sinh các token sau khi giai đoạn xử lý đầu vào đã xong.
 
 Trong Q2 có 32 token output.
 
@@ -464,7 +464,7 @@ thông lượng sinh token
 
 chỉ số thứ ba:
 
-**E2E độ trễ — end-to-end độ trễ, tổng thời gian từ khi bắt đầu giai đoạn xử lý đầu vào tới khi token cuối cùng của bài đo sẵn sàng.**
+**độ trễ toàn lượt (end-to-end latency, E2E latency)** — tổng thời gian từ khi bắt đầu xử lý đầu vào tới khi token cuối cùng của bài đo sẵn sàng.
 
 Nếu bắt đầu tại:
 
@@ -607,7 +607,7 @@ Chỉ là không để một outlier — **giá trị lệch rất xa phần cò
 
 ## MAD cho biết các lần đo phân tán ra sao
 
-Q2 còn dùng **MAD — trung vị Absolute Deviation, trung vị của độ lệch tuyệt đối so với trung vị**.
+Q2 còn dùng **độ lệch tuyệt đối trung vị (Median Absolute Deviation, MAD)**.
 
 Với dãy vừa rồi:
 
@@ -649,7 +649,7 @@ MAD = 1
 
 Nó cho ta biết phần lớn measurement nằm khá chặt quanh trung tâm dù có một outlier rất lớn.
 
-Q2 cũng không báo **phân vị 95 (p95) — phân vị thứ 95, tức mức mà khoảng 95% lần đo nằm ở hoặc thấp hơn nó**.
+Q2 cũng không báo **phân vị thứ 95 (p95)** — mức mà khoảng 95% lần đo nằm ở hoặc thấp hơn nó.
 
 Hình dung nếu có 100 lần đo đã sắp từ nhanh tới chậm:
 
@@ -666,7 +666,7 @@ chậm nhất
 
 Nếu `p95 = 250 ms`, ta có thể hiểu gần đúng rằng khoảng 95% các lần đo hoàn thành trong 250 ms hoặc nhanh hơn, còn khoảng 5% chậm hơn mức đó.
 
-Đây là một **tail chỉ số — chỉ số nhìn phần đuôi chậm của phân bố**.
+Đây là một **chỉ số phần đuôi (tail metric)** — chỉ số nhìn phần đuôi chậm của phân bố.
 
 Nhưng với chỉ năm lần đo trong mỗi cell, số mẫu quá ít để một tail chỉ số như phân vị 95 (p95) có ý nghĩa ổn định.
 
@@ -772,11 +772,11 @@ Tại sao?
 
 Vì Q2 được thiết kế trước với vai trò:
 
-> **mô tả đặc tính — mô tả đầy đủ mặt phẳng hiệu năng/resource.**
+> **mô tả đặc tính (characterization)** — mô tả đầy đủ mặt phẳng hiệu năng và tài nguyên.
 
 Không phải:
 
-> **advantage adjudication — phán quyết liệu có một lợi thế thực tế hay không.**
+> **phán quyết lợi thế (advantage adjudication)** — phán quyết liệu có một lợi thế thực tế hay không.
 
 Đó là hai công việc khoa học khác nhau.
 
@@ -897,7 +897,7 @@ Nó tồn tại để tìm ra kiến trúc đó **thực sự làm được gì 
 2. **TTFT, giai đoạn sinh token thông lượng và E2E là ba câu hỏi khác nhau.** Một chữ “nhanh” không thay thế được ba chỉ số này; nhiều lần đo và trung vị giúp tránh để một run bất thường định nghĩa toàn bộ kết quả.
 3. **Q2 hoàn thành mô tả đặc tính, không chọn phương án thắng.** 20/20 attempt thành công tạo ra một mặt phẳng evidence đủ hợp lệ; việc một practical advantage có tồn tại hay không phải được khóa thành câu hỏi riêng và kiểm tra bằng bằng chứng mới ở Q3.
 
-**Chương 10 — Khi “tự build được” vẫn chưa đủ**
+**Chương 10 — Tự xây được vẫn chưa có nghĩa là tốt hơn**
 
 Ở chương tiếp theo, ArcLLM sẽ làm điều khó nhất đối với một project đã đầu tư rất nhiều công sức:
 
