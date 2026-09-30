@@ -1,5 +1,34 @@
 # Chương 7 — KV cache: model bắt đầu nhớ token trước
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: KV cache / sinh token**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** KV cache / sinh token.
+
+
 > **Câu hỏi của chương:** Sau khi một token đã đi xuyên toàn bộ model, làm thế nào để token tiếp theo sử dụng lại những gì GPU vừa tính thay vì bắt đầu lại từ đầu?
 
 Ở cuối Chương 6, ArcLLM đã đi xuyên toàn bộ decoder.
