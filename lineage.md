@@ -200,7 +200,7 @@ Additional outline decisions:
 - Ledger64 is not a standalone public-book chapter; historical evidence remains in lineage/source-of-truth but the main narrative stays compact;
 - former Ch. 12/15/16 material is compressed into the new Part III arc, with the value converging at the whole-system/Amdahl lesson;
 - the correctness/Q6 story remains an independent Chapter 13;
-- Token-XRay no longer has a main chapter; it appears only lightly as an internally created observability tool, with optional deeper treatment in a bonus section;
+- an internal observability prototype is not a standalone public-book chapter; the public narrative keeps only general lessons that are independently understandable;
 - a research experiment does not automatically become a chapter. A chapter must introduce a concept, change belief, close a path, or force an architectural boundary.
 
 
@@ -212,7 +212,7 @@ Public README QA:
 - rewritten as a reader-facing landing page rather than an author/editorial planning note;
 - separates currently published reading links (Foreword + Chapters 1–11) from the future roadmap;
 - preserves the approved 20-chapter / 4-part structure and each part's goal;
-- removes author-facing commentary about why Token-XRay does or does not receive a main chapter;
+- removes author-facing commentary about internal tools or unpublished research programs;
 - future sections are labeled as upcoming content rather than as already published chapters;
 - editorial principles are phrased as promises to the reader rather than internal workflow instructions.
 
@@ -386,26 +386,22 @@ Approved:
 `chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md`
 
 Bonus editorial scope:
-- opens from the completed ArcLLM runtime story toward broader ways AI might help observe and reason about complex systems;
-- Token X-Ray is presented as an evidence-linking/orchestration layer rather than a generic profiler replacement;
-- SIX is presented as a controlled numerical perturbation program, not as biological EEG, physical electrical token encoding, or a claim of a new universal theory;
-- the bonus preserves major SIX FAIL/UNRESOLVED results, including unsupported intrinsic-frequency, strong mode-switch, fixed-geometry, and strong context-modulation interpretations;
-- the strongest retained SIX claim remains local and bounded: under small perturbations and a common intervention interface, causal-response geometry is explained by an operating-point-conditioned complete local tangent field;
-- future applications to factories, robotics, infrastructure, digital twins and other complex systems are explicitly framed as research directions, not demonstrated outcomes;
-- the book remains standalone and does not promise a second volume.
+- opens from the completed ArcLLM runtime story toward broader questions about observing complex systems;
+- separates observation, measurement adequacy, interpretation and causal claims;
+- treats small differences as questions to investigate rather than automatically as signal or noise;
+- frames dynamic-state observation and controlled intervention only as general conceptual directions;
+- does not publish names, mechanisms, branch structure or results from internal research programs;
+- the book remains standalone and does not promise another public volume.
 
 README roadmap QA:
-- Part I now mirrors Parts III–IV with direct chapter links and one-sentence summaries for Chapters 1–8;
-- Part II now mirrors Parts III–IV with direct chapter links and one-sentence summaries for Chapters 9–11;
-- the Bonus is linked from both the main reading list and the supplemental-material section;
-- publication status now records Foreword + Chapters 1–20 + Bonus as public.
-
+- publication status records Foreword + Part 0 + Chapters 1–20 + Bonus as public;
+- reader-facing chapter titles and summaries use Vietnamese-first terminology.
 
 ## 2026-09-28 — FINAL EVIDENCE QA PATCH SET APPROVED AND CLOSED
 
 Author decision:
 - patch every evidence-QA finding affecting the main book;
-- leave the Bonus unchanged because it is intentionally an open research direction rather than a current-state SIX survey.
+- keep the Bonus bounded to public, general conceptual directions rather than unpublished internal research.
 
 Applied evidence-alignment patches:
 - Chapter 2: corrected GGUF expansion to **GGML Universal File**;
@@ -426,9 +422,9 @@ Patch commits:
 - Chapter 20: `e8d538961512444740bdb882a6c659220101cbc3`
 
 Bonus disposition:
-- QA-08 = **ACCEPTED_NO_PATCH**;
-- the root SIX narrative remains scientifically valid for the direction-opening purpose of the Bonus;
-- later SIX_R1/R2/R3 results remain outside this Bonus scope and are not backfilled.
+- Bonus was subsequently rewritten to enforce the public/private research boundary;
+- only generic conceptual questions remain public;
+- no internal project name, mechanism, branch lineage or unpublished result is reproduced.
 
 Final QA state:
 - 21 content units QA-CLEAN;
@@ -436,3 +432,25 @@ Final QA state:
 - 0 open findings;
 - no benchmark number or scientific verdict was rewritten;
 - no README change was required.
+
+
+## 2026-10-01 — Zero-reader rewrite and publication-boundary hardening
+
+Reader feedback showed that the scientifically correct edition still assumed too much technical vocabulary for a true zero-background reader.
+
+Editorial actions:
+- rewrote README, Foreword, Part 0 and Chapter 1 around everyday mental models before technical names;
+- localized chapter titles and prose to Vietnamese-first terminology;
+- replaced the repeated full-system glossary map with progressive per-chapter maps that reveal only concepts already introduced;
+- localized explanatory diagrams while preserving exact technical identifiers where they are part of the evidence;
+- retained all ArcLLM scientific numbers, PASS/FAIL verdicts and evidence boundaries;
+- rewrote the Bonus as a generic conceptual bridge about observation, measurement, small differences, state change over time and causal caution;
+- removed names, mechanisms, branch structure and unpublished outcomes of internal research programs from public book content and public editorial metadata.
+
+Publication-boundary note:
+Earlier public editorial metadata accidentally named unpublished internal research programs. Those identifiers and associated technical details were sanitized. This is a public-publication boundary correction only; it does not modify or delete the private scientific lineage in the source research repositories.
+
+Pedagogical QA:
+- PQA-01 through PQA-10: APPROVED_FIXED;
+- full-book zero-reader regression: PASS;
+- scientific verdict rewrite count: 0.
