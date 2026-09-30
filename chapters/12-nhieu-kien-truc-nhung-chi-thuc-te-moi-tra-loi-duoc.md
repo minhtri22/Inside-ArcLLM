@@ -162,9 +162,9 @@ nhiều lane cùng làm một hàng
 
 chia chiều K
 
-chia output thành tile
+chia đầu ra thành các khối xử lý
 
-dùng subgroup
+dùng nhóm con GPU
 
 dùng ma trận phối hợp (cooperative matrix)
 
@@ -226,10 +226,10 @@ Một cơ chế khác được chọn:
 Cách phân chia được khóa:
 
 ```text
-1 subgroup
+1 nhóm con GPU
 = 32 lane
 
-1 subgroup
+1 nhóm con GPU
 → phụ trách 1 hàng đầu ra
 ```
 
@@ -321,7 +321,7 @@ Hai process độc lập được chạy.
 Ngưỡng tổng hợp đã khóa trước:
 
 ```text
-speedup >= 1,50×
+mức tăng tốc >= 1,50×
 ```
 
 và từng shape riêng lẻ phải đạt ít nhất:
@@ -553,7 +553,7 @@ Vì vậy kết luận tổng thể vẫn là:
 Một kiến trúc có thể:
 
 ```text
-decode nhanh hơn
+sinh token nhanh hơn
 +
 E2E tốt hơn
 ```
@@ -576,11 +576,11 @@ Nếu không có ranh giới, AI có thể nhìn KHÔNG ĐẠT (FAIL) vừa rồ
 
 ```text
 tối ưu TTFT
-đổi buffer
+đổi vùng nhớ
 đổi pipeline
-gộp thêm kernel
+gộp thêm chương trình GPU
 thử geometry khác
-chạy lại workload khác
+chạy lại bài đo khác
 ```
 
 Mỗi ý tưởng đều có thể nghe hợp lý.
@@ -633,16 +633,16 @@ Nó tạo ra một bản đồ ngày càng rõ:
 CPU submit overhead
 → không phải lời giải chính
 
-giảm dispatch count đơn thuần
-→ không đủ giải thích gap
+chỉ giảm số lần giao việc cho GPU
+→ không đủ giải thích khoảng cách
 
-TTFT-only trong hai workload này
+chỉ cải thiện TTFT trong hai bài đo này
 → ceiling E2E thấp
 
 Q4 Split-K
-→ component mechanism có tín hiệu mạnh
+→ cơ chế ở cấp thành phần có tín hiệu mạnh
 
-decode/post-TTFT
+sinh token / phần sau token đầu tiên
 → vùng có headroom toàn hệ lớn
 ```
 
@@ -655,7 +655,7 @@ một số chết bằng reasoning
 ↓
 một số chết bằng measurement
 ↓
-một số PASS ở component
+một số kết quả ĐẠT ở cấp thành phần
 ↓
 một số FAIL khi lên toàn hệ
 ↓
@@ -701,7 +701,7 @@ M — khóa một cơ chế
 ↓
 AI triển khai phép thử hẹp
 ↓
-C — chỉ được vào sau khi contract đã khóa
+C — chỉ được vào sau khi tiêu chuẩn đã khóa
 ↓
 T — chỉ được vào sau khi kết quả nhỏ đủ điều kiện chuyển tiếp
 ```
