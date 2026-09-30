@@ -257,9 +257,9 @@ Nhưng một tệp mô hình nằm trên ổ đĩa không tự tính được.
 
 Máy tính cần bộ xử lý.
 
-**CPU — bộ xử lý trung tâm (Central Processing Unit)** là bộ xử lý đa dụng. Nó giỏi làm nhiều loại công việc và điều phối hệ thống.
+**bộ xử lý trung tâm (Central Processing Unit, CPU)** là bộ xử lý đa dụng. Nó giỏi làm nhiều loại công việc và điều phối hệ thống.
 
-**GPU — bộ xử lý đồ họa (Graphics Processing Unit)** ban đầu nổi tiếng nhờ xử lý hình ảnh, nhưng nó cũng rất phù hợp với việc thực hiện rất nhiều phép tính số tương tự nhau song song.
+**bộ xử lý đồ họa (Graphics Processing Unit, GPU)** ban đầu nổi tiếng nhờ xử lý hình ảnh, nhưng nó cũng rất phù hợp với việc thực hiện rất nhiều phép tính số tương tự nhau song song.
 
 Mô hình ngôn ngữ cần vô số phép nhân và cộng trên các khối số lớn. Vì thế GPU thường rất quan trọng.
 
