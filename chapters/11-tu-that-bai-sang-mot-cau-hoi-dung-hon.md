@@ -1,47 +1,23 @@
-# Chương 11 — Từ thất bại sang một câu hỏi đúng hơn
+# Chương 11 — Từ một thất bại tới câu hỏi đúng hơn
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Thất bại
+>    ↓
+> tách chi phí theo từng vùng
+>    ↓
+> [ đặt giả thuyết có thể kiểm tra ]
+>    ↓
+> chưa vội tối ưu
 > ```
->
-> ▶ **Đang mở ở chương này:** bottleneck / cơ chế kế tiếp.
 
 
 > **Câu hỏi của chương:** Khi một kiến trúc đã bị bằng chứng đo lường buộc phải dừng lại, điều gì đủ mạnh để cho phép ta mở một kiến trúc kế tiếp?
 
-Chương 10 kết thúc bằng một verdict rất rõ:
+Chương 10 kết thúc bằng một kết luận rất rõ:
 
 ```text
 FEASIBLE_NO_DEMONSTRATED_ADVANTAGE
@@ -49,7 +25,7 @@ FEASIBLE_NO_DEMONSTRATED_ADVANTAGE
 
 Dịch cẩn thận:
 
-> **ArcLLM đã chứng minh được rằng nó có thể chạy model thật, nhưng chưa chứng minh được một lợi thế thực tế so với llama.cpp trong các điều kiện đã kiểm tra.**
+> **ArcLLM đã chứng minh được rằng nó có thể chạy mô hình thật, nhưng chưa chứng minh được một lợi thế thực tế so với llama.cpp trong các điều kiện đã kiểm tra.**
 
 Đó không phải là một lỗi kỹ thuật.
 
@@ -71,7 +47,7 @@ Ta biết hệ thống đang chậm hơn đối chứng rất nhiều.
 
 Ta cũng biết còn vô số ý tưởng có thể thử.
 
-AI thậm chí có thể tiếp tục đề xuất hàng chục biến thể kernel, tile, cách gộp phép tính hay cách lập lịch khác nhau chỉ trong vài phút.
+AI thậm chí có thể tiếp tục đề xuất hàng chục biến thể chương trình GPU, khối xử lý, cách gộp phép tính hay cách lập lịch khác nhau chỉ trong vài phút.
 
 Nhưng nếu cứ tiếp tục thử cho tới khi xuất hiện một con số đẹp, ta không còn nghiên cứu kiến trúc nữa.
 
@@ -135,11 +111,11 @@ là:
 
 > **bước số 0 của nghiên cứu kiến trúc kế tiếp**.
 
-Ở SA0 chưa viết kernel mới.
+Ở SA0 chưa viết chương trình GPU mới.
 
-Chưa chạy benchmark để tìm speedup.
+Chưa chạy phép đo so sánh để tìm mức tăng tốc.
 
-Chưa thay đổi runtime.
+Chưa thay đổi hệ thực thi.
 
 Ta chỉ hỏi:
 
@@ -209,17 +185,17 @@ GPU chạy tiếp
 
 Điều này lập tức loại bỏ một lời giải thích quá đơn giản:
 
-> **469 dispatch không có nghĩa ArcLLM đang trả chi phí 469 lần CPU giao việc cho GPU.**
+> **469 lần giao việc cho GPU không có nghĩa ArcLLM đang trả chi phí 469 lần CPU giao việc cho GPU.**
 
-Nếu muốn hiểu vì sao decode chậm, ta phải nhìn tiếp:
+Nếu muốn hiểu vì sao giai đoạn sinh token chậm, ta phải nhìn tiếp:
 
 > **469 công việc đó thực sự đang làm gì?**
 
-## Gần một nửa graph decode là các phép nhân lớn
+## Gần một nửa đồ thị sinh token là các phép nhân lớn
 
-Mỗi token mới đi qua 28 decoder layer.
+Mỗi token mới đi qua 28 decoder lớp.
 
-Trong mỗi layer có các bước như:
+Trong mỗi lớp có các bước như:
 
 ```text
 RMSNorm
@@ -272,7 +248,7 @@ Có:
 196 phép GEMM / token
 ```
 
-Trong tổng số 469 dispatch:
+Trong tổng số 469 lần giao việc cho GPU:
 
 ```text
 196
@@ -282,15 +258,15 @@ thuộc riêng họ công việc này.
 
 Con số đó chưa chứng minh:
 
-> “GEMM là nguyên nhân của toàn bộ performance gap.”
+> “GEMM là nguyên nhân của toàn bộ hiệu năng khoảng cách.”
 
 Nhưng nó cho ta một vùng đủ lớn và đủ cụ thể để bắt đầu kiểm tra.
 
-## Prefill và decode đang được đối xử rất khác nhau
+## Xử lý đầu vào và sinh token đang được đối xử rất khác nhau
 
-Ở Chương 8, P7 đã tối ưu khá sâu đường **prefill — giai đoạn model xử lý toàn bộ prompt đầu vào**.
+Ở Chương 8, P7 đã tối ưu khá sâu đường **giai đoạn xử lý đầu vào — giai đoạn mô hình xử lý toàn bộ prompt đầu vào**.
 
-Prefill đã có những đường tính toán chuyên biệt như:
+giai đoạn xử lý đầu vào đã có những đường tính toán chuyên biệt như:
 
 ```text
 Q/K/V/O được chia tile
@@ -298,7 +274,7 @@ gate + up được gộp
 FFN-down có đường tính toán riêng
 ```
 
-Nhưng khi chuyển sang **decode — giai đoạn mỗi lần chỉ sinh thêm một token**, kiến trúc vẫn chủ yếu sử dụng đường GEMM dùng chung cho trường hợp batch bằng 1.
+Nhưng khi chuyển sang **giai đoạn sinh token — giai đoạn mỗi lần chỉ sinh thêm một token**, kiến trúc vẫn chủ yếu sử dụng đường GEMM dùng chung cho trường hợp batch bằng 1.
 
 `Batch-1` nghĩa rất đơn giản:
 
@@ -316,21 +292,21 @@ decode
 
 Điều này đặc biệt đáng chú ý vì Q3 lại cho thấy:
 
-> **decode chính là nơi ArcLLM chậm hơn llama.cpp rất nhiều.**
+> **giai đoạn sinh token chính là nơi ArcLLM chậm hơn llama.cpp rất nhiều.**
 
 Tới đây một câu hỏi mới bắt đầu có hình dạng.
 
 Không phải:
 
-> “Có thể giảm vài dispatch không?”
+> “Có thể giảm vài lần giao việc cho GPU không?”
 
 Mà là:
 
-> **“Có phải cách ArcLLM tổ chức phép nhân ma trận cho từng token decode đang khiến GPU hoạt động rất kém hiệu quả?”**
+> **“Có phải cách ArcLLM tổ chức phép nhân ma trận cho từng token giai đoạn sinh token đang khiến GPU hoạt động rất kém hiệu quả?”**
 
-## Vì sao batch-1 có thể khó?
+## Vì sao mỗi lần chỉ xử lý một token có thể khó?
 
-Hãy tưởng tượng prefill có 512 token.
+Hãy tưởng tượng giai đoạn xử lý đầu vào có 512 token.
 
 GPU nhận được rất nhiều hàng dữ liệu để chia công việc:
 
@@ -342,7 +318,7 @@ token 3
 token 512
 ```
 
-Nhưng decode thì khác.
+Nhưng giai đoạn sinh token thì khác.
 
 Mỗi bước chỉ có:
 
@@ -362,7 +338,7 @@ GPU vẫn có rất nhiều đơn vị tính toán.
 
 Nhưng giờ ta không còn hàng trăm token độc lập để chia cho chúng.
 
-Muốn dùng GPU hiệu quả, runtime phải tìm cách chia công việc theo những hướng khác:
+Muốn dùng GPU hiệu quả, hệ thực thi phải tìm cách chia công việc theo những hướng khác:
 
 ```text
 các hàng đầu ra
@@ -409,9 +385,9 @@ Gộp lại:
 
 ## Nhưng một giả thuyết không được sinh ra chỉ vì nghe có lý
 
-Sau khi Q3 đã cho verdict âm tính, ta phải đặc biệt cẩn thận.
+Sau khi Q3 đã cho kết luận âm tính, ta phải đặc biệt cẩn thận.
 
-Nếu cứ thấy chỗ nào “có vẻ chậm” rồi viết kernel mới, ta rất dễ quay lại vòng tuning vô hạn.
+Nếu cứ thấy chỗ nào “có vẻ chậm” rồi viết chương trình GPU mới, ta rất dễ quay lại vòng tuning vô hạn.
 
 Do đó việc mở SA cần hai nguồn lý do.
 
@@ -433,7 +409,7 @@ Thứ hai là:
 
 > **những công trình đã được công bố công khai có cho thấy loại cơ chế này thực sự đáng nghiên cứu hay không?**
 
-## Đọc paper để tìm cơ chế, không phải để mượn speedup
+## Đọc bài báo khoa học để tìm cơ chế, không phải để mượn con số tăng tốc
 
 Sau Q3, ta khảo sát một số công trình công khai như:
 
@@ -444,11 +420,11 @@ QServe
 DeepSpeed Inference
 ```
 
-Ta không cần đi sâu vào từng paper ở đây.
+Ta không cần đi sâu vào từng bài báo khoa học ở đây.
 
 Điều quan trọng là cách dùng chúng.
 
-Một paper không được phép biến thành lập luận:
+Một bài báo khoa học không được phép biến thành lập luận:
 
 ```text
 paper A nhanh 2×
@@ -458,13 +434,13 @@ ArcLLM cũng sẽ nhanh 2×
 
 Hardware khác.
 
-Kernel khác.
+chương trình GPU khác.
 
 Driver khác.
 
-Quantization có thể khác.
+lượng tử hóa có thể khác.
 
-Workload có thể khác.
+bài đo có thể khác.
 
 Thứ duy nhất ta được mang về là:
 
@@ -476,11 +452,11 @@ nguyên lý thiết kế
 một câu hỏi mới cho ArcLLM
 ```
 
-Không phải con số speedup.
+Không phải con số mức tăng tốc.
 
-Ví dụ, FlashDecoding++ cho thấy các phép nhân “phẳng” trong decode có thể khai thác GPU không hiệu quả nếu dùng dataflow không phù hợp.
+Ví dụ, FlashDecoding++ cho thấy các phép nhân “phẳng” trong giai đoạn sinh token có thể khai thác GPU không hiệu quả nếu dùng dataflow không phù hợp.
 
-MARLIN cho thấy phép nhân ma trận với trọng số ít bit trong autoregressive inference cần scheduling, pipelining và cách giải mã trọng số được thiết kế cùng nhau.
+MARLIN cho thấy phép nhân ma trận với trọng số ít bit trong autoregressive suy luận cần scheduling, pipelining và cách giải mã trọng số được thiết kế cùng nhau.
 
 `Pipelining — đường ống xử lý` nghĩa là:
 
@@ -488,15 +464,15 @@ MARLIN cho thấy phép nhân ma trận với trọng số ít bit trong autoreg
 
 QServe tiếp tục củng cố một bài học:
 
-> **trọng số dùng ít bit hơn không tự động có nghĩa runtime sẽ nhanh hơn.**
+> **trọng số dùng ít bit hơn không tự động có nghĩa hệ thực thi sẽ nhanh hơn.**
 
 Chi phí giải mã trọng số lượng tử hóa có thể rất lớn nếu layout và cách tính không phù hợp.
 
 `Dequantization — giải mã lượng tử hóa` là:
 
-> **chuyển dữ liệu trọng số đã nén/lượng tử hóa sang giá trị cần thiết cho phép tính tại thời điểm kernel xử lý chúng.**
+> **chuyển dữ liệu trọng số đã nén/lượng tử hóa sang giá trị cần thiết cho phép tính tại thời điểm chương trình GPU xử lý chúng.**
 
-DeepSpeed Inference lại cho thấy performance của transformer nhiều khi phải được nhìn ở mức **dataflow của cả chuỗi tính toán**, chứ không chỉ một kernel riêng lẻ.
+DeepSpeed suy luận lại cho thấy hiệu năng của transformer nhiều khi phải được nhìn ở mức **dataflow của cả chuỗi tính toán**, chứ không chỉ một chương trình GPU riêng lẻ.
 
 Những công trình này không chứng minh ArcLLM sẽ nhanh hơn.
 
@@ -508,31 +484,31 @@ Chúng chỉ nói:
 
 Từ evidence của ArcLLM và các nghiên cứu công khai, hypothesis đầu tiên được đặt tên:
 
-> **SA-H1 — Decode-Specialized Packed-Quant Executor.**
+> **SA-H1 — giai đoạn sinh token-Specialized Packed-Quant Executor.**
 
 Nói bằng tiếng Việt:
 
-> **Một đường thực thi chuyên biệt cho decode, được thiết kế trực tiếp cho các phép nhân Q4_K/Q6_K khi mỗi bước chỉ có một token mới.**
+> **Một đường thực thi chuyên biệt cho giai đoạn sinh token, được thiết kế trực tiếp cho các phép nhân Q4_K/Q6_K khi mỗi bước chỉ có một token mới.**
 
-Mục tiêu không phải đổi model.
+Mục tiêu không phải đổi mô hình.
 
-Không đổi Q4_K/Q6_K thành một loại quantization khác.
+Không đổi Q4_K/Q6_K thành một loại lượng tử hóa khác.
 
 Không bỏ qua neuron.
 
-Không dùng attention xấp xỉ.
+Không dùng cơ chế chú ý xấp xỉ.
 
-Không đổi workload.
+Không đổi bài đo.
 
 Không tìm một bài toán dễ hơn để thắng.
 
 Câu hỏi rất hẹp:
 
-> **Cùng model, cùng phép tính, cùng ý nghĩa số học — nhưng liệu ta có thể tổ chức công việc tốt hơn cho GPU hay không?**
+> **Cùng mô hình, cùng phép tính, cùng ý nghĩa số học — nhưng liệu ta có thể tổ chức công việc tốt hơn cho GPU hay không?**
 
-## Có phải chỉ cần gộp nhiều kernel lại?
+## Có phải chỉ cần gộp nhiều chương trình GPU lại?
 
-Trong runtime, **kernel fusion — gộp kernel** là cách đưa hai hoặc nhiều công việc tính toán liên quan vào cùng một kernel GPU thay vì chạy chúng thành các kernel tách rời.
+Trong hệ thực thi, **chương trình GPU gộp phép tính — gộp chương trình GPU** là cách đưa hai hoặc nhiều công việc tính toán liên quan vào cùng một chương trình GPU GPU thay vì chạy chúng thành các chương trình GPU tách rời.
 
 Ví dụ:
 
@@ -552,11 +528,11 @@ một kernel
 làm A rồi tiếp tục B
 ```
 
-Mục tiêu có thể là giảm số lần khởi chạy kernel, giảm dữ liệu trung gian phải ghi/đọc lại hoặc tạo điều kiện dùng chung dữ liệu đã có sẵn.
+Mục tiêu có thể là giảm số lần khởi chạy chương trình GPU, giảm dữ liệu trung gian phải ghi/đọc lại hoặc tạo điều kiện dùng chung dữ liệu đã có sẵn.
 
 Một giả thuyết tự nhiên vì vậy là:
 
-> “469 dispatch nhiều quá. Nếu gộp nhiều phép tính liên quan lại thì có giải quyết được vấn đề không?”
+> “469 lần giao việc cho GPU nhiều quá. Nếu gộp nhiều phép tính liên quan lại thì có giải quyết được vấn đề không?”
 
 SA0 kiểm tra câu này bằng một phép tính rất đơn giản.
 
@@ -568,9 +544,9 @@ K
 V
 ```
 
-hiện cần ba dispatch mỗi layer.
+hiện cần ba lần giao việc cho GPU mỗi lớp.
 
-Nếu gộp Q, K và V vào một kernel:
+Nếu gộp Q, K và V vào một chương trình GPU:
 
 ```text
 3
@@ -578,13 +554,13 @@ Nếu gộp Q, K và V vào một kernel:
 1
 ```
 
-mỗi layer tiết kiệm:
+mỗi lớp tiết kiệm:
 
 ```text
 2 dispatch
 ```
 
-28 layer:
+28 lớp:
 
 ```text
 2 × 28
@@ -613,7 +589,7 @@ Tổng cộng:
 = 84 dispatch
 ```
 
-Decode graph có thể từ:
+giai đoạn sinh token đồ thị có thể từ:
 
 ```text
 469
@@ -625,7 +601,7 @@ xuống:
 385
 ```
 
-Nếu giả sử rất đơn giản rằng mọi dispatch tốn thời gian ngang nhau, giới hạn tăng tốc theo số lượng dispatch là:
+Nếu giả sử rất đơn giản rằng mọi lần giao việc cho GPU tốn thời gian ngang nhau, giới hạn tăng tốc theo số lượng lần giao việc cho GPU là:
 
 ```text
 469 / 385
@@ -634,7 +610,7 @@ Nếu giả sử rất đơn giản rằng mọi dispatch tốn thời gian ngan
 
 Tức khoảng 22%.
 
-Nhưng ở Q3, llama.cpp trong **phép đối chứng cùng model, cùng máy và cùng workload** có decode throughput cao hơn ArcLLM khoảng:
+Nhưng ở Q3, llama.cpp trong **phép đối chứng cùng mô hình, cùng máy và cùng bài đo** có giai đoạn sinh token thông lượng cao hơn ArcLLM khoảng:
 
 ```text
 35,7× → 56,8×
@@ -644,9 +620,9 @@ Nhưng ở Q3, llama.cpp trong **phép đối chứng cùng model, cùng máy v�
 
 Vì vậy SA0 loại bỏ một lời giải thích quá đơn giản:
 
-> **Chỉ giảm số dispatch bằng cách gộp kernel không thể là cơ chế chính.**
+> **Chỉ giảm số lần giao việc cho GPU bằng cách gộp chương trình GPU không thể là cơ chế chính.**
 
-Gộp kernel vẫn có thể hữu ích.
+Gộp chương trình GPU vẫn có thể hữu ích.
 
 Nhưng nó chỉ là yếu tố hỗ trợ.
 
@@ -654,7 +630,7 @@ Cơ chế chính vẫn phải nằm sâu hơn ở:
 
 > **cách tổ chức phép nhân ma trận, đọc trọng số, giải mã trọng số và chia công việc trên GPU.**
 
-## Tiết kiệm việc đọc activation cũng chưa đủ
+## Tiết kiệm việc đọc dữ liệu trung gian cũng chưa đủ
 
 Q, K và V cùng đọc một hidden vector.
 
@@ -677,7 +653,7 @@ Một vector:
 = 14.336 byte
 ```
 
-Nếu việc gộp QKV giúp tránh được hai lần đọc thừa mỗi layer:
+Nếu việc gộp QKV giúp tránh được hai lần đọc thừa mỗi lớp:
 
 ```text
 2 × 14.336 × 28
@@ -716,11 +692,11 @@ của quy mô đó.
 
 Do vậy cũng không thể nói:
 
-> “Gộp kernel sẽ giải quyết performance vì nó giảm rất nhiều lượng dữ liệu model phải đọc.”
+> “Gộp chương trình GPU sẽ giải quyết hiệu năng vì nó giảm rất nhiều lượng dữ liệu mô hình phải đọc.”
 
 Bằng chứng không hỗ trợ kết luận ấy.
 
-Việc gộp kernel có thể giúp vì những lý do khác:
+Việc gộp chương trình GPU có thể giúp vì những lý do khác:
 
 ```text
 giảm dữ liệu trung gian
@@ -737,15 +713,15 @@ Q3 có một lợi thế đặc biệt.
 
 Nó không chỉ nói ArcLLM chậm.
 
-Nó còn có một runtime đối chứng chạy trên **chính máy đó**.
+Nó còn có một hệ thực thi đối chứng chạy trên **chính máy đó**.
 
-ArcLLM decode:
+ArcLLM giai đoạn sinh token:
 
 ```text
 ≈ 0,297 → 0,335 token/giây
 ```
 
-llama.cpp trên cùng model, cùng Intel Arc 140V và cùng workload:
+llama.cpp trên cùng mô hình, cùng Intel Arc 140V và cùng bài đo:
 
 ```text
 ≈ 11,35 → 18,58 token/giây
@@ -767,17 +743,17 @@ Nhưng chúng cho phép một kết luận quan trọng hơn:
 
 Chính phép đối chứng với llama.cpp đã chứng minh rằng:
 
-> **cùng model và cùng phần cứng có thể sinh token nhanh hơn rất nhiều so với đường decode hiện tại của ArcLLM.**
+> **cùng mô hình và cùng phần cứng có thể sinh token nhanh hơn rất nhiều so với đường giai đoạn sinh token hiện tại của ArcLLM.**
 
-Vấn đề vì vậy nằm ở cách runtime hiện tổ chức công việc, chứ không thể đơn giản đổ cho giới hạn tuyệt đối của GPU.
+Vấn đề vì vậy nằm ở cách hệ thực thi hiện tổ chức công việc, chứ không thể đơn giản đổ cho giới hạn tuyệt đối của GPU.
 
-## SA-H1 được tách nhỏ trước khi implementation
+## SA-H1 được tách nhỏ trước khi triển khai
 
 SA0 tiếp tục chia giả thuyết lớn thành những câu hỏi nhỏ hơn.
 
 Cơ chế chính được giữ lại là:
 
-> **GPU có thể đang bị khai thác kém hiệu quả vì cách ArcLLM tổ chức GEMM Q4_K/Q6_K cho từng token decode.**
+> **GPU có thể đang bị khai thác kém hiệu quả vì cách ArcLLM tổ chức GEMM Q4_K/Q6_K cho từng token giai đoạn sinh token.**
 
 Đây là phần quan trọng nhất của SA-H1.
 
@@ -802,7 +778,7 @@ Lý do rất đơn giản:
 
 Không tối ưu chỉ vì một phần nhìn có vẻ lớn.
 
-## Và vẫn chưa được phép viết kernel mới
+## Và vẫn chưa được phép viết chương trình GPU mới
 
 Đến đây ta đã có:
 
@@ -818,11 +794,11 @@ hình thành SA-H1
 phân rã cơ chế
 ```
 
-Nhưng kernel mới vẫn chưa được phép xuất hiện.
+Nhưng chương trình GPU mới vẫn chưa được phép xuất hiện.
 
 Đó là vai trò của:
 
-> **SA0 — bước kiểm tra nguyên nhân và khả năng thực hiện trước khi đầu tư vào implementation.**
+> **SA0 — bước kiểm tra nguyên nhân và khả năng thực hiện trước khi đầu tư vào triển khai.**
 
 SA0 không xác nhận rằng kiến trúc mới nhanh hơn.
 
@@ -850,7 +826,7 @@ có cách kiểm tra rõ ràng
 → PASS để tiếp tục nghiên cứu
 ```
 
-Nó **không phải PASS hiệu suất**.
+Nó **không phải ĐẠT (PASS) hiệu suất**.
 
 Nó cũng không có nghĩa giả thuyết đã đúng.
 
@@ -885,9 +861,9 @@ Vì vậy SA0 có một bước riêng:
 
 Trong các tài liệu GPU/API, từ **primitive — thao tác nền tảng** thường được dùng cho những khả năng cơ bản mà phần cứng hoặc API cung cấp để các phép tính lớn hơn xây lên trên đó. Ví dụ một loại thao tác theo nhóm lane, một kiểu dữ liệu số học hay một phép toán ma trận chuyên biệt đều có thể được xem là primitive ở mức này.
 
-SA0-CAP không chạy model.
+SA0-CAP không chạy mô hình.
 
-Không benchmark.
+Không phép đo so sánh.
 
 Không tạo shader mới cho successor.
 
@@ -976,7 +952,7 @@ hiệu suất của kiến trúc kế tiếp
 → chưa biết
 ```
 
-Đây là một kết quả rất quan trọng dù chưa có speedup nào.
+Đây là một kết quả rất quan trọng dù chưa có mức tăng tốc nào.
 
 Bởi câu hỏi ban đầu:
 
@@ -992,7 +968,7 @@ Có phạm vi.
 
 Có điều kiện dừng.
 
-Có khả năng FAIL.
+Có khả năng KHÔNG ĐẠT (FAIL).
 
 Và quan trọng nhất:
 
@@ -1004,7 +980,7 @@ Hãy nhìn lại ba chương vừa qua.
 
 Chương 9 hỏi:
 
-> **Ta đang đứng ở đâu khi so với một runtime trưởng thành dưới cùng điều kiện?**
+> **Ta đang đứng ở đâu khi so với một hệ thực thi trưởng thành dưới cùng điều kiện?**
 
 Chương 10 hỏi:
 
@@ -1065,9 +1041,9 @@ Và khi câu trả lời xuất hiện, ta phải thực sự dừng.
 ### Nhớ 3 điều
 
 1. **Successor Architecture (SA) không phải một “v2” mặc định.** Kiến trúc kế tiếp chỉ được mở khi kiến trúc cũ đã đóng và có một cơ chế mới đủ cụ thể để kiểm tra.
-2. **Các công trình đã công bố chỉ giúp hình thành giả thuyết.** Speedup của FlashDecoding++, MARLIN, QServe hay DeepSpeed không phải bằng chứng rằng ArcLLM sẽ đạt cùng kết quả trên Intel Arc.
+2. **Các công trình đã công bố chỉ giúp hình thành giả thuyết.** mức tăng tốc của FlashDecoding++, MARLIN, QServe hay DeepSpeed không phải bằng chứng rằng ArcLLM sẽ đạt cùng kết quả trên Intel Arc.
 3. **SA0 chưa chứng minh hiệu suất.** Nó chỉ xác nhận rằng giả thuyết về cách tổ chức GEMM Q4_K/Q6_K cho từng token có đủ cơ sở về cơ chế và phần cứng để đáng tiếp tục nghiên cứu.
 
 > **Phần II kết thúc tại đây.**
 >
-> Ta đã xây được một runtime, để bằng chứng phán xét nó, chấp nhận một kết quả âm tính và học được cách đặt một câu hỏi mới mà không phủ nhận kết quả cũ.
+> Ta đã xây được một hệ thực thi, để bằng chứng phán xét nó, chấp nhận một kết quả âm tính và học được cách đặt một câu hỏi mới mà không phủ nhận kết quả cũ.
