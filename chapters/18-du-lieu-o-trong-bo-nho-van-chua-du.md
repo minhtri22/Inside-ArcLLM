@@ -69,11 +69,11 @@ khi nào phải bỏ?
 
 Đây là lúc ba khái niệm bắt đầu tách ra rõ ràng:
 
-> **trạng thái cư trú trong bộ nhớ (trạng thái cư trú)** — một cách biểu diễn đang có mặt trong vùng bộ nhớ cần thiết hay chưa.
+> **trạng thái cư trú trong bộ nhớ (residency)** — một cách biểu diễn đang có mặt trong vùng bộ nhớ cần thiết hay chưa.
 
-> **quá trình thu nhận hoặc tạo biểu diễn (quá trình thu nhận)** — làm cho cách biểu diễn cần thiết xuất hiện.
+> **quá trình thu nhận hoặc tạo biểu diễn (acquisition)** — làm cho cách biểu diễn cần thiết xuất hiện.
 
-> **vòng đời (vòng đời)** — khi nào giữ, khi nào loại bỏ và khi nào phải tạo lại cách biểu diễn đó.
+> **vòng đời (lifecycle)** — khi nào giữ, khi nào loại bỏ và khi nào phải tạo lại cách biểu diễn đó.
 
 Nhưng bằng chứng sau đó còn cho thấy ngay cả ba khái niệm này vẫn chưa đủ nếu ta trộn chúng với câu hỏi:
 
@@ -175,7 +175,7 @@ Nếu câu trả lời là có, tạo B rồi dùng B.
 
 Đây là loại thứ nhất:
 
-> **tạo biểu diễn dựa trên khả năng bù chi phí nhờ tái sử dụng (reuse-amortized quá trình thu nhận).**
+> **tạo biểu diễn dựa trên khả năng bù chi phí nhờ tái sử dụng (reuse-amortized acquisition).**
 
 Nói đơn giản:
 
@@ -290,7 +290,7 @@ Nó là điều kiện để đường thực thi có giới hạn đó trở n�
 
 Đây là loại thứ hai:
 
-> **tạo biểu diễn bắt buộc để phép tính trở nên khả thi (mandatory-for-feasibility quá trình thu nhận).**
+> **tạo biểu diễn bắt buộc để phép tính trở nên khả thi (mandatory-for-feasibility acquisition).**
 
 Ta có thể so hai trường hợp:
 
@@ -596,7 +596,7 @@ Bằng chứng buộc ArcLLM phải tách chúng.
 
 Khái niệm được thêm vào rất nhỏ:
 
-> **trạng thái sẵn sàng thực thi (cách thực thi readiness)** — đường thực thi có thể xử lý yêu cầu hiện tại ngay bây giờ hay không.
+> **trạng thái sẵn sàng thực thi (execution readiness)** — đường thực thi có thể xử lý yêu cầu hiện tại ngay bây giờ hay không.
 
 Nó là một trạng thái độc lập với việc có hay không có cách biểu diễn dữ liệu phụ trong bộ nhớ.
 
@@ -614,11 +614,11 @@ Từ đây có bốn câu hỏi tách biệt:
 
 Ta cũng cần phân biệt:
 
-> **khả dụng về nguyên tắc (cách thực thi available)** — đường thực thi tồn tại và về nguyên tắc có thể dùng.
+> **khả dụng về nguyên tắc (execution availability)** — đường thực thi tồn tại và về nguyên tắc có thể dùng.
 
 với:
 
-> **sẵn sàng thực thi (cách thực thi ready)** — đường đó có thể xử lý yêu cầu hiện tại ngay lúc này.
+> **sẵn sàng thực thi (execution ready)** — đường đó có thể xử lý yêu cầu hiện tại ngay lúc này.
 
 Một đường có thể tồn tại trong hệ thực thi nhưng tạm thời chưa sẵn sàng cho yêu cầu hiện tại.
 
@@ -791,7 +791,7 @@ Nhưng giữ lại tốn gần:
 
 trong thí nghiệm hiện tại.
 
-Nếu **áp lực bộ nhớ (bộ nhớ pressure)** tăng, giữ cách biểu diễn dữ liệu này có thể làm phần khác của hệ thống khó hoạt động.
+Nếu **áp lực bộ nhớ (memory pressure)** tăng, giữ cách biểu diễn dữ liệu này có thể làm phần khác của hệ thống khó hoạt động.
 
 Vì vậy vòng đời phải là một quyết định riêng.
 
