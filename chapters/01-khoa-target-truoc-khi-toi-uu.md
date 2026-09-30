@@ -1,33 +1,44 @@
 # Chương 1 — Bên dưới một câu trả lời AI có gì?
 
-
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt — Chương 1 mở toàn bộ cỗ máy ở mức khái quát**
+> **Bản đồ xuyên suốt**
 >
 > ```text
-> văn bản → token → tensor
->                     ↓
->          model / parameters
->                     ↓
->                  runtime
->                     ↓
->            CPU / GPU / bộ nhớ
->                     ↓
->      RMSNorm / attention / FFN
->                     ↓
->              decoder layer
->                     ↓
->             nhiều decoder layer
->                     ↓
->          KV cache / sinh token
->                     ↓
->        benchmark / tối ưu / kiến trúc
+> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
+> 
+> AI                                   Văn bản
+> ↓                                    ↓
+> Machine Learning                     Tokenizer
+> ↓                                    ↓
+> Neural Network                       Token / token ID
+> ↓                                    ↓
+> Language Model                       Embedding → tensor
+> ↓                                           +
+> LLM                                  parameters / weights từ model
+> ↓                                           ↓
+> Transformer                          Runtime
+> ↓                                           ↓
+> Decoder-only Transformer             CPU / GPU / bộ nhớ
+> ↓                                           ↓
+> Nhiều decoder layer                  RMSNorm / Attention / FFN
+> ↓ chứa                                      ↓
+> Parameters / Weights                 một decoder layer
+>                                             ↓
+>                                      nhiều decoder layer
+>                                             ↓
+>                                      logits → token tiếp theo
+>                                             ↓
+>                                      KV cache / lặp lại
+>                                             ↓
+>                                      benchmark / tối ưu
+>                                             ↓
+>                                      representation / lifecycle
 > ```
 >
-> Nếu một thuật ngữ trong sơ đồ còn lạ, [Phần 0 — Bản đồ trước khi vào rừng](00-ban-do-truoc-khi-vao-rung.md) đã dựng nền cho toàn bộ các khái niệm này.
+> ▶ **Đang mở ở chương này:** toàn bộ cỗ máy ở mức khái quát.
 
-Khi chúng ta mở một ứng dụng AI, gõ một câu hỏi rồi vài giây sau nhận được câu trả lời, mọi thứ trông rất đơn giản.
+Nếu sơ đồ trên còn hoàn toàn mới, hãy đọc [Phần 0 — Bản đồ trước khi vào rừng](00-ban-do-truoc-khi-vao-rung.md) trước. Khi chúng ta mở một ứng dụng AI, gõ một câu hỏi rồi vài giây sau nhận được câu trả lời, mọi thứ trông rất đơn giản.
 
 Nhưng bên dưới ô chat ấy là nhiều lớp khác nhau.
 
