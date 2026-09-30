@@ -1,42 +1,18 @@
-# Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được
+# Chương 12 — Nhiều cách đều có lý, nhưng chỉ thực tế mới trả lời
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Nhiều ý tưởng
+>     ↓
+> khám phá rộng
+>     ↓
+> [ chọn một cơ chế đủ rõ ]
+>     ↓
+> thiết kế phép thử
 > ```
->
-> ▶ **Đang mở ở chương này:** E/M/C/T / chọn cơ chế.
 
 
 > **Câu hỏi của chương:** Khi AI có thể nghĩ ra rất nhiều cách làm một phép tính nhanh hơn, làm thế nào biết ý tưởng nào thực sự đáng đưa vào kiến trúc?
@@ -47,7 +23,7 @@ Kiến trúc ArcLLM cũ đã đóng.
 
 Nhưng một giả thuyết mới đã đủ cơ sở để được nghiên cứu:
 
-> **Có thể đường decode hiện tại đang sử dụng GPU kém hiệu quả vì cách nó chia phép nhân Q4_K/Q6_K của từng token.**
+> **Có thể đường giai đoạn sinh token hiện tại đang sử dụng GPU kém hiệu quả vì cách nó chia phép nhân Q4_K/Q6_K của từng token.**
 
 Phần cứng cũng đã được kiểm tra.
 
@@ -57,7 +33,7 @@ Nhưng từ đây xuất hiện một vấn đề khác.
 
 Có rất nhiều cách chia công việc.
 
-Ta có thể chia theo hàng đầu ra, chia chiều K, thay kích thước nhóm GPU, gộp nhiều phép tính, dùng subgroup, thử cooperative matrix, thay cách giải mã trọng số hoặc kết hợp nhiều thay đổi cùng lúc.
+Ta có thể chia theo hàng đầu ra, chia chiều K, thay kích thước nhóm GPU, gộp nhiều phép tính, dùng nhóm con GPU, thử cooperative matrix, thay cách giải mã trọng số hoặc kết hợp nhiều thay đổi cùng lúc.
 
 AI có thể tiếp tục sinh thêm phương án gần như vô hạn.
 
@@ -69,7 +45,7 @@ Mà phải là:
 
 > **“Trong rất nhiều ý tưởng có vẻ hợp lý, ý tưởng nào đáng tiêu bằng chứng mới để kiểm tra?”**
 
-## Nhắc lại bốn mode làm việc E/M/C/T
+## Nhắc lại bốn chế độ làm việc E/M/C/T
 
 Ở Chương 8, ta đã gặp bốn chế độ nghiên cứu. Sau bốn chương, nên nhắc lại chúng trước khi đi tiếp.
 
@@ -111,7 +87,7 @@ Chương này chủ yếu đi qua **E và M**.
 
 Chương 13 sẽ cho thấy **C** trở nên quan trọng thế nào khi một cơ chế nhanh nhưng không giữ được tính đúng.
 
-Chương 14 sau đó sẽ đi sâu vào **T**: một kết quả tốt ở thành phần có sống sót khi bước vào model thật và toàn bộ runtime hay không.
+Chương 14 sau đó sẽ đi sâu vào **T**: một kết quả tốt ở thành phần có sống sót khi bước vào mô hình thật và toàn bộ hệ thực thi hay không.
 
 Bốn mode không phải bốn loại công việc bắt buộc phải tách thành bốn dự án.
 
@@ -121,7 +97,7 @@ Chúng là bốn cách tư duy giúp ta biết:
 
 ## AI làm cho ý tưởng trở nên rất rẻ
 
-Trước thời kỳ AI hỗ trợ lập trình, nghĩ ra rồi triển khai mười phiên bản kernel có thể tốn rất nhiều thời gian.
+Trước thời kỳ AI hỗ trợ lập trình, nghĩ ra rồi triển khai mười phiên bản chương trình GPU có thể tốn rất nhiều thời gian.
 
 Bây giờ chi phí đó giảm mạnh.
 
@@ -153,7 +129,7 @@ Thứ đắt không còn chỉ là code.
 
 Thứ đắt là:
 
-> **fresh evidence — bằng chứng mới chưa bị dùng để lựa chọn chính giả thuyết đang cần kiểm tra.**
+> **bằng chứng mới — bằng chứng mới chưa bị dùng để lựa chọn chính giả thuyết đang cần kiểm tra.**
 
 Một phép đo mới có thể tiêu thời gian máy, thời gian review, một cơ hội xác nhận độc lập và quan trọng nhất là ranh giới giữa:
 
@@ -169,7 +145,7 @@ giải thích sau khi đã thấy kết quả
 
 Vì vậy không phải mọi ý tưởng AI sinh ra đều xứng đáng được chạy.
 
-## Mode E: được phép nghĩ rộng, nhưng chưa được tin
+## E — Khám phá: được phép nghĩ rộng, nhưng chưa được tin
 
 **Mode E — Explore, chế độ khám phá** là nơi AI có thể phát huy khả năng mở rộng không gian ý tưởng.
 
@@ -197,7 +173,7 @@ gộp các phép chiếu
 thay cách giải mã trọng số
 ```
 
-AI có thể đọc source, thống kê shape, tra khả năng phần cứng, đối chiếu paper và đưa ra nhiều cách phân rã.
+AI có thể đọc source, thống kê shape, tra khả năng phần cứng, đối chiếu bài báo khoa học và đưa ra nhiều cách phân rã.
 
 Nhưng Mode E có một ranh giới:
 
@@ -207,13 +183,13 @@ Mode E là nơi nghĩ rộng.
 
 Không phải nơi kết luận rộng.
 
-## Mode M: giữ lại đúng một cơ chế
+## M — Kiểm tra cơ chế: giữ lại đúng một cơ chế
 
 Bước tiếp theo là **Mode M — Mechanism qualification, kiểm tra xem một cơ chế có đủ rõ để đáng thử hay không**.
 
 Thay vì hỏi:
 
-> “Làm decode nhanh hơn thế nào?”
+> “Làm giai đoạn sinh token nhanh hơn thế nào?”
 
 ta chọn một thay đổi rất cụ thể.
 
@@ -231,7 +207,7 @@ cộng dần
 ghi kết quả
 ```
 
-Trong GPU, một đơn vị công việc nhỏ như vậy thường được gọi là **invocation — một lần thực thi nhỏ bên trong kernel**.
+Trong GPU, một đơn vị công việc nhỏ như vậy thường được gọi là **invocation — một lần thực thi nhỏ bên trong chương trình GPU**.
 
 Với một phép nhân có:
 
@@ -282,7 +258,7 @@ Sau đó các kết quả từng phần phải được cộng lại.
 
 Bước đó gọi là:
 
-> **subgroup reduction — phép gom và cộng kết quả giữa các lane trong cùng subgroup.**
+> **nhóm con GPU reduction — phép gom và cộng kết quả giữa các lane trong cùng nhóm con GPU.**
 
 Hình ảnh trực giác chuyển từ:
 
@@ -312,13 +288,13 @@ Ta biết chính xác thứ đang thay đổi:
 
 > **work partitioning — cách chia công việc.**
 
-Không đổi model.
+Không đổi mô hình.
 
 Không đổi định dạng Q4_K.
 
-Không gộp kernel.
+Không gộp chương trình GPU.
 
-Không thử nhiều kích thước subgroup cùng lúc.
+Không thử nhiều kích thước nhóm con GPU cùng lúc.
 
 Không thêm bước giải mã toàn bộ trọng số ra buffer khác.
 
@@ -330,13 +306,13 @@ Không thêm bước giải mã toàn bộ trọng số ra buffer khác.
 
 Cơ chế Split-K được kiểm tra trước trên các phép nhân Q4_K thành phần.
 
-Chưa chạy toàn model.
+Chưa chạy toàn mô hình.
 
-Chưa tuyên bố tốc độ toàn runtime.
+Chưa tuyên bố tốc độ toàn hệ thực thi.
 
 Câu hỏi chỉ là:
 
-> **Cùng shape, cùng dữ liệu và cùng phép tính, cách chia K mới có nhanh hơn kernel cũ mà vẫn giữ kết quả số học trong ngưỡng đã khóa không?**
+> **Cùng shape, cùng dữ liệu và cùng phép tính, cách chia K mới có nhanh hơn chương trình GPU cũ mà vẫn giữ kết quả số học trong ngưỡng đã khóa không?**
 
 Có năm shape Q4_K đại diện cho các phép chiếu thật trong decoder.
 
@@ -370,13 +346,13 @@ Ngay cả shape tăng ít nhất cũng khoảng:
 1,66× → 1,67×
 ```
 
-Tính đúng cũng PASS.
+Tính đúng cũng ĐẠT (PASS).
 
 Đây là một kết quả rất mạnh.
 
 Nhưng câu hợp lệ chỉ là:
 
-> **Cách chia K bằng subgroup 32 lane làm các phép nhân Q4_K thành phần được thử chạy nhanh hơn đáng kể.**
+> **Cách chia K bằng nhóm con GPU 32 lane làm các phép nhân Q4_K thành phần được thử chạy nhanh hơn đáng kể.**
 
 Không được nhảy thành:
 
@@ -390,7 +366,7 @@ Hai câu đó khác nhau hoàn toàn.
 
 Phản xạ tự nhiên là:
 
-> “Đưa ngay vào runtime.”
+> “Đưa ngay vào hệ thực thi.”
 
 Nhưng nghiên cứu phải hỏi thêm:
 
@@ -414,7 +390,7 @@ Ngay cả khi làm phần đó nhanh vô hạn, toàn chương trình vẫn còn
 99 giây
 ```
 
-Speedup toàn hệ tối đa:
+mức tăng tốc toàn hệ tối đa:
 
 ```text
 100 / 99
@@ -471,27 +447,27 @@ S
 ≈ 1,67×
 ```
 
-Component nhanh hơn 3×.
+thành phần nhanh hơn 3×.
 
 Nhưng toàn hệ lý tưởng chỉ khoảng 1,67×.
 
 Từ đây câu hỏi quan trọng không còn là:
 
-> “Kernel nhanh bao nhiêu?”
+> “chương trình GPU nhanh bao nhiêu?”
 
 Mà là:
 
-> **“Nếu kernel nhanh hơn, toàn hệ còn bao nhiêu chỗ để hưởng lợi?”**
+> **“Nếu chương trình GPU nhanh hơn, toàn hệ còn bao nhiêu chỗ để hưởng lợi?”**
 
-## Evidence cũ giúp ta biết nơi nào còn headroom
+## Bằng chứng cũ giúp ta biết nơi nào còn dư địa
 
-Q2 cho thấy ở workload ngắn W-S, phần thời gian sau token đầu tiên chiếm khoảng:
+Q2 cho thấy ở bài đo ngắn W-S, phần thời gian sau token đầu tiên chiếm khoảng:
 
 ```text
 99,1%
 ```
 
-tổng E2E latency.
+tổng E2E độ trễ.
 
 Ở W-C:
 
@@ -499,7 +475,7 @@ tổng E2E latency.
 83,8%
 ```
 
-Tức trong hai workload này, phần lớn thời gian nằm **sau khi token đầu tiên xuất hiện**.
+Tức trong hai bài đo này, phần lớn thời gian nằm **sau khi token đầu tiên xuất hiện**.
 
 Nếu tưởng tượng một cách phi thực tế rằng TTFT — thời gian chờ token đầu tiên — có thể được xóa hoàn toàn, giới hạn cải thiện E2E chỉ khoảng:
 
@@ -525,9 +501,9 @@ Nó chỉ giúp trả lời:
 
 ## Một kiến trúc tích hợp cho ta bài học khó hơn
 
-Sau đó, các thay đổi decode được đưa vào một kiến trúc kế tiếp lớn hơn.
+Sau đó, các thay đổi giai đoạn sinh token được đưa vào một kiến trúc kế tiếp lớn hơn.
 
-Decode thực sự tốt hơn.
+giai đoạn sinh token thực sự tốt hơn.
 
 Trong bốn phép so sánh mới:
 
@@ -537,7 +513,7 @@ Trong bốn phép so sánh mới:
 3,20×
 ```
 
-E2E latency cũng tốt hơn:
+E2E độ trễ cũng tốt hơn:
 
 ```text
 ≈ 1,14×
@@ -547,9 +523,9 @@ E2E latency cũng tốt hơn:
 
 Nếu chỉ nhìn hai dòng này, rất dễ nói:
 
-> “Kiến trúc mới PASS.”
+> “Kiến trúc mới ĐẠT (PASS).”
 
-Nhưng contract còn một điều kiện:
+Nhưng tiêu chuẩn đã khóa còn một điều kiện:
 
 > **TTFT không được xấu đi quá 10%.**
 
@@ -570,9 +546,9 @@ Ngưỡng tối đa:
 
 Ba trong bốn cell vi phạm.
 
-Vì vậy verdict tổng thể vẫn là:
+Vì vậy kết luận tổng thể vẫn là:
 
-> **FAIL.**
+> **KHÔNG ĐẠT (FAIL).**
 
 Một kiến trúc có thể:
 
@@ -588,15 +564,15 @@ mà vẫn:
 FAIL
 ```
 
-bởi nó tạo ra một cái giá mới vượt contract ở nơi khác.
+bởi nó tạo ra một cái giá mới vượt tiêu chuẩn đã khóa ở nơi khác.
 
 Thực tế không quan tâm sơ đồ kiến trúc đẹp đến đâu.
 
 Nó chỉ trả lời bằng hành vi của cả hệ thống.
 
-## E và M bảo vệ dự án khỏi chính khả năng sinh ý tưởng của AI
+## Khám phá và kiểm tra cơ chế bảo vệ dự án khỏi chính khả năng sinh ý tưởng của AI
 
-Nếu không có ranh giới, AI có thể nhìn FAIL vừa rồi rồi lập tức đề xuất:
+Nếu không có ranh giới, AI có thể nhìn KHÔNG ĐẠT (FAIL) vừa rồi rồi lập tức đề xuất:
 
 ```text
 tối ưu TTFT
@@ -609,7 +585,7 @@ chạy lại workload khác
 
 Mỗi ý tưởng đều có thể nghe hợp lý.
 
-Và vì implementation trở nên rẻ, câu:
+Và vì triển khai trở nên rẻ, câu:
 
 > “Thử thêm một chút nữa.”
 
@@ -643,9 +619,9 @@ Nó nằm ở việc quyết định:
 
 > Ta đang thay một cơ chế hay năm thứ cùng lúc?
 
-> FAIL này có được phép đứng yên không?
+> KHÔNG ĐẠT (FAIL) này có được phép đứng yên không?
 
-> Local speedup có đủ headroom để đáng đi tiếp không?
+> Local mức tăng tốc có đủ headroom để đáng đi tiếp không?
 
 ## Sau nhiều phép thử, điều nhận được là một bản đồ
 
@@ -706,7 +682,7 @@ Ghép decoder.
 
 Chạy test.
 
-Từ đây, vấn đề chính không còn là thiếu khả năng implementation.
+Từ đây, vấn đề chính không còn là thiếu khả năng triển khai.
 
 Nó là **kỷ luật lựa chọn**.
 
@@ -736,10 +712,10 @@ Hai bước tiếp theo sẽ khó hơn.
 
 Bởi một cơ chế có thể rất nhanh.
 
-Nhưng nếu nó không còn tính đúng, performance thậm chí không được phép lên tiếng.
+Nhưng nếu nó không còn tính đúng, hiệu năng thậm chí không được phép lên tiếng.
 
 ### Nhớ 3 điều
 
 1. **E/M/C/T là bốn ranh giới của cùng một quá trình nghiên cứu.** Chương 12 tập trung vào E — nghĩ rộng và M — khóa một cơ chế; Chương 13 và 14 lần lượt cho thấy C và T.
 2. **AI làm phương án trở nên rẻ, nhưng bằng chứng mới vẫn đắt.** Vì vậy không phải mọi ý tưởng AI sinh ra đều xứng đáng được chạy.
-3. **Local speedup không phải system value.** Split-K Q4 đạt khoảng `3,14×` ở phép thử thành phần, nhưng Amdahl và một FAIL ở cấp hệ thống cho thấy kiến trúc chỉ có giá trị khi toàn hệ thực sự hưởng lợi.
+3. **Local mức tăng tốc không phải system value.** Split-K Q4 đạt khoảng `3,14×` ở phép thử thành phần, nhưng Amdahl và một KHÔNG ĐẠT (FAIL) ở cấp hệ thống cho thấy kiến trúc chỉ có giá trị khi toàn hệ thực sự hưởng lợi.
