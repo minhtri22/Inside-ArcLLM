@@ -67,7 +67,7 @@ Mà là:
 
 Từ đây xuất hiện một ký hiệu mới:
 
-> **Successor Architecture (SA) — kiến trúc kế tiếp.**
+> **kiến trúc kế tiếp (Successor Architecture, SA).**
 
 `SA` không đơn giản có nghĩa:
 
@@ -236,7 +236,7 @@ Mỗi phép chiếu chủ yếu là một phép nhân giữa dữ liệu đầu 
 
 Trong machine learning, loại phép tính này thường được gọi bằng thuật ngữ:
 
-> **GEMM — phép nhân ma trận tổng quát (General Matrix Multiplication).**
+> **phép nhân ma trận tổng quát (General Matrix Multiplication, GEMM).**
 
 Có:
 
@@ -264,7 +264,7 @@ Nhưng nó cho ta một vùng đủ lớn và đủ cụ thể để bắt đầ
 
 ## Xử lý đầu vào và sinh token đang được đối xử rất khác nhau
 
-Ở Chương 8, P7 đã tối ưu khá sâu đường **giai đoạn xử lý đầu vào — giai đoạn mô hình xử lý toàn bộ **đoạn đầu vào****.
+Ở Chương 8, P7 đã tối ưu khá sâu đường **giai đoạn xử lý đầu vào (prefill)** — giai đoạn mô hình xử lý toàn bộ đoạn đầu vào.
 
 giai đoạn xử lý đầu vào đã có những đường tính toán chuyên biệt như:
 
@@ -274,7 +274,7 @@ gate + up được gộp
 FFN-down có đường tính toán riêng
 ```
 
-Nhưng khi chuyển sang **giai đoạn sinh token — giai đoạn mỗi lần chỉ sinh thêm một token**, kiến trúc vẫn chủ yếu sử dụng đường GEMM dùng chung cho trường hợp batch bằng 1.
+Nhưng khi chuyển sang **giai đoạn sinh token (decode)** — giai đoạn mỗi lần chỉ sinh thêm một token, kiến trúc vẫn chủ yếu sử dụng đường GEMM dùng chung cho trường hợp batch bằng 1.
 
 `Batch-1` nghĩa rất đơn giản:
 
@@ -349,7 +349,7 @@ các bước giải mã trọng số lượng tử hóa
 
 Nếu cách chia không phù hợp, GPU có thể rơi vào trạng thái:
 
-> **under-utilization — phần cứng có tài nguyên nhưng không được cung cấp công việc theo cách đủ hiệu quả để sử dụng chúng.**
+> **không tận dụng hết phần cứng (under-utilization)** — phần cứng có tài nguyên nhưng không được cung cấp công việc theo cách đủ hiệu quả để sử dụng chúng.
 
 Đây là lúc một thuật ngữ dài xuất hiện trong tài liệu nghiên cứu:
 
@@ -458,7 +458,7 @@ Ví dụ, FlashDecoding++ cho thấy các phép nhân “phẳng” trong giai �
 
 MARLIN cho thấy phép nhân ma trận với trọng số ít bit trong autoregressive suy luận cần scheduling, pipelining và cách giải mã trọng số được thiết kế cùng nhau.
 
-`Pipelining — đường ống xử lý` nghĩa là:
+**xử lý theo đường ống (pipelining)** nghĩa là:
 
 > **chồng các giai đoạn đọc dữ liệu, giải mã và tính toán lên nhau thay vì luôn chờ bước trước hoàn tất toàn bộ mới bắt đầu bước sau.**
 
@@ -484,7 +484,7 @@ Chúng chỉ nói:
 
 Từ evidence của ArcLLM và các nghiên cứu công khai, hypothesis đầu tiên được đặt tên:
 
-> **SA-H1 — giai đoạn sinh token-Specialized Packed-Quant Executor.**
+> **SA-H1 — bộ thực thi lượng tử đóng gói chuyên cho sinh token (Decode-Specialized Packed-Quant Executor).**
 
 Nói bằng tiếng Việt:
 
@@ -508,7 +508,7 @@ Câu hỏi rất hẹp:
 
 ## Có phải chỉ cần gộp nhiều chương trình GPU lại?
 
-Trong hệ thực thi, **chương trình GPU gộp phép tính — gộp chương trình GPU** là cách đưa hai hoặc nhiều công việc tính toán liên quan vào cùng một chương trình GPU GPU thay vì chạy chúng thành các chương trình GPU tách rời.
+Trong hệ thực thi, **chương trình GPU đã gộp (fused kernel)** là cách đưa hai hoặc nhiều công việc tính toán liên quan vào cùng một chương trình GPU GPU thay vì chạy chúng thành các chương trình GPU tách rời.
 
 Ví dụ:
 
@@ -798,7 +798,7 @@ Nhưng chương trình GPU mới vẫn chưa được phép xuất hiện.
 
 Đó là vai trò của:
 
-> **SA0 — bước kiểm tra nguyên nhân và khả năng thực hiện trước khi đầu tư vào triển khai.**
+> **SA0 — bước kiểm tra nguyên nhân và khả năng thực hiện trước khi đầu tư triển khai (causal/capability qualification).**
 
 SA0 không xác nhận rằng kiến trúc mới nhanh hơn.
 
@@ -855,9 +855,9 @@ rồi tự giả định những thứ đó tồn tại.
 
 Vì vậy SA0 có một bước riêng:
 
-> **SA0-CAP — kiểm tra khả năng phần cứng của SA0.**
+> **SA0-CAP — kiểm tra khả năng phần cứng (capability check).**
 
-`CAP` ở đây là viết tắt của **capability — khả năng phần cứng có thể cung cấp**.
+`CAP` ở đây là viết tắt của **khả năng phần cứng (capability)**.
 
 Trong tài liệu GPU và giao diện lập trình, **thao tác nền tảng (primitive)** thường được dùng cho những khả năng cơ bản mà phần cứng hoặc API cung cấp để các phép tính lớn hơn xây lên trên đó. Ví dụ một loại thao tác theo nhóm lane, một kiểu dữ liệu số học hay một phép toán ma trận chuyên biệt đều có thể được xem là primitive ở mức này.
 
