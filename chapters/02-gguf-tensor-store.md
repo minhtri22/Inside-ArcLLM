@@ -1,55 +1,31 @@
-# Chương 2 — GGUF không còn là một file, nó trở thành tensor store
+# Chương 2 — Bên trong tệp mô hình có gì? (GGUF)
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Tệp mô hình
+>    ↓
+> [ các khối số + cách chúng được lưu ]
+>    ↓
+> Hệ thực thi
+>    ↓
+> Bộ nhớ / CPU / GPU
 > ```
->
-> ▶ **Đang mở ở chương này:** model file / tensor.
 
 
-> **Câu hỏi của chương:** Một model có hàng tỷ con số được đặt trong file như thế nào, và runtime có phải bung tất cả chúng ra trước khi dùng không?
+> **Câu hỏi của chương:** Một mô hình có hàng tỷ con số được đặt trong file như thế nào, và hệ thực thi có phải bung tất cả chúng ra trước khi dùng không?
 
-Ở cuối Chương 1, ArcLLM đã làm được một việc rất cơ bản nhưng quan trọng: xác nhận đúng file model, đọc được định dạng GGUF và nhìn thấy bên trong có **338 tensor**.
+Ở cuối Chương 1, ArcLLM đã làm được một việc rất cơ bản nhưng quan trọng: xác nhận đúng file mô hình, đọc được định dạng GGUF và nhìn thấy bên trong có **338 khối số**.
 
-Con số 338 nói một điều đơn giản: file model không phải một khối bí ẩn duy nhất. Bên trong nó có nhiều “gói dữ liệu”, mỗi gói có tên, hình dạng, kiểu lưu trữ và vị trí riêng.
+Con số 338 nói một điều đơn giản: file mô hình không phải một khối bí ẩn duy nhất. Bên trong nó có nhiều “gói dữ liệu”, mỗi gói có tên, hình dạng, kiểu lưu trữ và vị trí riêng.
 
 Chương này chỉ hỏi:
 
 > **Bên trong chiếc hộp có gì, từng món nằm ở đâu, và có thể lấy đúng món cần dùng mà không phải đổ toàn bộ hộp ra sàn hay không?**
 
-Ta vẫn chưa tính toán gì với model.
+Ta vẫn chưa tính toán gì với mô hình.
 
 Chưa cần GPU chạy một phép nhân nào.
 
@@ -57,17 +33,17 @@ Việc trước mắt chỉ là **mở chiếc hộp cho đúng cách**.
 
 ## GGUF giống một kho hàng có mục lục
 
-**GGUF là viết tắt của GGML Universal File** — một định dạng file nhị phân trong hệ sinh thái GGML, được dùng để lưu model cùng những thông tin cần thiết để runtime có thể đọc và sử dụng nó.
+**GGUF là viết tắt của GGML Universal File** — một định dạng file nhị phân trong hệ sinh thái GGML, được dùng để lưu mô hình cùng những thông tin cần thiết để hệ thực thi có thể đọc và sử dụng nó.
 
-Model mà ArcLLM dùng trong giai đoạn này được lưu trong một file **GGUF**.
+mô hình mà ArcLLM dùng trong giai đoạn này được lưu trong một file **GGUF**.
 
 Có thể hình dung GGUF giống một kho hàng được sắp xếp khá cẩn thận.
 
-Ở đầu kho có phần thông tin mô tả: đây là model thuộc kiến trúc nào, có bao nhiêu tensor, một số thông số chung là gì.
+Ở đầu kho có phần thông tin mô tả: đây là mô hình thuộc kiến trúc nào, có bao nhiêu khối số, một số thông số chung là gì.
 
-Sau đó là một danh mục cho biết từng tensor tên gì, có kích thước ra sao, dùng kiểu dữ liệu nào và nằm ở vị trí nào trong file.
+Sau đó là một danh mục cho biết từng khối số tên gì, có kích thước ra sao, dùng kiểu dữ liệu nào và nằm ở vị trí nào trong file.
 
-Cuối cùng mới tới phần “hàng thật”: những byte chứa dữ liệu của model.
+Cuối cùng mới tới phần “hàng thật”: những byte chứa dữ liệu của mô hình.
 
 Có thể hình dung:
 
@@ -87,7 +63,7 @@ FILE GGUF
 └──────────────────────────────┘
 ```
 
-**Metadata** đơn giản là “dữ liệu mô tả dữ liệu”.
+**thông tin mô tả** đơn giản là “dữ liệu mô tả dữ liệu”.
 
 Nếu một thùng hàng có nhãn:
 
@@ -97,25 +73,25 @@ Loại hàng: dễ vỡ
 Kho: số 3
 ```
 
-thì những dòng trên nhãn là metadata.
+thì những dòng trên nhãn là thông tin mô tả.
 
 Còn những món thực sự nằm trong thùng mới là dữ liệu chính.
 
 GGUF cũng gần như vậy.
 
-Nhờ có phần mô tả này, runtime không phải nhìn vào byte thứ một triệu trong file rồi đoán:
+Nhờ có phần mô tả này, hệ thực thi không phải nhìn vào byte thứ một triệu trong file rồi đoán:
 
-> “Không biết số này thuộc phần nào của model?”
+> “Không biết số này thuộc phần nào của mô hình?”
 
 Nó có một bản đồ.
 
-## Tensor thực ra là gì?
+## khối số thực ra là gì?
 
-Ở chương trước, tôi tạm gọi tensor là “một bảng số”.
+Ở chương trước, tôi tạm gọi khối số là “một bảng số”.
 
 Bây giờ ta có thể làm rõ hơn một chút.
 
-Trong quá trình huấn luyện, model học bằng cách điều chỉnh rất nhiều con số. Những con số đã học ấy thường được gọi là **weights — trọng số**.
+Trong quá trình huấn luyện, mô hình học bằng cách điều chỉnh rất nhiều con số. Những con số đã học ấy thường được gọi là **trọng số — trọng số**.
 
 Nếu hàng tỷ con số chỉ nằm trong một danh sách dài vô tận, việc quản lý chúng sẽ rất khó.
 
@@ -134,19 +110,19 @@ Một bảng hai chiều có thể là:
 [ 1.1   0.4 ]
 ```
 
-**Tensor** là cách gọi tổng quát cho những khối số như vậy, kể cả khi chúng có nhiều hơn hai chiều.
+**khối số** là cách gọi tổng quát cho những khối số như vậy, kể cả khi chúng có nhiều hơn hai chiều.
 
 Người đọc chưa cần học đại số tuyến tính để tiếp tục.
 
 Hiện tại chỉ cần nhớ:
 
-> **Tensor là một khối số có hình dạng xác định; model sử dụng những khối số đó trong các phép tính.**
+> **khối số là một khối số có hình dạng xác định; mô hình sử dụng những khối số đó trong các phép tính.**
 
-Ở P1 — bước tiếp theo sau P0 — ArcLLM chưa cần hiểu toàn bộ ý nghĩa toán học của từng tensor.
+Ở P1 — bước tiếp theo sau P0 — ArcLLM chưa cần hiểu toàn bộ ý nghĩa toán học của từng khối số.
 
 Nhiệm vụ trước mắt đơn giản hơn nhiều:
 
-> **Đếm đúng chúng và biết chính xác mỗi tensor nằm ở đâu trong file.**
+> **Đếm đúng chúng và biết chính xác mỗi khối số nằm ở đâu trong file.**
 
 Kết quả của file đã được khóa từ P0 là:
 
@@ -195,9 +171,9 @@ Giả sử ta có 256 giá trị và lưu tất cả bằng F32:
 
 Chỉ 256 con số đã cần 1.024 byte.
 
-Với một model có hàng tỷ trọng số, con số ấy tăng lên rất nhanh.
+Với một mô hình có hàng tỷ trọng số, con số ấy tăng lên rất nhanh.
 
-Đó là một trong những lý do người ta sử dụng **quantization — lượng tử hóa**.
+Đó là một trong những lý do người ta sử dụng **lượng tử hóa — lượng tử hóa**.
 
 Ý tưởng cơ bản không quá khó.
 
@@ -251,7 +227,7 @@ Khoảng cách vẫn rất lớn.
 
 Đó là lý do giữ trọng số trong dạng đã được lượng tử hóa có giá trị.
 
-## Tại sao không bung toàn bộ model thành F32 ngay từ đầu?
+## Tại sao không bung toàn bộ mô hình thành F32 ngay từ đầu?
 
 Hãy tưởng tượng bạn mua một chiếc tủ được đóng trong vài hộp phẳng.
 
@@ -261,7 +237,7 @@ Cách khác là giữ mọi thứ gọn trong dạng đóng gói, và lấy đú
 
 P1 chọn tư duy thứ hai.
 
-Nếu Q4_K trong file đã được đóng gói rất gọn, runtime không nên bắt đầu bằng việc mở toàn bộ chúng thành F32 rồi tạo thêm một bản sao lớn trong RAM.
+Nếu Q4_K trong file đã được đóng gói rất gọn, hệ thực thi không nên bắt đầu bằng việc mở toàn bộ chúng thành F32 rồi tạo thêm một bản sao lớn trong RAM.
 
 ArcLLM muốn:
 
@@ -269,7 +245,7 @@ ArcLLM muốn:
 
 Đây là lúc xuất hiện hai khái niệm mới:
 
-**memory mapping** và **zero-copy view**.
+**bộ nhớ mapping** và **zero-copy view**.
 
 Tên nghe khá kỹ thuật, nhưng ý tưởng lại rất đời thường.
 
@@ -289,23 +265,23 @@ Bắt đầu sử dụng
 
 Cách đó có thể hoạt động.
 
-Nhưng với file model lớn, nó có nghĩa ta vừa có file gốc, vừa tạo thêm một vùng nhớ lớn để chứa bản sao của file.
+Nhưng với file mô hình lớn, nó có nghĩa ta vừa có file gốc, vừa tạo thêm một vùng nhớ lớn để chứa bản sao của file.
 
-P1 dùng một cơ chế của hệ điều hành gọi là **memory mapping — ánh xạ file vào không gian bộ nhớ của chương trình**.
+P1 dùng một cơ chế của hệ điều hành gọi là **bộ nhớ mapping — ánh xạ file vào không gian bộ nhớ của chương trình**.
 
 Có thể hình dung hệ điều hành mở cho ArcLLM một “cửa sổ” nhìn vào file.
 
-Runtime có thể truy cập một vùng trong file gần giống như đang truy cập bộ nhớ, thay vì tự đọc toàn bộ file rồi chép nó sang một buffer khác.
+hệ thực thi có thể truy cập một vùng trong file gần giống như đang truy cập bộ nhớ, thay vì tự đọc toàn bộ file rồi chép nó sang một vùng nhớ khác.
 
 Trong P1, cửa sổ này là **read-only — chỉ đọc**.
 
-ArcLLM không được phép dùng nó để sửa file model.
+ArcLLM không được phép dùng nó để sửa file mô hình.
 
-Ánh xạ chỉ đọc giúp tránh ghi đè model gốc và cho phép dùng GGUF như một:
+Ánh xạ chỉ đọc giúp tránh ghi đè mô hình gốc và cho phép dùng GGUF như một:
 
-> **tensor store — kho tensor.**
+> **kho các khối số — kho khối số.**
 
-Runtime biết tensor mình cần nằm ở đâu, rồi truy cập đúng vùng byte tương ứng.
+hệ thực thi biết khối số mình cần nằm ở đâu, rồi truy cập đúng vùng byte tương ứng.
 
 P1 gọi cách truy cập này là **direct zero-copy view**.
 
@@ -317,13 +293,13 @@ Hệ điều hành vẫn quản lý việc đưa những phần dữ liệu cầ
 
 “Zero-copy” trong phạm vi P1 có nghĩa hẹp hơn:
 
-> **ArcLLM không tự tạo thêm một bản sao toàn bộ payload chỉ để có thể đọc tensor.**
+> **ArcLLM không tự tạo thêm một bản sao toàn bộ payload chỉ để có thể đọc khối số.**
 
 Đó mới là điều P1 thực sự chứng minh.
 
-## Biết tensor nằm ở đâu vẫn chưa đủ
+## Biết khối số nằm ở đâu vẫn chưa đủ
 
-Giả sử danh mục nói một tensor bắt đầu tại byte số 1.000 và dài 144 byte.
+Giả sử danh mục nói một khối số bắt đầu tại byte số 1.000 và dài 144 byte.
 
 Ta có:
 
@@ -333,7 +309,7 @@ Bắt đầu : 1.000
 Kết thúc: 1.144
 ```
 
-Nếu tensor tiếp theo bắt đầu ở byte 1.144, hai tensor đứng sát nhau nhưng không đè lên nhau.
+Nếu khối số tiếp theo bắt đầu ở byte 1.144, hai khối số đứng sát nhau nhưng không đè lên nhau.
 
 ```text
 Tensor A
@@ -343,7 +319,7 @@ Tensor B
                     1.144 ──────────
 ```
 
-Nhưng nếu tensor B lại bắt đầu ở 1.130:
+Nhưng nếu khối số B lại bắt đầu ở 1.130:
 
 ```text
 Tensor A
@@ -352,7 +328,7 @@ Tensor A
 Tensor B        1.130 ──────────
 ```
 
-một đoạn byte đang bị cả hai tensor cùng nhận là của mình.
+một đoạn byte đang bị cả hai khối số cùng nhận là của mình.
 
 Đó gọi là **overlap — chồng lấn**.
 
@@ -360,11 +336,11 @@ P1 vì vậy kiểm tra hai điều.
 
 Thứ nhất là **bounds — giới hạn**.
 
-Nếu file kết thúc ở byte 10.000 nhưng một tensor tuyên bố dữ liệu của nó kéo dài tới byte 10.200, rõ ràng có vấn đề.
+Nếu file kết thúc ở byte 10.000 nhưng một khối số tuyên bố dữ liệu của nó kéo dài tới byte 10.200, rõ ràng có vấn đề.
 
 Thứ hai là overlap.
 
-Hai tensor không được vô tình trỏ vào những vùng dữ liệu chồng lên nhau.
+Hai khối số không được vô tình trỏ vào những vùng dữ liệu chồng lên nhau.
 
 Kết quả P1 cho file thật:
 
@@ -376,7 +352,7 @@ Kết quả P1 cho file thật:
 
 Điều này không hào nhoáng.
 
-Nhưng trước khi cho GPU tính hàng triệu phép toán, runtime phải chắc rằng mình đang đọc đúng byte.
+Nhưng trước khi cho GPU tính hàng triệu phép toán, hệ thực thi phải chắc rằng mình đang đọc đúng byte.
 
 Nếu địa chỉ sai, một chương trình chạy nhanh hơn chỉ có nghĩa là:
 
@@ -388,7 +364,7 @@ Một mục tiêu quan trọng khác của P1 là xác nhận ArcLLM có thể �
 
 P1 đã PASS điều đó.
 
-Nói đơn giản, runtime có thể đi theo chuỗi:
+Nói đơn giản, hệ thực thi có thể đi theo chuỗi:
 
 ```text
 Cần tensor nào?
@@ -402,7 +378,7 @@ Kiểu dữ liệu là Q4_K
 Truy cập trực tiếp vùng byte đó
 ```
 
-mà chưa cần mở toàn bộ tensor thành một mảng F32 mới.
+mà chưa cần mở toàn bộ khối số thành một mảng F32 mới.
 
 Điều này đặt nền cho những bước sau.
 
@@ -410,11 +386,11 @@ Nhưng ta phải giữ ranh giới kết luận thật rõ.
 
 P1 **chưa chứng minh GPU tính được Q4_K**.
 
-P1 chưa chứng minh model tạo ra câu trả lời đúng.
+P1 chưa chứng minh mô hình tạo ra câu trả lời đúng.
 
 P1 chưa đo tốc độ.
 
-P1 cũng chưa chứng minh toàn bộ model có thể chạy.
+P1 cũng chưa chứng minh toàn bộ mô hình có thể chạy.
 
 Nó chỉ chứng minh một điều:
 
@@ -438,7 +414,7 @@ Tại sao?
 
 Bởi câu hỏi P1 là:
 
-> “Ta có thể ánh xạ GGUF, xác định đúng từng tensor và truy cập trực tiếp Q4_K hay không?”
+> “Ta có thể ánh xạ GGUF, xác định đúng từng khối số và truy cập trực tiếp Q4_K hay không?”
 
 Ở hai lần lỗi trước, câu hỏi đó chưa hề được đem ra kiểm tra.
 
@@ -478,9 +454,9 @@ Muốn kết luận điều gì, trước hết phải chắc rằng thứ cần
 
 ## P1 đã chứng minh được gì?
 
-Đến cuối P1, ArcLLM biết rằng file GGUF đã khóa từ P0 có thể được dùng như một **tensor store chỉ đọc**.
+Đến cuối P1, ArcLLM biết rằng file GGUF đã khóa từ P0 có thể được dùng như một **kho các khối số chỉ đọc**.
 
-338 tensor được nhận diện:
+338 khối số được nhận diện:
 
 ```text
 141 F32
@@ -490,7 +466,7 @@ Muốn kết luận điều gì, trước hết phải chắc rằng thứ cần
 
 Tất cả vùng byte đều nằm trong giới hạn file.
 
-Không tensor nào chồng lên tensor khác.
+Không khối số nào chồng lên khối số khác.
 
 Dữ liệu Q4_K có thể được truy cập trực tiếp trong khi vẫn giữ dạng packed.
 
@@ -516,8 +492,8 @@ Câu hỏi tiếp theo vì thế trở nên tự nhiên:
 
 ### Nhớ 3 điều
 
-1. **GGUF không chỉ là một “file model”.** Nó chứa thông tin mô tả, danh mục tensor và dữ liệu giúp runtime biết chính xác từng tensor nằm ở đâu.
-2. **Quantization giúp lưu trọng số gọn hơn.** P1 giữ Q4_K và Q6_K ở dạng đóng gói thay vì mở toàn bộ thành F32 ngay từ đầu.
+1. **GGUF không chỉ là một “file mô hình”.** Nó chứa thông tin mô tả, danh mục khối số và dữ liệu giúp hệ thực thi biết chính xác từng khối số nằm ở đâu.
+2. **lượng tử hóa giúp lưu trọng số gọn hơn.** P1 giữ Q4_K và Q6_K ở dạng đóng gói thay vì mở toàn bộ thành F32 ngay từ đầu.
 3. **Script hỏng hoặc build hỏng không tự động là FAIL của giả thuyết.** Chỉ khi phép thử thực sự chạy, evidence mới được quyền trả lời câu hỏi.
 
 **Chương 3 — Xây phần lõi Vulkan**
