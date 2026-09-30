@@ -16,17 +16,17 @@
 
 Ở cuối Chương 6, ArcLLM đã đi xuyên toàn bộ decoder.
 
-Một token ID được biến thành phép nhúng, đi qua 28 lớp giải mã, qua phép chuẩn hóa cuối, tới LM head và tạo ra điểm dự đoán — **điểm số mà mô hình gán cho các token có thể đứng tiếp theo**.
+Một token ID được biến thành phép nhúng, đi qua 28 lớp giải mã, qua phép chuẩn hóa cuối, tới lớp tạo điểm đầu ra (LM head) và tạo ra điểm dự đoán — **điểm số mà mô hình gán cho các token có thể đứng tiếp theo**.
 
 CPU và GPU thậm chí còn đồng ý về token có điểm cao nhất.
 
 Nhưng P5 vẫn chỉ giống như chụp một bức ảnh.
 
-mô hình nhận một đầu vào.
+Mô hình nhận một đầu vào.
 
-mô hình tính.
+Mô hình tính.
 
-mô hình cho một đầu ra.
+Mô hình cho một đầu ra.
 
 Trong thực tế, mô hình ngôn ngữ phải làm điều gì đó động hơn:
 
@@ -180,19 +180,19 @@ token mới
 
 P6 là lần đầu ArcLLM kiểm tra con đường này xuyên qua toàn bộ 28 lớp.
 
-## Hai pha: prefill và decode
+## Hai giai đoạn: xử lý đầu vào (giai đoạn xử lý đầu vào) và sinh token (giai đoạn sinh token)
 
 Khi một người gửi cho mô hình một prompt, ví dụ:
 
 > “Hôm nay trời…”
 
-mô hình trước hết phải xử lý những token đã có.
+Mô hình trước hết phải xử lý những token đã có.
 
-Giai đoạn đó thường được gọi là **prefill — pha xử lý toàn bộ các token đầu vào ban đầu để xây trạng thái cần thiết cho việc sinh tiếp**.
+Giai đoạn đó thường được gọi là **giai đoạn xử lý đầu vào — pha xử lý toàn bộ các token đầu vào ban đầu để xây trạng thái cần thiết cho việc sinh tiếp**.
 
 Sau đó mô hình bắt đầu sinh từng token mới.
 
-Mỗi bước như vậy được gọi là **decode — pha xử lý token mới nhất dựa trên trạng thái đã tích lũy trước đó**.
+Mỗi bước như vậy được gọi là **giai đoạn sinh token — pha xử lý token mới nhất dựa trên trạng thái đã tích lũy trước đó**.
 
 Hình dung:
 
@@ -227,7 +227,7 @@ sau đó
 
 Không cần thêm ý nghĩa nào phức tạp hơn.
 
-## Prompt của P6 không phải câu tiếng Việt
+## Đầu vào của P6 không phải một câu tiếng Việt
 
 P6 không dùng một câu tự nhiên để làm thí nghiệm.
 
@@ -239,7 +239,7 @@ Nó khóa trực tiếp các token ID:
 
 Đây là một lựa chọn cố ý.
 
-P6 không nghiên cứu tokenizer.
+P6 không nghiên cứu bộ tách và mã hóa văn bản.
 
 Không nghiên cứu chất lượng câu trả lời.
 
@@ -267,9 +267,9 @@ Các giá trị này không phải thông số tối ưu cho mọi mô hình.
 
 Chúng chỉ là contract của phép thử P6.
 
-## Prefill bắt đầu ghi “trí nhớ”
+## Giai đoạn xử lý đầu vào bắt đầu ghi “trí nhớ”
 
-Trong pha prefill, bốn token đầu vào cùng đi qua mô hình.
+Trong pha giai đoạn xử lý đầu vào, bốn token đầu vào cùng đi qua mô hình.
 
 Ở mỗi một trong 28 lớp, cơ chế chú ý tạo ra K và V tương ứng.
 
@@ -297,7 +297,7 @@ K cache: [...]
 V cache: [...]
 ```
 
-Khi prefill kết thúc, những cuốn sổ này vẫn còn ở GPU.
+Khi giai đoạn xử lý đầu vào kết thúc, những cuốn sổ này vẫn còn ở GPU.
 
 Không bị xóa.
 
@@ -309,15 +309,15 @@ Không bị đọc ngược về CPU.
 
 Ở P6, bây giờ cả **trạng thái phát sinh theo chuỗi token** cũng bắt đầu được giữ lại.
 
-## Decode đọc lại chính bộ nhớ đệm ấy
+## Giai đoạn sinh token đọc lại chính bộ nhớ đệm ấy
 
-Sau prefill, mô hình có điểm dự đoán.
+Sau giai đoạn xử lý đầu vào, mô hình có điểm dự đoán.
 
 ArcLLM đọc điểm dự đoán về phía CPU để tìm token đứng đầu.
 
 P6 cố tình dùng cách đơn giản và hoàn toàn xác định:
 
-**greedy argmax — chọn token có logit cao nhất.**
+**chọn token có điểm cao nhất argmax — chọn token có logit cao nhất.**
 
 P6 chỉ cần một quy tắc cố định để trả lời câu hỏi tính đúng.
 
@@ -339,11 +339,11 @@ token mới
 decode trên GPU
 ```
 
-Nhưng điểm quan trọng nhất là trong bước decode:
+Nhưng điểm quan trọng nhất là trong bước giai đoạn sinh token:
 
-> **cơ chế chú ý đọc trực tiếp K/V bộ nhớ đệm mà prefill vừa để lại trên GPU.**
+> **cơ chế chú ý đọc trực tiếp bộ nhớ đệm K/V mà giai đoạn xử lý đầu vào vừa để lại trên GPU.**
 
-Không có **intermediate host round-trip** đối với bộ nhớ đệm KV.
+Không có **vòng đi-về trung gian qua CPU** đối với bộ nhớ đệm KV.
 
 CPU không đọc K/V.
 
@@ -392,7 +392,7 @@ Hai chuyện không giống nhau.
 
 P6 muốn chứng minh trạng thái cơ chế chú ý có thể ở lại GPU xuyên qua các bước generation, chứ chưa cố loại CPU khỏi mọi phần của hệ thực thi.
 
-## CPU reference cũng có bộ nhớ đệm KV riêng
+## Cách tính tham chiếu trên CPU cũng có bộ nhớ đệm KV riêng
 
 Làm sao biết bộ nhớ đệm GPU đúng?
 
@@ -451,7 +451,7 @@ Nhắc lại:
 - **max_abs — sai số tuyệt đối lớn nhất**;
 - **RMSE — căn trung bình bình phương sai số, phản ánh sai lệch tổng thể của dãy**.
 
-Ngoài ra token greedy — **token đứng đầu theo logit** — phải giống hệt giữa CPU và GPU.
+Ngoài ra token chọn token có điểm cao nhất — **token đứng đầu theo logit** — phải giống hệt giữa CPU và GPU.
 
 Sau đó P6 còn kiểm tra trực tiếp phần K và V bộ nhớ đệm đã thật sự được sử dụng.
 
@@ -481,7 +481,7 @@ trạng thái được giữ lại bên trong
 
 Đây là một gate mạnh hơn nhiều so với chỉ nhìn câu trả lời cuối.
 
-## Token đầu tiên sau prefill
+## Token đầu tiên sau giai đoạn xử lý đầu vào
 
 P6 chạy thật.
 
@@ -499,7 +499,7 @@ CPU và GPU cùng chọn token:
 
 Đây là output token đầu tiên của phép thử.
 
-Prefill điểm dự đoán có:
+giai đoạn xử lý đầu vào điểm dự đoán có:
 
 ```text
 max_abs
@@ -511,11 +511,11 @@ RMSE
 
 Cả hai nằm trong gate đã khóa.
 
-Token `6228` sau đó được đưa trở lại để thực hiện bước decode tiếp theo.
+Token `6228` sau đó được đưa trở lại để thực hiện bước giai đoạn sinh token tiếp theo.
 
 ## Và token tiếp theo cũng khớp
 
-Decode sử dụng chính bộ nhớ đệm KV đã được tạo ở prefill.
+giai đoạn sinh token sử dụng chính bộ nhớ đệm KV đã được tạo ở giai đoạn xử lý đầu vào.
 
 Sau bước này, CPU và GPU tiếp tục đồng ý:
 
@@ -531,7 +531,7 @@ Toàn bộ hai token đầu ra của bài thử vì vậy là:
 
 Đây là **exact agreement — khớp chính xác token ID**, không phải chỉ gần nhau về điểm số.
 
-Decode điểm dự đoán cũng PASS:
+giai đoạn sinh token điểm dự đoán cũng ĐẠT (PASS):
 
 ```text
 max_abs
@@ -618,7 +618,7 @@ KV CACHE
 
 Đây là lần đầu kiến trúc hệ thực thi bắt đầu có “trí nhớ theo phiên chạy”.
 
-## P6 PASS thực sự cho phép nói gì?
+## P6 ĐẠT thực sự cho phép nói gì?
 
 Tóm tắt:
 
@@ -660,7 +660,7 @@ V cache
 → PASS
 ```
 
-P6 vì vậy CLOSED với PASS.
+P6 vì vậy CLOSED với ĐẠT (PASS).
 
 Nhưng ranh giới vẫn phải giữ.
 
@@ -676,13 +676,13 @@ Và P6 chưa phải đường chạy thực tế.
 
 Điều nó chứng minh là:
 
-> **ArcLLM đã có một đường generation tối thiểu trong đó prefill tạo bộ nhớ đệm KV trên GPU, decode tái sử dụng trực tiếp bộ nhớ đệm đó, CPU và GPU cho cùng các token greedy, và bản thân K/V bộ nhớ đệm cũng vượt qua các cổng tính đúng đã khóa.**
+> **ArcLLM đã có một đường generation tối thiểu trong đó giai đoạn xử lý đầu vào tạo bộ nhớ đệm KV trên GPU, giai đoạn sinh token tái sử dụng trực tiếp bộ nhớ đệm đó, CPU và GPU cho cùng các token chọn token có điểm cao nhất, và bản thân bộ nhớ đệm K/V cũng vượt qua các cổng tính đúng đã khóa.**
 
 Lần đầu tiên trong hành trình này, mô hình không chỉ tính một lượt.
 
 Nó đã **giữ trạng thái từ quá khứ để tính bước tiếp theo**.
 
-## Từ proof sang đường chạy thực tế hơn
+## Từ bằng chứng ban đầu sang đường chạy thực tế hơn
 
 P0 tới P6 đã trả lời một chuỗi câu hỏi ngày càng lớn:
 
@@ -714,12 +714,12 @@ Câu hỏi tiếp theo thay đổi:
 
 ### Nhớ 3 điều
 
-1. **Prefill — xử lý prompt ban đầu — tạo K/V; decode — xử lý token mới — tái sử dụng K/V đã có.** Đó là lý do bộ nhớ đệm KV tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
-2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có intermediate host round-trip đối với K/V.
-3. **P6 PASS là generation-tính đúng PASS, chưa phải performance hay production PASS.** Hai token greedy `[6228, 17]`, điểm dự đoán và chính K/V bộ nhớ đệm đều vượt qua các gate đã khóa.
+1. **giai đoạn xử lý đầu vào — xử lý prompt ban đầu — tạo K/V; giai đoạn sinh token — xử lý token mới — tái sử dụng K/V đã có.** Đó là lý do bộ nhớ đệm KV tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
+2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có vòng đi-về trung gian qua CPU đối với K/V.
+3. **P6 ĐẠT (PASS) là generation-tính đúng ĐẠT (PASS), chưa phải hiệu năng hay production ĐẠT (PASS).** Hai token chọn token có điểm cao nhất `[6228, 17]`, điểm dự đoán và chính bộ nhớ đệm K/V đều vượt qua các gate đã khóa.
 
 **Chương 8 — đường chạy thực tế không đến từ một chương trình GPU thần kỳ**
 
-hệ thực thi giờ đã có thể nhớ.
+Hệ thực thi giờ đã có thể nhớ.
 
 Bước tiếp theo là làm cho con đường đó giống một hệ thực thi sử dụng thực tế hơn.
