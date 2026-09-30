@@ -19,7 +19,7 @@
 
 Ở cuối Chương 3, ArcLLM đã dựng được phần nền của một “nhà máy GPU”.
 
-hệ thực thi đã mở được thiết bị Vulkan, có hàng đợi để giao việc, có vùng nhớ giữ dữ liệu mô hình, có vùng nhớ tạm để làm việc, và quan trọng nhất: ArcLLM đã gửi một lệnh thật xuống GPU rồi xác nhận GPU thực hiện nó.
+Hệ thực thi đã mở được thiết bị Vulkan, có hàng đợi để giao việc, có vùng nhớ giữ dữ liệu mô hình, có vùng nhớ tạm để làm việc, và quan trọng nhất: ArcLLM đã gửi một lệnh thật xuống GPU rồi xác nhận GPU thực hiện nó.
 
 Nhưng có một khoảng cách rất lớn giữa:
 
@@ -39,7 +39,7 @@ ArcLLM không làm vậy.
 
 Thay vào đó, dự án tách mô hình thành những phép tính nhỏ hơn, kiểm tra từng phép một, rồi chỉ khi những viên gạch đó đủ đáng tin mới bắt đầu xây cả bức tường.
 
-## mô hình lớn nhưng được tạo thành từ những việc nhỏ hơn
+## Mô hình lớn nhưng được tạo thành từ những việc nhỏ hơn
 
 Một mô hình ngôn ngữ có thể chứa hàng tỷ trọng số và rất nhiều lớp.
 
@@ -218,7 +218,7 @@ CPU cũng tính độc lập.
 
 Hai kết quả được so với nhau.
 
-Gate — **cổng kiểm tra** — đạt PASS.
+Gate — **cổng kiểm tra** — đạt ĐẠT (PASS).
 
 Đây là lần đầu trong chuỗi P3 mà một phép toán thật của mô hình cùng trọng số thật đi qua Vulkan và vượt qua kiểm tra số học.
 
@@ -264,7 +264,7 @@ kết quả
 
 Nếu P1 chỉ chứng minh:
 
-> “Ta nhìn thấy được Q4_K trong file.”
+> “Ta nhìn thấy được Q4_K trong tệp.”
 
 thì P3 bắt đầu chứng minh:
 
@@ -374,7 +374,7 @@ Hãy lấy một câu đơn giản:
 
 Từ “nó” có thể cần liên hệ với một phần xuất hiện trước đó.
 
-mô hình không làm việc này bằng cách “hiểu như con người” theo đúng nghĩa đời thường. Bên dưới vẫn là những phép toán tạo điểm số, chuẩn hóa chúng rồi kết hợp thông tin.
+Mô hình không làm việc này bằng cách “hiểu như con người” theo đúng nghĩa đời thường. Bên dưới vẫn là những phép toán tạo điểm số, chuẩn hóa chúng rồi kết hợp thông tin.
 
 P3 sử dụng một bài kiểm tra **bounded GQA cơ chế chú ý**.
 
@@ -386,7 +386,7 @@ Ta tách cụm này ra:
 
 Từ “bounded” rất quan trọng.
 
-Một phép cơ chế chú ý nhỏ PASS không có nghĩa:
+Một phép cơ chế chú ý nhỏ ĐẠT (PASS) không có nghĩa:
 
 > “cơ chế chú ý của toàn mô hình chắc chắn đúng.”
 
@@ -394,7 +394,7 @@ Nó chỉ cho phép nói:
 
 > **Cơ chế đã được hiện thực hóa đủ đúng trong phạm vi test đã khóa để được dùng làm viên gạch tiếp theo.**
 
-## SwiGLU và residual: biến đổi rồi cộng trở lại
+## SwiGLU và đường cộng tắt (residual): biến đổi rồi cộng trở lại
 
 Một lớp giải mã còn có một nhánh thường được gọi là FFN — **Feed-Forward Network, nhánh biến đổi tín hiệu sau cơ chế chú ý**.
 
@@ -459,7 +459,7 @@ SwiGLU + residual
 → biến đổi qua nhánh FFN rồi cộng đường tắt
 ```
 
-Cả bảy gate đều PASS khi so với **independent CPU references — cách tính tham chiếu độc lập trên CPU**.
+Cả bảy gate đều ĐẠT (PASS) khi so với **independent CPU references — cách tính tham chiếu độc lập trên CPU**.
 
 Điều này quan trọng.
 
@@ -475,11 +475,11 @@ Một đống gạch tốt chưa phải một ngôi nhà.
 
 Bước tiếp theo phải kiểm tra xem khi ghép chúng theo đúng thứ tự của mô hình, toàn bộ một lớp có còn đúng hay không.
 
-## Hai lần dừng trước đó vẫn không phải chương trình GPU FAIL
+## Hai lần dừng trước đó vẫn chưa phải kết quả KHÔNG ĐẠT của phép tính GPU
 
 P3 cũng từng có những lần chưa tới được phép thử thật.
 
-Một lần package thiếu file cấu hình.
+Một lần package thiếu tệp cấu hình.
 
 Một lần khác shader đã compile nhưng quá trình build dừng vì những source cần thiết từ GGUF/kho các khối số chưa được đóng gói cùng.
 
@@ -497,7 +497,7 @@ không có verdict khoa học
 
 Sau khi phần đóng gói được sửa mà không thay đổi contract số học của P3, phép thử thật mới chạy.
 
-Khi đó bảy gate mới được adjudicate — **đánh giá theo tiêu chuẩn đã khóa** — là PASS.
+Khi đó bảy gate mới được adjudicate — **đánh giá theo tiêu chuẩn đã khóa** — là ĐẠT (PASS).
 
 Đây là lần thứ hai cuốn sách gặp cùng một nguyên tắc, và nó đáng để lặp lại:
 
@@ -539,7 +539,7 @@ Nhưng vẫn phải nhắc ngay điều P3 **chưa chứng minh**:
 - chưa chứng minh tốc độ;
 - chưa chứng minh mô hình end-to-end đúng.
 
-P3 PASS chỉ mở quyền đi sang câu hỏi mới:
+P3 ĐẠT (PASS) chỉ mở quyền đi sang câu hỏi mới:
 
 > **Nếu từng viên gạch đều đúng riêng lẻ, khi ghép chúng thành một lớp giải mã thật với trọng số thật, kết quả cuối lớp có còn đúng không?**
 
@@ -549,7 +549,7 @@ P3 PASS chỉ mở quyền đi sang câu hỏi mới:
 
 1. **chương trình GPU — chương trình tính toán nhỏ trên GPU — phải được kiểm tra riêng trước khi được tin tưởng trong một mô hình lớn.**
 2. **CPU reference — cách tính tham chiếu độc lập trên CPU — đóng vai trò “đáp án” để kiểm tra GPU, và ngưỡng sai số phải được khóa trước khi nhìn kết quả.**
-3. **P3 PASS là PASS của các phép tính nền tảng — những phép toán nền tảng — chứ chưa phải PASS của lớp giải mã hay toàn mô hình.**
+3. **P3 ĐẠT (PASS) là ĐẠT (PASS) của các phép tính nền tảng — những phép toán nền tảng — chứ chưa phải ĐẠT (PASS) của lớp giải mã hay toàn mô hình.**
 
 **Chương 5 — Một lớp giải mã hoàn chỉnh**
 
