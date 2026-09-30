@@ -33,7 +33,7 @@ Nhưng từ đây xuất hiện một vấn đề khác.
 
 Có rất nhiều cách chia công việc.
 
-Ta có thể chia theo hàng đầu ra, chia chiều K, thay kích thước nhóm GPU, gộp nhiều phép tính, dùng nhóm con GPU, thử cooperative matrix, thay cách giải mã trọng số hoặc kết hợp nhiều thay đổi cùng lúc.
+Ta có thể chia theo hàng đầu ra, chia chiều K, thay kích thước nhóm GPU, gộp nhiều phép tính, dùng nhóm con GPU, thử ma trận phối hợp (cooperative matrix), thay cách giải mã trọng số hoặc kết hợp nhiều thay đổi cùng lúc.
 
 AI có thể tiếp tục sinh thêm phương án gần như vô hạn.
 
@@ -147,7 +147,7 @@ Vì vậy không phải mọi ý tưởng AI sinh ra đều xứng đáng đư�
 
 ## E — Khám phá: được phép nghĩ rộng, nhưng chưa được tin
 
-**Mode E — Explore, chế độ khám phá** là nơi AI có thể phát huy khả năng mở rộng không gian ý tưởng.
+**chế độ E — Khám phá — Explore, chế độ khám phá** là nơi AI có thể phát huy khả năng mở rộng không gian ý tưởng.
 
 Ta có thể hỏi:
 
@@ -166,7 +166,7 @@ chia output thành tile
 
 dùng subgroup
 
-dùng cooperative matrix
+dùng ma trận phối hợp (cooperative matrix)
 
 gộp các phép chiếu
 
@@ -175,17 +175,17 @@ thay cách giải mã trọng số
 
 AI có thể đọc source, thống kê shape, tra khả năng phần cứng, đối chiếu bài báo khoa học và đưa ra nhiều cách phân rã.
 
-Nhưng Mode E có một ranh giới:
+Nhưng chế độ E — Khám phá có một ranh giới:
 
-> **Một ý tưởng xuất hiện trong Mode E mới chỉ là ứng viên. Nó chưa được quyền tiêu bằng chứng xác nhận.**
+> **Một ý tưởng xuất hiện trong chế độ E — Khám phá mới chỉ là ứng viên. Nó chưa được quyền tiêu bằng chứng xác nhận.**
 
-Mode E là nơi nghĩ rộng.
+chế độ E — Khám phá là nơi nghĩ rộng.
 
 Không phải nơi kết luận rộng.
 
 ## M — Kiểm tra cơ chế: giữ lại đúng một cơ chế
 
-Bước tiếp theo là **Mode M — Mechanism qualification, kiểm tra xem một cơ chế có đủ rõ để đáng thử hay không**.
+Bước tiếp theo là **chế độ M — Kiểm tra cơ chế — Mechanism qualification, kiểm tra xem một cơ chế có đủ rõ để đáng thử hay không**.
 
 Thay vì hỏi:
 
@@ -298,7 +298,7 @@ Không thử nhiều kích thước nhóm con GPU cùng lúc.
 
 Không thêm bước giải mã toàn bộ trọng số ra buffer khác.
 
-Đó chính là Mode M:
+Đó chính là chế độ M — Kiểm tra cơ chế:
 
 > **Giữ một cơ chế đủ hẹp để nếu kết quả thay đổi, ta còn biết thứ gì đã tạo ra thay đổi đó.**
 
@@ -591,13 +591,13 @@ Và vì triển khai trở nên rẻ, câu:
 
 rất dễ lặp mãi.
 
-Mode E và M ngăn điều đó.
+chế độ E — Khám phá và M ngăn điều đó.
 
 ```text
-Mode E
+chế độ E — Khám phá
 → được nghĩ rộng
 
-Mode M
+chế độ M — Kiểm tra cơ chế
 → phải khóa một cơ chế rõ ràng
 
 sau khi phép thử đã chạy
