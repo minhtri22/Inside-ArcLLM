@@ -23,11 +23,11 @@ Phần III kết thúc bằng một nguyên tắc quan trọng:
 
 Đó chính là điều ArcLLM làm.
 
-Sau khi gate/up đã được tăng tốc mạnh, bản đồ bottleneck cũ không còn đủ an toàn để dùng như hiện tại.
+Sau khi hai nhánh gate và up của FFN đã được tăng tốc mạnh, bản đồ nút thắt cũ không còn đủ an toàn để dùng như hiện tại.
 
 Một vùng khác bắt đầu đáng chú ý: **FFN-down Q4_K**.
 
-Trong mô hình 7B đang xét, có 14 layer mà phép `FFN-down` dùng trọng số Q4_K với hình dạng:
+Trong mô hình 7B đang xét, có 14 lớp mà phép `FFN-down` dùng trọng số Q4_K với hình dạng:
 
 ```text
 K    = 18944
@@ -51,7 +51,7 @@ mà còn nằm ở:
 
 ## Cách thực thi và cách biểu diễn dữ liệu là hai chuyện khác nhau
 
-**cách thực thi — cách thực thi** trả lời:
+**Cách thực thi (execution)** trả lời:
 
 > GPU chia công việc cho các đơn vị tính toán như thế nào?
 
@@ -76,7 +76,7 @@ Ví dụ đường cũ:
 
 Còn:
 
-> **cách biểu diễn dữ liệu — cách biểu diễn dữ liệu**
+> **Cách biểu diễn dữ liệu (representation)**
 
 trả lời một câu khác:
 
@@ -125,7 +125,7 @@ thành:
 ```text
 Split-K32
 +
-representation mới
+cách biểu diễn mới
 ```
 
 và phương án thử nhanh hơn 5×.
@@ -141,7 +141,7 @@ Ta không biết:
 ```text
 Split-K đóng góp bao nhiêu?
 
-representation đóng góp bao nhiêu?
+cách biểu diễn dữ liệu đóng góp bao nhiêu?
 
 cả hai có hỗ trợ nhau không?
 
@@ -163,7 +163,7 @@ Ta gọi hai yếu tố:
 ```text
 A = thay cách chia công việc
 
-B = thay representation
+B = thay cách biểu diễn dữ liệu
 ```
 
 Ta có bốn trường hợp:
@@ -208,7 +208,7 @@ Nếu A nhanh hơn 0, ta biết thay đổi cách thực thi có hiệu ứng.
 ```text
 Serial-K
 +
-representation mới
+cách biểu diễn mới
 ```
 
 Cách chia công việc vẫn Serial-K như mốc đối chứng.
@@ -222,7 +222,7 @@ Nếu B nhanh hơn 0, ta biết cách biểu diễn dữ liệu tự nó có hi�
 ```text
 Split-K32
 +
-representation mới
+cách biểu diễn mới
 ```
 
 Điểm rất quan trọng:
@@ -287,7 +287,7 @@ Q4_K gốc
 ↓
 materialize một lần
 ↓
-execution image
+bản dữ liệu phục vụ thực thi
 ↓
 GPU dùng lại cho nhiều token
 ```
@@ -597,7 +597,7 @@ Bởi nếu không có thí nghiệm 2×2, ta rất dễ xây một câu chuyệ
 ```text
 Split-K tốt
 +
-representation mới tốt
+cách biểu diễn mới tốt
 =
 hãy luôn dùng cả hai
 ```
@@ -823,7 +823,7 @@ Hai phương án tạo thành:
 Không phải mọi Thí nghiệm cuối cùng đều phải cho:
 
 ```text
-WINNER = X
+PHƯƠNG ÁN TỐT NHẤT = X
 ```
 
 Đôi khi câu trả lời khoa học đúng là:
@@ -881,11 +881,11 @@ Sau nó, câu chuyện trở nên khác.
 Cùng một phép toán Q4-down có ít nhất hai trục tương đối độc lập:
 
 ```text
-EXECUTION
+CÁCH THỰC THI
 GPU chia công việc thế nào?
 
-REPRESENTATION
-dữ liệu được chuẩn bị thế nào để execution đọc?
+CÁCH BIỂU DIỄN DỮ LIỆU
+dữ liệu được chuẩn bị thế nào để đường thực thi đọc?
 ```
 
 Và hai trục còn có thể tương tác.
@@ -897,13 +897,13 @@ Và hai trục còn có thể tương tác.
 Nếu cùng một logical khối số có thể có:
 
 ```text
-representation lưu trữ
+cách biểu diễn để lưu trữ
 ```
 
 và:
 
 ```text
-representation phục vụ execution
+cách biểu diễn phục vụ thực thi
 ```
 
 thì hệ thực thi cần biết chúng khác nhau.
