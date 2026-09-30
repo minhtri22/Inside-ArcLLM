@@ -1,5 +1,32 @@
 # Chương 1 — Bên dưới một câu trả lời AI có gì?
 
+
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — Chương 1 mở toàn bộ cỗ máy ở mức khái quát**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu / kiến trúc
+> ```
+>
+> Nếu một thuật ngữ trong sơ đồ còn lạ, [Phần 0 — Bản đồ trước khi vào rừng](00-ban-do-truoc-khi-vao-rung.md) đã dựng nền cho toàn bộ các khái niệm này.
+
 Khi chúng ta mở một ứng dụng AI, gõ một câu hỏi rồi vài giây sau nhận được câu trả lời, mọi thứ trông rất đơn giản.
 
 Nhưng bên dưới ô chat ấy là nhiều lớp khác nhau.
@@ -136,7 +163,7 @@ Câu trả lời ngắn nhất là:
 
 > **Nếu mục đích chỉ là sử dụng model, chúng ta không cần ArcLLM.**
 
-`llama.cpp` đã là một runtime rất trưởng thành. Mục tiêu công khai của dự án là thực hiện suy luận LLM bằng C/C++ với thiết lập tối thiểu và hiệu năng cao trên nhiều loại phần cứng. Qua thời gian, nó đã có rất nhiều backend, hỗ trợ CPU, nhiều dòng GPU và nhiều kiểu lượng tử hóa khác nhau.
+`llama.cpp` đã là một runtime rất trưởng thành. Mục tiêu công khai của dự án là thực hiện suy luận LLM bằng C/C++ với thiết lập tối thiểu và hiệu năng cao trên nhiều loại phần cứng. Qua thời gian, nó đã có rất nhiều **backend — lớp thực thi nối runtime với một loại phần cứng hoặc cơ chế cụ thể —**, hỗ trợ CPU, nhiều dòng GPU và nhiều kiểu **quantization — lượng tử hóa, cách biểu diễn trọng số gọn hơn bằng ít bit hơn —** khác nhau.
 
 Ollama lại giải quyết một nhu cầu ở lớp cao hơn: giúp người dùng tải, quản lý và chạy model thuận tiện hơn mà không cần tự xử lý tất cả chi tiết phía dưới.
 
@@ -170,7 +197,7 @@ Nhưng ArcLLM chọn không dùng llama.cpp làm lõi nghiên cứu.
 
 Lý do không phải vì muốn “viết lại cho hay hơn”.
 
-Nếu ngay từ đầu chúng ta lấy một runtime trưởng thành làm lõi, rất nhiều quyết định quan trọng đã được đưa ra hộ chúng ta: cách tổ chức tensor, cách chọn kernel, cách quản lý bộ nhớ, cách chia backend, cách điều phối công việc và hàng loạt tối ưu đã tích lũy qua nhiều năm.
+Nếu ngay từ đầu chúng ta lấy một runtime trưởng thành làm lõi, rất nhiều quyết định quan trọng đã được đưa ra hộ chúng ta: cách tổ chức tensor, cách chọn **kernel — chương trình tính toán nhỏ chạy trên GPU —**, cách quản lý bộ nhớ, cách chia backend, cách điều phối công việc và hàng loạt tối ưu đã tích lũy qua nhiều năm.
 
 Ta có thể đo chúng.
 
@@ -258,7 +285,7 @@ Nó được sinh ra trên một chiếc máy có GPU Intel Arc 140V, lấy cả
 
 Vậy bắt đầu xây một runtime như vậy từ đâu?
 
-Có lẽ phản xạ đầu tiên là viết ngay một kernel thật nhanh.
+Có lẽ phản xạ đầu tiên là viết ngay một kernel thật nhanh. Nhắc lại, **kernel** ở đây là chương trình tính toán nhỏ được gửi xuống GPU để thực hiện một loại phép tính cụ thể; Chương 4 sẽ mở khái niệm này kỹ hơn.
 
 ArcLLM không bắt đầu ở đó.
 
@@ -276,13 +303,13 @@ Nhưng chỉ ghi tên model vẫn chưa đủ.
 
 Hai file có thể có cùng tên mà nội dung khác nhau.
 
-Vì vậy file được khóa bằng **SHA-256** — một dấu vân tay số. Chỉ cần nội dung bên trong thay đổi thì dấu vân tay cũng thay đổi.
+Vì vậy file được khóa bằng **SHA-256 — một hàm băm dùng để tạo “dấu vân tay số” cho dữ liệu —**. Chỉ cần nội dung bên trong thay đổi thì dấu vân tay cũng thay đổi.
 
 P0 cũng kiểm tra xem máy có nhìn thấy GPU hay không, model có đọc được hay không và lượng bộ nhớ cần thiết có nằm trong khả năng phần cứng hay không.
 
 Lần kiểm tra đầu tiên cho thấy file model chứa 338 tensor. Có thể tạm hiểu **tensor** là những bảng số mà model sử dụng trong các phép tính. Chúng ta sẽ mở chúng ra kỹ hơn ở chương sau.
 
-Với ngữ cảnh 4.096 token, bộ lập kế hoạch ước lượng runtime cần khoảng 2,120 GiB bộ nhớ, trong khi ngưỡng khả năng đã được xác nhận là 3,75 GiB.
+Với **context — phạm vi token mà runtime chuẩn bị để model có thể xử lý trong một lượt —** là 4.096 token, bộ lập kế hoạch ước lượng runtime cần khoảng 2,120 GiB bộ nhớ, trong khi ngưỡng khả năng đã được xác nhận là 3,75 GiB. **GiB — gibibyte —** là một đơn vị dung lượng bộ nhớ; ở đây ta chỉ cần dùng nó để so sánh “cần bao nhiêu” với “máy có thể đáp ứng bao nhiêu”.
 
 Không cần công thức phức tạp:
 
