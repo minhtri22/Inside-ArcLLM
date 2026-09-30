@@ -23,32 +23,38 @@ Bản đồ thứ hai trả lời:
 Có thể đặt hai bản đồ cạnh nhau như sau:
 
 ```text
-HỌ HÀNG KHÁI NIỆM                         ĐƯỜNG ĐI CỦA DỮ LIỆU
+HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
 
-AI                                        Văn bản người dùng
-↓                                         ↓
-Machine Learning                          Tokenizer
-↓                                         ↓
-Neural Network                            Token / token ID
-↓                                         ↓
-Language Model                            Embedding → tensor
-↓                                         ↓
-LLM                                       Decoder-only Transformer
-↓                                         ↓
-Transformer                               Nhiều decoder layer
-↓                                         ├─ RMSNorm
-Decoder-only Transformer                  ├─ Attention
-↓                                         ├─ FFN
-Nhiều decoder layer                       └─ Residual
-↓                                         ↓
-Parameters / Weights                      Logits
-                                          ↓
-                                          Token tiếp theo
-                                          ↓
-                                          lặp lại
+AI                                   Văn bản
+↓                                    ↓
+Machine Learning                     Tokenizer
+↓                                    ↓
+Neural Network                       Token / token ID
+↓                                    ↓
+Language Model                       Embedding → tensor
+↓                                           +
+LLM                                  parameters / weights từ model
+↓                                           ↓
+Transformer                          Runtime
+↓                                           ↓
+Decoder-only Transformer             CPU / GPU / bộ nhớ
+↓                                           ↓
+Nhiều decoder layer                  RMSNorm / Attention / FFN
+↓ chứa                                      ↓
+Parameters / Weights                 một decoder layer
+                                             ↓
+                                      nhiều decoder layer
+                                             ↓
+                                      logits → token tiếp theo
+                                             ↓
+                                      KV cache / lặp lại
+                                             ↓
+                                      benchmark / tối ưu
+                                             ↓
+                                      representation / lifecycle
 ```
 
-Đừng cố học thuộc sơ đồ này ngay. Chỉ cần biết mỗi chương sau sẽ mở một phần của nó.
+Đây là **bản đồ xuyên suốt duy nhất** của cuốn sách. Đừng cố học thuộc ngay; từ Chương 1 trở đi, cùng sơ đồ này sẽ xuất hiện lại và chỉ thay dòng **“Đang mở ở chương này”**.
 
 ## AI không đồng nghĩa với LLM
 
