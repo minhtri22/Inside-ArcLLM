@@ -111,7 +111,7 @@ Phần này dành cho người muốn đi tiếp từ “làm cho chạy nhanh�
 
 ## Cách cuốn sách được viết
 
-- **Tiếng Việt là ngôn ngữ chính.** Khi có cách gọi tiếng Việt đủ rõ, sách dùng tiếng Việt trước. Thuật ngữ tiếng Anh chỉ được giữ trong ngoặc khi nó giúp người đọc tra cứu hoặc khi không có cách dịch ngắn gọn, chính xác.
+- **Tiếng Việt là ngôn ngữ chính, thuật ngữ gốc là chiếc cầu tra cứu.** Khi một khái niệm kỹ thuật được giới thiệu, sách ưu tiên dạng **tiếng Việt (English)**, ví dụ **hệ thực thi (runtime)**, **tín hiệu hoàn thành (fence)**, **chương trình GPU (kernel)**. Không dịch mất từ gốc trong ngoặc; người đọc cần nhận ra đúng thuật ngữ khi gặp tài liệu chuyên môn sau này.
 - **Ý tưởng phải được hiểu trước khi học tên.** Một khái niệm mới bắt đầu bằng hình dung gần gũi hoặc cách hiểu tạm thời, rồi mới đi dần tới định nghĩa chính xác hơn.
 - **Không dùng trước khi dạy.**
 - **Không yêu cầu biết lập trình.**
