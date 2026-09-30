@@ -75,13 +75,13 @@ Nó đặt một giả thuyết có thể bị bác bỏ.
 
 Giả thuyết được gọi là:
 
-**H-NPA — bounded no-practical-advantage hypothesis.**
+**H-NPA — giả thuyết “chưa chứng minh được lợi thế thực tế trong phạm vi đã khóa”.**
 
 Đọc bằng tiếng Việt:
 
 > **Trong hai bài đo W-S và W-C đã khóa, kiến trúc ArcLLM hiện tại chưa chứng minh được một lợi thế đủ có ý nghĩa thực tế và tái lập qua hai phiên chạy mới.**
 
-Từ **bounded — có phạm vi giới hạn** rất quan trọng.
+Cụm **“trong phạm vi đã khóa”** rất quan trọng.
 
 Q3 không nói:
 
@@ -91,7 +91,7 @@ Nó chỉ hỏi:
 
 > **Với chính kiến trúc hiện tại, chính hardware này, chính mô hình này và hai regime đã khóa, có advantage thực tế nào vượt qua tiêu chuẩn đã khóa hay không?**
 
-Đó là một claim nhỏ hơn.
+Đó là một **kết luận hẹp hơn**.
 
 Nhưng kiểm chứng được.
 
@@ -118,7 +118,7 @@ Nếu W-S thắng về TTFT ở phiên đo A nhưng sang phiên đo B lại ch�
 
 Nếu W-S thắng TTFT ở phiên đo A nhưng không lặp lại ở phiên đo B, cũng chưa đủ.
 
-Claim phải tái lập đúng nơi nó tuyên bố tồn tại.
+Một kết luận phải tái lập đúng nơi nó tuyên bố tồn tại.
 
 ## “Lợi thế thực tế” phải được định nghĩa trước
 
@@ -347,7 +347,7 @@ Tại sao không dùng luôn bảng đó để adjudicate Q3?
 
 Bởi threshold Q3 được thiết kế sau khi Q2 đã cho thấy bề mặt hiệu năng.
 
-Nếu lại dùng chính Q2 để xác nhận claim, ta sẽ vừa dùng evidence để hình thành câu hỏi, vừa dùng cùng evidence đó để tự trả lời.
+Nếu lại dùng chính Q2 để xác nhận kết luận, ta sẽ vừa dùng **bằng chứng** để hình thành câu hỏi, vừa dùng chính bằng chứng đó để tự trả lời.
 
 Q3 vì vậy yêu cầu:
 
