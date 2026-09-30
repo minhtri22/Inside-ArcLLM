@@ -868,7 +868,7 @@ Tên “tổng quát” rất dễ tạo cảm giác lớn hơn evidence.
 
 Bằng chứng hiện tại không cho phép nói:
 
-> “Mọi primitive trong mọi mô hình, mọi GPU và mọi hệ thực thi đều chỉ cần sáu chiều này.”
+> “Mọi thao tác nền tảng trong mọi mô hình, mọi GPU và mọi hệ thực thi đều chỉ cần sáu chiều này.”
 
 Điều được chứng minh nhỏ hơn:
 
@@ -939,7 +939,7 @@ LỚP KẾT NỐI PHẦN CỨNG
 
 Đây chính là ý nghĩa thực tế của một **bề mặt mở rộng tổng quát**.
 
-Không phải plugin framework đồ sộ.
+Không cần một **khung phần mềm mở rộng** đồ sộ.
 
 Không phải kiến trúc được thiết kế trước để “sau này có thể mở rộng”.
 
@@ -951,7 +951,7 @@ Mà là:
 
 Có một chi tiết cần giữ thật rõ.
 
-Các bước xây v4, kiểm tra 114.688 trạng thái và gắn vào lớp thực thi phần cứng Vulkan không phải một benchmark hiệu năng mới.
+Các bước xây v4, kiểm tra 114.688 trạng thái và gắn vào lớp thực thi phần cứng Vulkan không phải một **phép đo hiệu năng mới**.
 
 Chúng xác nhận:
 
@@ -968,7 +968,7 @@ Chúng **không** xác nhận:
 
 Không có kết luận đó.
 
-Một kiến trúc phần mềm có thể tốt hơn về khả năng mô tả và quản lý hệ thống mà chưa tạo ra một speedup mới.
+Một kiến trúc phần mềm có thể tốt hơn về khả năng mô tả và quản lý hệ thống mà chưa tạo ra một **mức tăng tốc mới**.
 
 Đây là một loại ĐẠT (PASS) khác.
 
