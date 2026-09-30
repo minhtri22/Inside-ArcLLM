@@ -50,7 +50,7 @@ P4 là lúc ArcLLM bắt đầu **lắp các bánh răng lại với nhau**.
 
 Ở mức đơn giản nhất, một mô hình ngôn ngữ không xử lý văn bản bằng một phép tính duy nhất.
 
-Dữ liệu đi qua nhiều **lớp — lớp xử lý** liên tiếp.
+Dữ liệu đi qua nhiều **lớp xử lý (layer)** liên tiếp.
 
 Mỗi lớp nhận tín hiệu từ lớp trước, thực hiện một chuỗi phép biến đổi rồi chuyển kết quả sang lớp tiếp theo.
 
@@ -70,9 +70,9 @@ Lớp 2
 
 Trong loại mô hình mà ArcLLM đang xây hệ thực thi, mỗi lớp có hai khu vực lớn mà ta đã làm quen ở Chương 4.
 
-Một phía là **cơ chế chú ý — phần giúp mô hình kết hợp thông tin giữa các vị trí token**.
+Một phía là **cơ chế chú ý (attention)** — phần giúp mô hình kết hợp thông tin giữa các vị trí token.
 
-Phía còn lại là **FFN — Feed-Forward Network, nhánh biến đổi tín hiệu sau cơ chế chú ý**.
+Phía còn lại là **mạng truyền thẳng (Feed-Forward Network, FFN)** — nhánh biến đổi tín hiệu sau cơ chế chú ý.
 
 Giữa các phần ấy còn có chuẩn hóa và những đường residual — **đường cộng tắt đưa tín hiệu cũ cộng trở lại kết quả mới**.
 
@@ -116,7 +116,7 @@ Có những trọng số ở dạng Q4_K.
 
 Có những trọng số ở dạng Q6_K.
 
-Q4_K và Q6_K đều là các dạng **lượng tử hóa — cách đóng gói trọng số bằng ít bit hơn để giảm lượng dữ liệu phải lưu và di chuyển**.
+Q4_K và Q6_K đều là các dạng **lượng tử hóa (quantization)** — cách đóng gói trọng số bằng ít bit hơn để giảm lượng dữ liệu phải lưu và di chuyển.
 
 Ta đã gặp Q4_K nhiều lần.
 
@@ -167,7 +167,7 @@ P4 thêm một câu hỏi mới:
 
 > **“Các phép toán có được nối với nhau đúng không?”**
 
-Ta bắt đầu kiểm tra cả **computation — phép tính** lẫn **dataflow — đường đi của dữ liệu**.
+Ta bắt đầu kiểm tra cả **phép tính (computation)** lẫn **đường đi dữ liệu (dataflow)**.
 
 ## 15 lần giao việc cho GPU trong một chuỗi thật
 
@@ -177,7 +177,7 @@ lớp `blk.0` của P4 được thực thi bằng:
 15 Vulkan dispatches
 ```
 
-Nhắc lại, **lần giao việc cho GPU — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU**.
+Nhắc lại, **lần giao việc cho GPU (dispatch)** — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU.
 
 Có thể hình dung mỗi lần giao việc cho GPU là một công đoạn trong dây chuyền:
 
@@ -197,7 +197,7 @@ Con số 15 không có nghĩa một lớp giải mã nói chung luôn phải có
 
 Nó chỉ mô tả implementation P4 đã được kiểm tra.
 
-Điều quan trọng hơn là cả 15 công việc này được ghi vào **một bộ lệnh — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
+Điều quan trọng hơn là cả 15 công việc này được ghi vào **một bộ lệnh (command buffer)** — một danh sách lệnh GPU đã chuẩn bị trước, rồi gửi xuống bằng:
 
 ```text
 1 bộ lệnh
@@ -241,13 +241,13 @@ Một điều được khóa rất rõ trong P4 là:
 
 **Host** ở đây là phía CPU và bộ nhớ mà chương trình trên CPU sử dụng trực tiếp.
 
-**Intermediate — dữ liệu trung gian —** là kết quả đang nằm giữa đầu vào và đầu ra cuối cùng của lớp.
+**dữ liệu trung gian (intermediate)** — là kết quả đang nằm giữa đầu vào và đầu ra cuối cùng của lớp.
 
 Nói đơn giản, P4 không cho phép đường thực thi:
 
 > **GPU tạo dữ liệu trung gian → đưa về CPU để đọc hoặc sửa → rồi gửi xuống GPU trở lại trước khi tiếp tục.**
 
-Đó chính là **vòng đi-về trung gian qua CPU — vòng lặp tính toán trung gian quay ngược về CPU** mà P4 muốn loại bỏ.
+Đó chính là **vòng đi-về trung gian qua CPU (intermediate host round-trip)** mà P4 muốn loại bỏ.
 
 Dữ liệu đi theo hướng:
 
@@ -295,7 +295,7 @@ Ta quay lại nguyên tắc của P3.
 
 GPU không được tự chấm bài cho chính mình.
 
-ArcLLM có một **independent CPU reference — cách tính tham chiếu độc lập trên CPU** cho cả lớp.
+ArcLLM có một **cách tính tham chiếu độc lập trên CPU (independent CPU reference)** cho cả lớp.
 
 Cùng một đầu vào.
 
@@ -343,7 +343,7 @@ Vậy sai khác lớn nhất là:
 max_abs = 0,02
 ```
 
-**max_abs — maximum absolute error — sai số tuyệt đối lớn nhất** trả lời câu hỏi:
+**sai số tuyệt đối lớn nhất (maximum absolute error, max_abs)** trả lời câu hỏi:
 
 > “Trong tất cả các giá trị, điểm tệ nhất lệch bao nhiêu?”
 
@@ -355,7 +355,7 @@ Ta cần thêm một góc nhìn khác.
 
 ## Sai số tổng thể (RMSE): nhìn cả dãy thay vì một điểm
 
-**RMSE — Root Mean Square Error — căn trung bình bình phương sai số** nghe khá toán học.
+**căn trung bình bình phương sai số (Root Mean Square Error, RMSE)** nghe khá toán học.
 
 Ta vẫn dùng ví dụ vừa rồi.
 
@@ -411,7 +411,7 @@ P4 không chạy xong rồi mới quyết định:
 
 > “Sai khoảng này chắc là chấp nhận được.”
 
-Hai cổng đã được **freeze — khóa trước khi xem outcome**:
+Hai cổng đã được **khóa trước (freeze) khi chưa xem kết quả (outcome)**:
 
 ```text
 max_abs <= 2e-2
@@ -678,10 +678,10 @@ P5 sẽ chuyển câu hỏi từ **“một căn phòng hoạt động chưa?”
 ### Nhớ 3 điều
 
 1. **phép tính nền tảng ĐẠT (PASS) chưa bảo đảm composition ĐẠT (PASS).** Các phép toán đúng riêng lẻ vẫn có thể sai khi ghép vì thứ tự, vùng nhớ hoặc đường đi dữ liệu.
-2. **P4 giữ intermediate — dữ liệu trung gian — ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
+2. **P4 giữ dữ liệu trung gian (intermediate) ở phía GPU suốt lớp.** Không có vòng CPU chen vào giữa để “cứu” kết quả.
 3. **P4 chỉ ĐẠT về tính đúng của một lớp, chưa phải của toàn bộ mô hình.** Một lớp thật đã vượt các tiêu chuẩn đã khóa; toàn bộ chuỗi lớp giải mã vẫn là câu hỏi của bước tiếp theo.
 
-**Chương 6 — giữ toàn bộ khối giải mã sẵn trong bộ nhớ**
+**Chương 6 — Giữ toàn bộ các lớp xử lý sẵn trong bộ nhớ GPU**
 
 Ta đã xây được một căn phòng hoàn chỉnh.
 
