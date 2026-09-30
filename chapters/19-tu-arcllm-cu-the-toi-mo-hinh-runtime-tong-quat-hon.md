@@ -339,7 +339,7 @@ Câu hỏi:
 
 > **Một cách biểu diễn dữ liệu được tạo riêng có đang tồn tại trong vùng bộ nhớ cần thiết hay không?**
 
-Đây là nghĩa hẹp của **trạng thái cư trú — trạng thái cư trú trong bộ nhớ**.
+Đây là nghĩa hẹp của **trạng thái cư trú trong bộ nhớ (residency)**.
 
 Không dùng nó để biểu diễn:
 
@@ -536,7 +536,7 @@ Không được sửa cách biểu diễn dữ liệu bắt buộc rồi phá đ
 
 Đó là một dạng:
 
-> **regression phép kiểm tra — bộ đối chứng hồi quy**, dùng để bảo đảm lớp trừu tượng mới không viết lại những gì trước đó đã được chứng minh.
+> **bộ kiểm tra hồi quy (regression tests)**, dùng để bảo đảm lớp trừu tượng mới không viết lại những gì trước đó đã được chứng minh.
 
 ## Một biến đúng/sai có thực sự đủ không?
 
@@ -1024,7 +1024,7 @@ Mà vì chúng đã bị thử phá.
 2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được có giới hạn P8 mandatory-feasibility case và cơ chế trực tiếp không có cách biểu diễn dữ liệu phụ.
 3. **“Tổng quát” không có nghĩa “phổ quát”.** v4 chỉ được xác nhận trong các lớp đã có bằng chứng. Một phản ví dụ tương lai có quyền mở lại kiến trúc.
 
-**Chương 20 — Ta đã hiểu hệ thực thi đến đâu?**
+**Chương 20 — Ta đã hiểu cỗ máy đến đâu?**
 
 Tới đây các mảnh đã hội tụ:
 
