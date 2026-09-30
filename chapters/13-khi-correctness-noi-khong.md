@@ -1,49 +1,24 @@
-# Chương 13 — Khi correctness nói “không”
+# Chương 13 — Nhanh nhưng sai thì vẫn là sai
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Một cơ chế có vẻ nhanh
+>         ↓
+> [ kiểm tra tính đúng ]
+>         ↓
+> đúng → mới được đo tốc độ
+> sai  → dừng
 > ```
->
-> ▶ **Đang mở ở chương này:** correctness gate / Confirm.
 
 
 > **Câu hỏi của chương:** Nếu một cơ chế đã chứng minh rằng nó có thể chạy nhanh hơn, nhưng khi áp dụng sang một loại trọng số khác nó không còn giữ được kết quả đúng, ta nên sửa tiếp hay phải dừng?
 
 Chương 12 kết thúc với một kết quả rất hấp dẫn.
 
-Một cơ chế Split-K dùng 32 lane trong cùng subgroup đã làm các phép nhân Q4_K thành phần nhanh hơn khoảng:
+Một cơ chế Split-K dùng 32 lane trong cùng nhóm con GPU đã làm các phép nhân Q4_K thành phần nhanh hơn khoảng:
 
 ```text
 3,14×
@@ -53,13 +28,13 @@ Một cơ chế Split-K dùng 32 lane trong cùng subgroup đã làm các phép 
 
 Các shape riêng lẻ đều vượt ngưỡng đã khóa.
 
-Tính đúng cũng PASS.
+Tính đúng cũng ĐẠT (PASS).
 
 Đây chính xác là loại kết quả rất dễ tạo ra một suy luận:
 
 > “Cơ chế này tốt. Hãy áp dụng nó cho các phép nhân lượng tử hóa khác.”
 
-Trong model thật, không phải mọi trọng số đều có cùng định dạng.
+Trong mô hình thật, không phải mọi trọng số đều có cùng định dạng.
 
 Ngoài Q4_K còn có Q6_K.
 
@@ -69,11 +44,11 @@ Câu hỏi tiếp theo vì vậy rất tự nhiên:
 
 Đây là lúc **Mode C — Confirm, chế độ xác nhận** trở thành nhân vật chính.
 
-## Mode C không hỏi “ta có thể làm nó chạy không?”
+## C — Xác nhận không hỏi “ta có thể làm nó chạy không?”
 
 Mode C hỏi một câu khó hơn:
 
-> **Một cơ chế đã được định nghĩa trước có vượt qua contract đã khóa trước hay không?**
+> **Một cơ chế đã được định nghĩa trước có vượt qua tiêu chuẩn đã khóa đã khóa trước hay không?**
 
 Điểm khác biệt rất lớn nằm ở hai chữ:
 
@@ -85,7 +60,7 @@ Cơ chế Split-K không được phép đổi.
 
 Geometry — **cách bố trí công việc trên GPU** — không được phép đổi.
 
-Subgroup vẫn:
+nhóm con GPU vẫn:
 
 ```text
 32 lane
@@ -97,7 +72,7 @@ Workgroup vẫn:
 128 invocation
 ```
 
-Một subgroup vẫn phụ trách:
+Một nhóm con GPU vẫn phụ trách:
 
 ```text
 1 output row
@@ -109,13 +84,13 @@ K vẫn được chia theo bước:
 32
 ```
 
-Cách cộng kết quả từng phần vẫn dùng cùng loại subgroup reduction.
+Cách cộng kết quả từng phần vẫn dùng cùng loại nhóm con GPU reduction.
 
-Không được thấy kết quả xấu rồi đổi ngay sang subgroup 16.
+Không được thấy kết quả xấu rồi đổi ngay sang nhóm con GPU 16.
 
 Không được thử geometry khác.
 
-Không được gộp kernel thêm.
+Không được gộp chương trình GPU thêm.
 
 Không được chuyển sang cooperative matrix.
 
@@ -127,7 +102,7 @@ Ta đã tạo ra một hypothesis mới.
 
 Cả Q4_K và Q6_K đều là những cách lưu trọng số đã được lượng tử hóa và đóng gói.
 
-**Quantization — lượng tử hóa** có thể hiểu là:
+**lượng tử hóa — lượng tử hóa** có thể hiểu là:
 
 > thay vì lưu mọi trọng số bằng một số thực lớn như F32, ta biểu diễn chúng bằng ít bit hơn cùng một số thông tin scale cần thiết để tái tạo giá trị gần đúng khi tính toán.
 
@@ -151,9 +126,9 @@ Vì vậy Q6 không được coi là:
 
 > “Q4 nhưng nhiều bit hơn nên chắc chắn dễ hơn.”
 
-Nó phải tự đi qua correctness gate.
+Nó phải tự đi qua tính đúng gate.
 
-## Correctness phải đứng trước performance
+## Tính đúng phải đứng trước tốc độ
 
 Thứ tự phép thử đã được khóa:
 
@@ -172,9 +147,9 @@ Thứ tự phép thử đã được khóa:
 
 Phần quan trọng nhất:
 
-> **Performance nằm sau correctness.**
+> **hiệu năng nằm sau tính đúng.**
 
-Nếu candidate sai, không có:
+Nếu phương án thử sai, không có:
 
 ```text
 candidate chạy nhanh bao nhiêu?
@@ -184,7 +159,7 @@ Câu hỏi đó chưa được phép tồn tại.
 
 ## Hai ngưỡng tính đúng được khóa từ trước
 
-Correctness contract dùng hai đại lượng quen thuộc.
+tính đúng tiêu chuẩn đã khóa dùng hai đại lượng quen thuộc.
 
 Thứ nhất:
 
@@ -216,7 +191,7 @@ CPU reference:
  3,000]
 ```
 
-Candidate:
+phương án thử:
 
 ```text
 [1,003
@@ -261,7 +236,7 @@ cũng nhỏ hơn:
 0,005
 ```
 
-Ví dụ này PASS cả hai gate.
+Ví dụ này ĐẠT (PASS) cả hai gate.
 
 Ngược lại, chỉ cần một giá trị lệch:
 
@@ -275,17 +250,17 @@ thì:
 max_abs > 0,02
 ```
 
-và correctness FAIL ngay cả khi những giá trị khác rất gần.
+và tính đúng KHÔNG ĐẠT (FAIL) ngay cả khi những giá trị khác rất gần.
 
-Các ngưỡng này không phải “độ đúng tuyệt đối của mọi model”.
+Các ngưỡng này không phải “độ đúng tuyệt đối của mọi mô hình”.
 
-Chúng là contract đã được đóng băng cho phép thử này.
+Chúng là tiêu chuẩn đã khóa đã được đóng băng cho phép thử này.
 
-## Q6 compile được
+## Q6 biên dịch được
 
-Candidate Q6 được triển khai.
+phương án thử Q6 được triển khai.
 
-Shader compile thành công.
+Shader biên dịch thành công.
 
 Native build cũng thành công.
 
@@ -319,13 +294,13 @@ mà vẫn:
 tính sai
 ```
 
-Infrastructure và correctness là hai lớp khác nhau.
+Infrastructure và tính đúng là hai lớp khác nhau.
 
 Q6 vượt qua lớp đầu.
 
-Nhưng rồi tới correctness.
+Nhưng rồi tới tính đúng.
 
-## Baseline PASS — candidate FAIL
+## Mốc đối chứng ĐẠT — phương án thử KHÔNG ĐẠT
 
 Harness — **chương trình điều khiển phép thử** — kiểm tra theo thứ tự:
 
@@ -360,13 +335,13 @@ thì bước trước:
 baseline_cpu
 ```
 
-đã phải PASS.
+đã phải ĐẠT (PASS).
 
-Nghĩa là đường baseline Q6 vẫn phù hợp với CPU reference trong case đang kiểm tra.
+Nghĩa là đường mốc đối chứng Q6 vẫn phù hợp với CPU reference trong case đang kiểm tra.
 
-Sau đó chính candidate Q6 vi phạm correctness contract.
+Sau đó chính phương án thử Q6 vi phạm tính đúng tiêu chuẩn đã khóa.
 
-Verdict:
+kết luận:
 
 ```text
 Q6_STAGE_FAIL_CORRECTNESS
@@ -384,9 +359,9 @@ Harness dùng kiểu:
 
 > **fail-fast — gặp lỗi đầu tiên thì dừng ngay.**
 
-Vì vậy khi `candidate_cpu` FAIL, chương trình dừng.
+Vì vậy khi `candidate_cpu` KHÔNG ĐẠT (FAIL), chương trình dừng.
 
-Nó không tiếp tục đo performance.
+Nó không tiếp tục đo hiệu năng.
 
 Và artifact giữ lại không chứa chính xác:
 
@@ -397,7 +372,7 @@ RMSE thực tế = bao nhiêu?
 
 Ta chỉ biết:
 
-> ít nhất một điều kiện correctness đã bị vi phạm.
+> ít nhất một điều kiện tính đúng đã bị vi phạm.
 
 Điều kiện có thể là:
 
@@ -427,11 +402,11 @@ Một phản xạ rất tự nhiên là:
 
 Nhưng đó là lúc Mode C phải làm việc.
 
-## Không được rerun chỉ vì ta tò mò
+## Không được chạy lại chỉ vì ta tò mò
 
-Phép thử đã có một contract.
+Phép thử đã có một tiêu chuẩn đã khóa.
 
-Correctness FAIL là stop condition.
+tính đúng KHÔNG ĐẠT (FAIL) là stop condition.
 
 Evidence đầu tiên hợp lệ.
 
@@ -467,15 +442,15 @@ Tại sao không sửa cho nó đúng?
 
 Bởi câu hỏi nghiên cứu không phải:
 
-> “Ta có thể bằng mọi cách làm ra một kernel Q6 nhanh và đúng không?”
+> “Ta có thể bằng mọi cách làm ra một chương trình GPU Q6 nhanh và đúng không?”
 
 Câu hỏi đã khóa là:
 
-> **“Giữ nguyên cơ chế Split-K và hình học thực thi đã thắng ở Q4, rồi dùng một Q6_K candidate với bộ đọc packed-Q6 tương ứng, correctness có còn giữ được hay không?”**
+> **“Giữ nguyên cơ chế Split-K và hình học thực thi đã thắng ở Q4, rồi dùng một Q6_K phương án thử với bộ đọc packed-Q6 tương ứng, tính đúng có còn giữ được hay không?”**
 
 Evidence đã trả lời:
 
-> **Không, trong contract hiện tại.**
+> **Không, trong tiêu chuẩn đã khóa hiện tại.**
 
 Nếu ta đổi cơ chế sau khi thấy outcome, ta đang hỏi câu khác.
 
@@ -483,7 +458,7 @@ Câu khác có thể đáng nghiên cứu.
 
 Nhưng nó phải được mở như một study mới.
 
-## Đây là một FAIL khoa học, không phải lỗi implementation chưa sửa xong
+## Đây là một kết quả KHÔNG ĐẠT về khoa học, không phải lỗi triển khai chưa sửa xong
 
 Ta cần phân biệt ba trường hợp.
 
@@ -493,7 +468,7 @@ Trường hợp thứ nhất:
 compiler lỗi
 ```
 
-Có thể chỉ là implementation defect.
+Có thể chỉ là triển khai defect.
 
 Trường hợp thứ hai:
 
@@ -532,7 +507,7 @@ Nó là:
 
 > **một kết quả khoa học âm tính hợp lệ.**
 
-## Performance của Q6 bằng bao nhiêu?
+## Tốc độ của Q6 bằng bao nhiêu?
 
 Câu trả lời là:
 
@@ -548,7 +523,7 @@ Không phải:
 
 Mà là:
 
-> **không có phép đo performance hợp lệ.**
+> **không có phép đo hiệu năng hợp lệ.**
 
 Số cặp timing Q6:
 
@@ -556,13 +531,13 @@ Số cặp timing Q6:
 0
 ```
 
-Target model:
+Target mô hình:
 
 ```text
 không được load
 ```
 
-Performance measurement:
+hiệu năng measurement:
 
 ```text
 không được chạy
@@ -590,9 +565,9 @@ Hoặc chậm.
 
 Ta không biết.
 
-Và study này không được phép đi tìm câu trả lời performance nữa.
+Và study này không được phép đi tìm câu trả lời hiệu năng nữa.
 
-## Q4 PASS không có nghĩa là Q6 cũng vậy
+## Q4 ĐẠT không có nghĩa Q6 cũng vậy
 
 Đây là bài học lớn hơn Q6.
 
@@ -602,7 +577,7 @@ Q4 đã cho kết quả rất đẹp:
 ~3,14× aggregate component speedup
 ```
 
-Correctness PASS.
+tính đúng ĐẠT (PASS).
 
 Nhưng điều đó chỉ chứng minh:
 
@@ -617,11 +592,11 @@ mọi model
 mọi GPU
 ```
 
-sẽ cùng PASS.
+sẽ cùng ĐẠT (PASS).
 
 Q6 đã bác bỏ một claim rộng hơn:
 
-> **cùng cơ chế Split-K và hình học thực thi có thể chuyển từ Q4_K sang Q6_K, với bộ đọc packed-Q6 tương ứng, mà vẫn giữ correctness contract.**
+> **cùng cơ chế Split-K và hình học thực thi có thể chuyển từ Q4_K sang Q6_K, với bộ đọc packed-Q6 tương ứng, mà vẫn giữ tính đúng tiêu chuẩn đã khóa.**
 
 Nói cách khác:
 
@@ -633,7 +608,7 @@ universal PASS
 
 Một result mạnh vẫn có biên giới.
 
-## Đây chính là Mode C
+## Đây chính là chế độ C — Xác nhận
 
 Ở Mode E, AI được quyền nghĩ rất nhiều.
 
@@ -641,7 +616,7 @@ Một result mạnh vẫn có biên giới.
 
 Mode C thay đổi thái độ hoàn toàn.
 
-Trước execution:
+Trước thực thi:
 
 ```text
 khóa hypothesis
@@ -651,7 +626,7 @@ khóa performance gate
 khóa stop rule
 ```
 
-Sau execution:
+Sau thực thi:
 
 ```text
 đọc evidence
@@ -667,15 +642,15 @@ AI lúc này không có nhiệm vụ:
 
 Nó có nhiệm vụ:
 
-> **Giúp bảo toàn contract, kiểm tra evidence và chỉ ra kết luận nhỏ nhất mà dữ liệu thực sự hỗ trợ.**
+> **Giúp bảo toàn tiêu chuẩn đã khóa, kiểm tra evidence và chỉ ra kết luận nhỏ nhất mà dữ liệu thực sự hỗ trợ.**
 
 Đây là sự khác biệt rất lớn.
 
 Nếu AI luôn được yêu cầu:
 
-> “Tiếp tục cho tới khi PASS.”
+> “Tiếp tục cho tới khi ĐẠT (PASS).”
 
-thì mọi FAIL chỉ trở thành một lỗi tạm thời cần sửa.
+thì mọi KHÔNG ĐẠT (FAIL) chỉ trở thành một lỗi tạm thời cần sửa.
 
 Khi đó dự án gần như mất khả năng học được rằng:
 
@@ -693,11 +668,11 @@ AI hoàn toàn có thể đề xuất:
 
 > thay cách accumulate;
 
-> dùng subgroup 16;
+> dùng nhóm con GPU 16;
 
 > đổi local size;
 
-> đo performance trước xem có đáng sửa correctness không.
+> đo hiệu năng trước xem có đáng sửa tính đúng không.
 
 Nhưng chính vì những phương án đó dễ sinh ra, con người càng phải giữ ranh giới:
 
@@ -717,11 +692,11 @@ Có thể so các topology reduction khác nhau.
 
 Có thể hỏi layout Q6 tạo ra boundary ở đâu.
 
-Nhưng không được quay lại và viết lại lịch sử rằng SA1-Q6 chưa FAIL.
+Nhưng không được quay lại và viết lại lịch sử rằng SA1-Q6 chưa KHÔNG ĐẠT (FAIL).
 
-FAIL đó phải được giữ nguyên.
+KHÔNG ĐẠT (FAIL) đó phải được giữ nguyên.
 
-## Vì sao FAIL này có giá trị?
+## Vì sao kết quả KHÔNG ĐẠT này có giá trị?
 
 Trước Q6, một niềm tin hợp lý có thể là:
 
@@ -743,7 +718,7 @@ Q6
 
 Bản đồ hiểu biết đã tốt hơn.
 
-Ta biết rằng quantization format không chỉ là một chi tiết lưu trữ.
+Ta biết rằng lượng tử hóa format không chỉ là một chi tiết lưu trữ.
 
 Nó có thể tạo ra boundary thực sự cho cách tổ chức phép tính.
 
@@ -751,7 +726,7 @@ Nó có thể tạo ra boundary thực sự cho cách tổ chức phép tính.
 
 Nếu Q6 chỉ được “sửa cho tới khi chạy được”, boundary này có thể biến mất khỏi lịch sử.
 
-## Một FAIL đúng có thể quý hơn một PASS dễ dãi
+## Một kết quả KHÔNG ĐẠT đúng có thể quý hơn một kết quả ĐẠT dễ dãi
 
 Giả sử sau khi thấy lỗi, ta đổi threshold:
 
@@ -762,29 +737,29 @@ max_abs
 0,05
 ```
 
-và candidate PASS.
+và phương án thử ĐẠT (PASS).
 
-Ta có một PASS.
+Ta có một ĐẠT (PASS).
 
-Nhưng PASS đó trả lời câu hỏi nào?
+Nhưng ĐẠT (PASS) đó trả lời câu hỏi nào?
 
 Không còn là câu hỏi đã đăng ký ban đầu.
 
 Hoặc giả sử đổi geometry ba lần cho tới khi một phiên bản đúng.
 
-Ta có thể có một kernel mới.
+Ta có thể có một chương trình GPU mới.
 
 Nhưng ta đã mất thông tin:
 
 > **cơ chế nguyên bản không chuyển được sang Q6.**
 
-Trong nghiên cứu, mục tiêu không phải tối đa số PASS.
+Trong nghiên cứu, mục tiêu không phải tối đa số ĐẠT (PASS).
 
 Mục tiêu là:
 
-> **tối đa lượng tri thức đáng tin mà mỗi PASS và FAIL mang lại.**
+> **tối đa lượng tri thức đáng tin mà mỗi ĐẠT (PASS) và KHÔNG ĐẠT (FAIL) mang lại.**
 
-## Cánh cửa sang Mode T vẫn đóng
+## Cánh cửa sang T — Kiểm tra toàn hệ vẫn đóng
 
 Chương 14 sẽ nói về **Mode T — Transfer**, tức đưa một mechanism đã xác nhận sang hệ thống thật.
 
@@ -831,9 +806,9 @@ Chỉ những thứ sống sót mới được quyền đi tiếp.
 
 ### Nhớ 3 điều
 
-1. **Mode C khóa luật trước rồi để evidence phán xét.** Q6 giữ nguyên cơ chế Split-K đã PASS ở Q4 và phải vượt correctness trước khi performance được phép đo.
-2. **Q6 FAIL về correctness, không FAIL về performance.** Performance không được chạy, số measurement pair bằng 0 và model thật không được load; vì vậy không được nói Q6 nhanh hay chậm.
-3. **Một PASS không tự động tổng quát sang miền khác.** Q4 chứng minh cơ chế có giá trị trong phạm vi Q4_K đã thử. Q6 cho thấy cùng cơ chế giữ nguyên không vượt được correctness contract ở một định dạng lượng tử hóa khác.
+1. **Mode C khóa luật trước rồi để evidence phán xét.** Q6 giữ nguyên cơ chế Split-K đã ĐẠT (PASS) ở Q4 và phải vượt tính đúng trước khi hiệu năng được phép đo.
+2. **Q6 KHÔNG ĐẠT (FAIL) về tính đúng, không KHÔNG ĐẠT (FAIL) về hiệu năng.** hiệu năng không được chạy, số measurement pair bằng 0 và mô hình thật không được load; vì vậy không được nói Q6 nhanh hay chậm.
+3. **Một ĐẠT (PASS) không tự động tổng quát sang miền khác.** Q4 chứng minh cơ chế có giá trị trong phạm vi Q4_K đã thử. Q6 cho thấy cùng cơ chế giữ nguyên không vượt được tính đúng tiêu chuẩn đã khóa ở một định dạng lượng tử hóa khác.
 
 **Chương 14 — Từ một cơ chế tốt tới hệ thống thật**
 
@@ -843,8 +818,8 @@ Nhưng Q4 thì đã sống sót.
 
 Câu hỏi kế tiếp vì vậy không còn là:
 
-> “Component này có nhanh không?”
+> “thành phần này có nhanh không?”
 
 Mà là:
 
-> **“Khi mang chính cơ chế đã PASS vào model thật, với trọng số thật, activation thật và toàn bộ decode graph, lợi ích đó còn tồn tại không?”**
+> **“Khi mang chính cơ chế đã ĐẠT (PASS) vào mô hình thật, với trọng số thật, dữ liệu trung gian thật và toàn bộ giai đoạn sinh token đồ thị, lợi ích đó còn tồn tại không?”**
