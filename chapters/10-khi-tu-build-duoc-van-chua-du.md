@@ -109,8 +109,8 @@ Tách câu này ra.
 
 ```text
 TTFT
-decode throughput
-E2E latency
+thông lượng sinh token
+độ trễ toàn lượt
 peak working set
 ```
 
@@ -129,7 +129,7 @@ Q3 vì vậy khóa threshold trước thực thi.
 Đối với TTFT:
 
 ```text
-Arc / baseline <= 0,90
+Arc / đối chứng <= 0,90
 ```
 
 nghĩa là ArcLLM phải có TTFT thấp hơn ít nhất 10%.
@@ -137,7 +137,7 @@ nghĩa là ArcLLM phải có TTFT thấp hơn ít nhất 10%.
 Ví dụ:
 
 ```text
-baseline TTFT = 100 ms
+TTFT đối chứng = 100 ms
 ```
 
 Muốn ĐẠT (PASS) benefit gate:
@@ -155,13 +155,13 @@ vì:
 Với giai đoạn sinh token thông lượng, hướng tốt lại ngược lại:
 
 ```text
-Arc / baseline >= 1,10
+Arc / đối chứng >= 1,10
 ```
 
 Ví dụ:
 
 ```text
-baseline = 10 token/s
+đối chứng = 10 token/s
 ```
 
 ArcLLM phải đạt ít nhất:
@@ -179,13 +179,13 @@ vì:
 E2E cũng giống TTFT:
 
 ```text
-Arc / baseline <= 0,90
+Arc / đối chứng <= 0,90
 ```
 
 Còn peak working set có threshold mạnh hơn:
 
 ```text
-Arc / baseline <= 0,85
+Arc / đối chứng <= 0,85
 ```
 
 tức thấp hơn ít nhất 15%.
@@ -225,7 +225,7 @@ Nhưng đồng thời:
 
 ```text
 TTFT chậm gấp 2
-decode chỉ còn một nửa
+sinh token chỉ còn một nửa
 E2E chậm gấp 3
 ```
 
@@ -239,23 +239,23 @@ Guard được khóa:
 
 ```text
 TTFT:
-Arc / baseline <= 1,10
+Arc / đối chứng <= 1,10
 
-decode throughput:
-Arc / baseline >= 0,90
+thông lượng sinh token:
+Arc / đối chứng >= 0,90
 
 E2E:
-Arc / baseline <= 1,10
+Arc / đối chứng <= 1,10
 
 working set:
-Arc / baseline <= 1,10
+Arc / đối chứng <= 1,10
 ```
 
 Ví dụ một phương án thử có:
 
 ```text
 working set
-= 0,80× baseline
+= 0,80× đối chứng
 ```
 
 → lợi hơn 20%, vượt benefit threshold 15%.
@@ -264,7 +264,7 @@ Nhưng nếu:
 
 ```text
 TTFT
-= 1,50× baseline
+= 1,50× đối chứng
 ```
 
 thì blocking-harm guard KHÔNG ĐẠT (FAIL).
@@ -303,7 +303,7 @@ Mà vì tiêu chuẩn đã khóa đã xác định trước bốn primary dimens
 
 ```text
 TTFT
-decode throughput
+thông lượng sinh token
 E2E
 working set
 ```
@@ -319,11 +319,11 @@ Một điểm còn mạnh hơn nữa:
 Trước Q3 adjudication, bị cấm:
 
 ```text
-kernel tuning
-scheduler tuning
+tinh chỉnh chương trình GPU
+tinh chỉnh cách lập lịch
 architecture change
-workload search
-đổi baseline
+tìm bài đo
+đổi mốc đối chứng
 đổi threshold
 ```
 
@@ -356,8 +356,8 @@ Q3 vì vậy yêu cầu:
 Có hai phiên đo độc lập:
 
 ```text
-Session A
-Session B
+Phiên đo A
+Phiên đo B
 ```
 
 Mỗi phiên đo chạy:
@@ -374,7 +374,7 @@ Tức:
 
 ```text
 2 × 2 × 5
-= 20 attempts/session
+= 20 lượt thử / phiên
 ```
 
 Hai phiên đo:
@@ -427,9 +427,9 @@ Nhưng nó giúp tránh một bias quá hiển nhiên.
 Hai fresh phiên đo vẫn khóa:
 
 ```text
-cùng model
-cùng baseline
-cùng GPU driver
+cùng mô hình
+cùng mốc đối chứng
+cùng trình điều khiển GPU
 cùng hardware
 cùng power scheme
 AC power
@@ -463,7 +463,7 @@ Mỗi attempt có:
 
 ```text
 32 generated tokens
-finite logits
+điểm dự đoán hữu hạn
 timing hợp lệ
 resource traces
 ```
@@ -484,7 +484,7 @@ Evidence đủ để adjudicate.
 TTFT
 = 12,422×
 
-decode
+sinh token
 = 0,02473×
 
 E2E
@@ -528,7 +528,7 @@ W-C phiên đo A:
 TTFT
 = 9,198×
 
-decode
+sinh token
 = 0,02172×
 
 E2E
@@ -552,7 +552,7 @@ W-S:
 TTFT
 = 14,801×
 
-decode
+sinh token
 = 0,01761×
 
 E2E
@@ -568,7 +568,7 @@ W-C:
 TTFT
 = 9,605×
 
-decode
+sinh token
 = 0,02800×
 
 E2E
@@ -643,9 +643,9 @@ PASS threshold
 +
 PASS blocking-harm guard
 +
-Session A
+Phiên đo A
 +
-Session B
+Phiên đo B
 ```
 
 Không điều kiện nào như vậy xuất hiện.
@@ -695,19 +695,19 @@ Vulkan core
 ↓
 kernels
 ↓
-decoder layer
+sinh tokenr layer
 ↓
-full decoder
+full sinh tokenr
 ↓
 KV cache
 ↓
 generation
 ↓
-production path
+đường chạy thực tế
 ↓
-7B execution
+thực thi mô hình 7B
 ↓
-matched benchmark
+phép đo đối chứng cùng điều kiện
 ```
 
 Rất nhiều thứ ĐẠT (PASS).
@@ -828,11 +828,11 @@ Và lần này, một ý tưởng mới sẽ không được phép bước vào 
 Nó phải giải thích được:
 
 ```text
-bottleneck nào
+nút thắt nào
 ↓
 mechanism nào
 ↓
-vì sao mechanism đó có thể thay đổi bottleneck
+vì sao cơ chế đó có thể thay đổi nút thắt
 ↓
 điều gì sẽ giết hypothesis
 ```
