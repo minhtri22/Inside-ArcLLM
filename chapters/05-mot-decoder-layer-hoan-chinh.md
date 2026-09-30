@@ -231,7 +231,7 @@ P4 muốn cả chuỗi chạy liền mạch.
 
 Một điều được khóa rất rõ trong P4 là:
 
-> **không có vòng lặp tính toán trung gian quay ngược về CPU (vòng đi-về trung gian qua CPU).**
+> **không có vòng đi-về trung gian qua CPU (zero intermediate host round-trip).**
 
 Đây là thuật ngữ chúng ta sẽ dùng từ đây về sau.
 
