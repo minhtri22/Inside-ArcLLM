@@ -81,7 +81,7 @@ Rồi lặp.
 
 ## Q4_K_M không có nghĩa mọi khối số đều là Q4_K
 
-P7 được gọi là bước xây **Q4_K_M đường chạy thực tế — đường thực thi Q4_K_M gần với cách hệ thực thi thực tế sẽ sử dụng mô hình hơn**.
+P7 được gọi là bước xây **đường chạy thực tế Q4_K_M (production path)** — đường thực thi gần với cách hệ thống thật sẽ sử dụng mô hình hơn.
 
 Ta cần làm rõ tên này trước.
 
@@ -152,7 +152,7 @@ Một cơ chế chạy được ở 4 hoặc 16 vị trí chưa chắc chạy đ
 
 P7-A vì vậy phải thay một số phần đã đủ cho **bằng chứng ban đầu** nhưng chưa đủ cho bài đo lớn hơn.
 
-cơ chế chú ý giai đoạn xử lý đầu vào chuyển sang **online softmax — cách tính softmax theo luồng để không phụ thuộc vào một mảng cố định chỉ chứa được số lượng token nhỏ**.
+cơ chế chú ý giai đoạn xử lý đầu vào chuyển sang **cách tính softmax theo luồng (online softmax)** — không phụ thuộc vào một mảng cố định chỉ chứa được số lượng token nhỏ.
 
 Các phép nhân trọng số Q4_K/Q6_K cho batch 512 được tổ chức thành **2-D packed GEMM — phép nhân ma trận GPU chia công việc theo hai chiều trong khi vẫn đọc trọng số đóng gói**.
 
@@ -207,7 +207,7 @@ R8-VK reference
 
 Cần đọc thật cẩn thận.
 
-Những con số R8-VK ở đây **không phải ĐẠT (PASS) threshold — không phải ngưỡng mà P7-A buộc phải vượt qua**.
+Những con số R8-VK ở đây **không phải ngưỡng ĐẠT (PASS threshold)** — không phải ngưỡng mà P7-A buộc phải vượt qua.
 
 Vì vậy ta không được viết:
 
@@ -215,7 +215,7 @@ Vì vậy ta không được viết:
 
 Scientific kết luận của P7-A là:
 
-> **Measurement ĐẠT (PASS) — phép đo đã chạy hợp lệ, tính đúng vẫn giữ, và evidence cho thấy đường chạy thực tế hiện tại còn một khoảng cách hiệu năng rất lớn.**
+> **Phép đo ĐẠT (measurement PASS)** — phép đo chạy hợp lệ, tính đúng vẫn giữ, và bằng chứng cho thấy đường chạy thực tế hiện tại còn một khoảng cách hiệu năng rất lớn.
 
 Đây là một khác biệt quan trọng.
 
@@ -257,15 +257,15 @@ Với `tg128`, phần lớn thời gian cũng nằm trong vùng GPU đang thực
 
 Nhưng nó loại được một giả thuyết lớn:
 
-> **Host orchestration — phần điều phối phía CPU — không phải nút thắt chính đầu tiên cần đánh.**
+> **Điều phối phía CPU (host orchestration)** không phải nút thắt chính đầu tiên cần xử lý.
 
-Evidence chỉ về **thiết bị-side thực thi — phần tính toán phía GPU**.
+Evidence chỉ về **thực thi phía thiết bị (device-side execution)** — phần tính toán phía GPU.
 
 Từ đây P7-B mở đo đạc hiệu năng — **đo thời gian bên trong từng nhóm công việc GPU**.
 
 ## Không tối ưu cả khu rừng — tìm cây lớn nhất trước
 
-P7-B dùng **Vulkan timestamp queries — dấu thời gian do GPU ghi lại quanh các lần giao việc cho GPU**.
+P7-B dùng **truy vấn dấu thời gian Vulkan (Vulkan timestamp queries)** — dấu thời gian do GPU ghi lại quanh các lần giao việc cho GPU.
 
 Ý tưởng rất đơn giản:
 
@@ -298,7 +298,7 @@ LM head
 ...
 ```
 
-Từ **family — họ** ở đây không có nghĩa gom tùy ý nhiều phép tính không liên quan. Nó chỉ một tập tác vụ có quan hệ vì cùng vai trò, cùng phép tính nền tảng hoặc cùng cơ chế thực thi, nên một thay đổi kiến trúc có thể tác động lên cả họ.
+Từ **họ tác vụ (family)** ở đây không có nghĩa gom tùy ý nhiều phép tính không liên quan. Nó chỉ một tập tác vụ có quan hệ vì cùng vai trò, cùng phép tính nền tảng hoặc cùng cơ chế thực thi, nên một thay đổi kiến trúc có thể tác động lên cả họ.
 
 Lần đầu tiên ArcLLM không chỉ biết:
 
@@ -322,7 +322,7 @@ Không sửa giai đoạn sinh token.
 
 ## Một thay đổi đầu tiên tạo khác biệt lớn
 
-P7-C thử **tiling — chia phép nhân ma trận thành các khối nhỏ để GPU có thể tái sử dụng dữ liệu hiệu quả hơn** cho FFN Q4_K và Q6_K.
+P7-C thử **chia khối (tiling)** — chia phép nhân ma trận thành các khối nhỏ để GPU tái sử dụng dữ liệu hiệu quả hơn cho FFN Q4_K và Q6_K.
 
 Các regression số học vẫn ĐẠT (PASS).
 
@@ -374,7 +374,7 @@ Nó quay lại đo.
 
 Sau khi FFN được cải thiện, P7-D profile lại graph.
 
-Lần này phần lớn thời gian chuyển sang các **cơ chế chú ý projections — những phép nhân tạo và biến đổi Q/K/V/O cho cơ chế chú ý**.
+Lần này phần lớn thời gian chuyển sang các **các phép chiếu của cơ chế chú ý (attention projections)** — những phép nhân tạo và biến đổi Q/K/V/O.
 
 Chỉ riêng nhóm này chiếm khoảng 59% chain time trong profile đó.
 
@@ -404,7 +404,7 @@ Gate:
 
 Rồi lại đo.
 
-Sau đó P7-G thử tăng mức tái sử dụng theo token với **token tile16 — xử lý một khối 16 token trong cấu trúc chương trình GPU đó**.
+Sau đó P7-G thử tăng mức tái sử dụng theo token với **khối 16 token (token tile16)** — xử lý 16 token trong cùng cấu trúc chương trình GPU.
 
 Kết quả:
 
@@ -462,7 +462,7 @@ thêm nhóm con GPU để nhiều làn tính toán phối hợp?
 
 Nếu cứ implementation → run → sửa → run cho tới khi số đẹp lên, ta rất dễ biến nghiên cứu thành tuning không có điểm dừng.
 
-Đây là đúng thời điểm cuốn sách cần giới thiệu bốn **research modes — chế độ quản trị nghiên cứu** mà chúng ta sẽ dùng về sau.
+Đây là đúng thời điểm cuốn sách cần giới thiệu bốn **các chế độ nghiên cứu (research modes)** mà chúng ta sẽ dùng về sau.
 
 Lưu ý quan trọng:
 
@@ -472,7 +472,7 @@ Ta đang dùng chúng như một cách đọc và quản trị những nghiên c
 
 ### E — Khám phá (Explore)
 
-**Mode E — khám phá nhanh** dùng khi câu hỏi còn là:
+**E — Khám phá (Explore)** dùng khi câu hỏi còn là:
 
 > “Vấn đề nằm ở đâu?”
 
@@ -513,7 +513,7 @@ Câu hỏi phải đủ hẹp để kết quả có thể giết hoặc giữ ch
 
 ### C — Xác nhận (Confirm)
 
-Nếu mechanism sống sót, mới đi sang **Mode C — phép xác nhận ĐẠT (PASS)/KHÔNG ĐẠT (FAIL) đã khóa trước**.
+Nếu mechanism sống sót, mới đi sang **C — Xác nhận (Confirm)** — phép xác nhận ĐẠT/KHÔNG ĐẠT đã khóa trước.
 
 Ví dụ P7 thường dùng:
 
@@ -536,7 +536,7 @@ KHÔNG ĐẠT (FAIL) là KHÔNG ĐẠT (FAIL).
 
 Chỉ khi Mode C ĐẠT (PASS) mới có lý do đưa mechanism sang đường lớn hơn.
 
-Đó là **Mode T — mang bằng chứng đã qua xác nhận vào hệ thống tiếp theo và kiểm tra nó còn giữ được giá trị hay không**.
+Đó là **T — Kiểm tra khi đưa lên toàn hệ (Transfer / carry-through)** — mang bằng chứng đã qua xác nhận vào hệ thống lớn hơn để xem giá trị còn giữ được hay không.
 
 Có thể hình dung:
 
@@ -560,7 +560,7 @@ PASS?
 
 Một nguyên tắc đặc biệt quan trọng là:
 
-> **Fresh evidence là research capital — bằng chứng mới là vốn nghiên cứu.**
+> **Bằng chứng mới (fresh evidence) là vốn nghiên cứu (research capital).**
 
 Không nên đốt một fresh run chỉ để hỏi một câu mà evidence cũ đã đủ sức giết.
 
@@ -667,7 +667,7 @@ mốc đối chứng dùng:
 
 cho 28 lớp.
 
-P7-L thử **gộp phép tính — gộp hai công việc liên quan vào một chương trình GPU** để gate và up có thể dùng chung một phần dữ liệu đầu vào và lịch lần giao việc cho GPU.
+P7-L thử **gộp phép tính (fusion)** — gộp hai công việc liên quan vào một chương trình GPU để gate và up có thể dùng chung một phần dữ liệu đầu vào và lịch lần giao việc cho GPU.
 
 Kết quả:
 
@@ -880,7 +880,7 @@ P7 ghi nhận rằng absolute thông lượng — **tốc độ tuyệt đối**
 
 Vì vậy các quyết định tối ưu dựa chủ yếu vào:
 
-> **A/B xen kẽ trong cùng lượt chạy — mốc đối chứng và phương án thử được chạy luân phiên trong cùng phiên đo.**
+> **Đo A/B xen kẽ trong cùng lượt chạy (same-run interleaved A/B)** — mốc đối chứng và phương án thử được chạy luân phiên trong cùng phiên đo.
 
 Lý do trực giác rất đơn giản.
 
@@ -964,7 +964,7 @@ Phần II bắt đầu từ đó.
 2. **Một phương án thử có nhanh hơn vẫn có thể KHÔNG ĐẠT.** P7-K tăng khoảng 6,8% nhưng không vượt ngưỡng `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn KHÔNG ĐẠT. Ngưỡng không được sửa sau khi đã thấy kết quả.
 3. **P7-L là phương án tốt nhất cho đường chạy nội bộ lúc đó, không phải bằng chứng ArcLLM thắng hệ thực thi khác.** Muốn đưa ra kết luận như vậy, cuốn sách phải chuyển sang phép đo đối chứng cùng điều kiện ở Chương 9.
 
-**Chương 9 — phép đo so sánh phải có đối chứng**
+**Chương 9 — Muốn biết nhanh hay chậm, phải có một mốc để so**
 
 Từ đây, câu hỏi không còn là:
 
