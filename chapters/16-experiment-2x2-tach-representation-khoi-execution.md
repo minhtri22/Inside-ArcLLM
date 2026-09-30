@@ -924,7 +924,7 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 ### Nhớ 3 điều
 
 1. **cách biểu diễn dữ liệu và cách thực thi là hai biến khác nhau.** Một cái quyết định dữ liệu được bố trí thế nào; cái kia quyết định GPU chia và thực hiện công việc thế nào. Thí nghiệm 2×2 cho phép thay từng yếu tố riêng rồi mới thử kết hợp.
-2. **Hai **cách tối ưu** tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai workload; tương tác được phân loại là đối kháng.
+2. **Hai cách tối ưu tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai bài đo; tương tác được phân loại là đối kháng.
 3. **Kiến trúc không chỉ được chọn bằng độ trễ.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident bộ nhớ. Kết quả đúng có thể là một frontier, không phải một phương án thắng duy nhất.
 
 **Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**
