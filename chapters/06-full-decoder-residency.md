@@ -67,7 +67,7 @@ Có thể hình dung:
 token ID
   1234
     ↓
-embedding
+phép nhúng
     ↓
 [0,12, -0,08, 0,44, ...]
 ```
@@ -111,7 +111,7 @@ Nếu thay đổi quá nhiều thứ cùng lúc:
 ```text
 chuỗi dài hơn
 +
-28 layer
+28 lớp
 +
 toàn bộ trọng số
 +
@@ -155,7 +155,7 @@ P5 giữ:
 trong:
 
 ```text
-4 tensor-aware packed weight arenas
+4 các vùng trọng số đóng gói theo khối số
 ```
 
 Ta tách cụm này:
@@ -167,14 +167,14 @@ Ta tách cụm này:
 Có thể hình dung:
 
 ```text
-Arena 1
+Vùng 1
 ┌───────────────────────┐
 │ tensor A              │
 │ tensor B              │
 │ tensor C              │
 └───────────────────────┘
 
-Arena 2
+Vùng 2
 ┌───────────────────────┐
 │ tensor D              │
 │ tensor E              │
@@ -203,7 +203,7 @@ Ta đã gặp từ **resident — cư trú, tức dữ liệu được giữ s�
 Toàn bộ các trọng số cần cho chuỗi:
 
 ```text
-embedding
+phép nhúng
    ↓
 28 decoder layers
    ↓
@@ -219,17 +219,17 @@ Ta có thể so hai cách tưởng tượng.
 Cách tệ:
 
 ```text
-Layer 0
+Lớp 0
 → lấy trọng số
 → tính
 → bỏ
 
-Layer 1
+Lớp 1
 → lấy trọng số
 → tính
 → bỏ
 
-Layer 2
+Lớp 2
 → lấy trọng số
 → tính
 → bỏ
@@ -242,11 +242,11 @@ toàn bộ trọng số cần thiết
 → đã cư trú
 
 token đi vào
-→ layer 0
-→ layer 1
-→ layer 2
+→ lớp 0
+→ lớp 1
+→ lớp 2
 → ...
-→ layer 27
+→ lớp 27
 ```
 
 Tòa nhà đã có sẵn tất cả các phòng.
@@ -316,11 +316,11 @@ cùng bảng trọng số
 ...
 
 đầu ra
-trạng thái model
+trạng thái mô hình
    ↓
 cùng bảng trọng số
    ↓
-logits
+điểm dự đoán
 ```
 
 P5 dùng chính khối số Q6_K đóng gói đó cho cả phép nhúng và lớp tạo điểm đầu ra (LM head) theo cấu trúc mô hình đã khóa.
@@ -345,7 +345,7 @@ chunk 2
 chunk 3
 ...
       ↓
-ghép thành logits cuối
+ghép thành điểm dự đoán cuối
 ```
 
 Điều quan trọng là việc chia chunk này vẫn diễn ra mà không có **vòng đi-về trung gian qua CPU — vòng lặp tính toán trung gian quay ngược về CPU**.
@@ -369,9 +369,9 @@ Nhắc lại:
 Điều đó hợp lý vì bây giờ ta không chạy một lớp nữa mà là toàn bộ:
 
 ```text
-embedding
+phép nhúng
 +
-28 layers
+28 lớps
 +
 final norm
 +
@@ -383,7 +383,7 @@ Nhưng điều đáng chú ý hơn là:
 ```text
 441 dispatches
 
-→ 1 command buffer
+→ 1 bộ lệnh
 → 1 submit
 → 1 fence wait
 ```
@@ -400,11 +400,11 @@ CPU chuẩn bị toàn bộ kế hoạch
 submit
         ↓
 GPU:
-embedding
-→ layer 0
-→ layer 1
+phép nhúng
+→ lớp 0
+→ lớp 1
 → ...
-→ layer 27
+→ lớp 27
 → norm
 → LM head
         ↓
@@ -537,7 +537,7 @@ Ta đã có:
 ```text
 token ID đầu vào
       ↓
-embedding thật
+phép nhúng thật
       ↓
 28 decoder layers
       ↓
@@ -545,7 +545,7 @@ final norm
       ↓
 LM head
       ↓
-logits
+điểm dự đoán
       ↓
 top1
 ```
@@ -635,10 +635,10 @@ Tóm tắt P5 bằng ngôn ngữ đã quen:
 980.097.536 packed bytes
 → khoảng 934,7 MiB dữ liệu trọng số đóng gói
 
-4 tensor-aware weight arenas
+4 vùng trọng số theo khối số
 → 4 vùng lưu trọng số, vẫn biết ranh giới từng tensor
 
-token embedding Q6_K
+token phép nhúng Q6_K
 → biến token ID thành vector đầu vào bằng trọng số thật
 
 28 decoder layers
@@ -648,12 +648,12 @@ final RMSNorm
 → chuẩn hóa trạng thái cuối
 
 tied Q6_K LM head
-→ dùng chung token_embd.weight để tạo logits đầu ra
+→ dùng chung token_embd.weight để tạo điểm dự đoán đầu ra
 
 441 Vulkan dispatches
 → 441 công việc GPU
 
-1 command buffer
+1 bộ lệnh
 1 submit
 1 fence wait
 → cả chuỗi được gửi như một execution liên tục
@@ -666,7 +666,7 @@ max_abs = 0,0002012252808
 RMSE    = 0,000007641232208
 → PASS
 
-logits
+điểm dự đoán
 max_abs = 0,00003051757812
 RMSE    = 0,000005368667236
 → PASS
