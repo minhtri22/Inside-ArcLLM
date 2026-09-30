@@ -927,7 +927,7 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 2. **Hai cách tối ưu tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai bài đo; tương tác được phân loại là đối kháng.
 3. **Kiến trúc không chỉ được chọn bằng độ trễ.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident bộ nhớ. Kết quả đúng có thể là một frontier, không phải một phương án thắng duy nhất.
 
-**Chương 17 — Khi một cách sắp dữ liệu trở thành một phần của kiến trúc**
+**Tiếp theo: [Chương 17 — Khi một cách sắp dữ liệu trở thành một phần của kiến trúc](17-exec148-khi-bang-chung-buoc-mot-lop-truu-tuong-moi-xuat-hien.md)**
 
 Thí nghiệm 2×2 vừa cho thấy một điều rất cụ thể:
 
