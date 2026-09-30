@@ -150,7 +150,7 @@ hay thực ra chúng đang làm trùng một việc?
 
 Đây là lý do cần một:
 
-> **factorial Thí nghiệm — thí nghiệm nhân tố**, ở đây là thiết kế **2×2**.
+> **thí nghiệm nhân tố (factorial experiment)**, ở đây là thiết kế **2×2**.
 
 Không phải vì bảng 2×2 trông đẹp.
 
@@ -278,7 +278,7 @@ Sau đó GPU dùng image đã được chuẩn bị sẵn.
 
 Đây gọi là:
 
-> **materialization — tạo ra một biểu diễn thực thi cụ thể từ dữ liệu nguồn.**
+> **tạo biểu diễn cụ thể (materialization)** — tạo ra một cách biểu diễn thực thi từ dữ liệu nguồn.
 
 Ta có thể hình dung:
 
@@ -501,7 +501,7 @@ Một lần nữa:
 
 Nó cho phép ta nhìn thấy:
 
-> **tương tác — sự tương tác giữa hai yếu tố.**
+> **tương tác (interaction)** — cách hai yếu tố ảnh hưởng lẫn nhau.
 
 ## Tương tác giữa hai thay đổi nghĩa là gì?
 
@@ -578,7 +578,7 @@ tương tác âm.
 
 Ta gọi đây là:
 
-> **antagonistic tương tác — tương tác đối kháng**, tức hai thay đổi đang chồng lấn hoặc cản một phần lợi ích của nhau.
+> **tương tác đối kháng (antagonistic interaction)**, tức hai thay đổi đang chồng lấn hoặc cản một phần lợi ích của nhau.
 
 Trong Thí nghiệm thật của ArcLLM, tương tác cũng âm rõ rệt ở cả W-S và W-C.
 
@@ -789,7 +789,7 @@ Vì vậy crossover thời gian không tự động quyết định architecture
 
 Sau đo thời gian, hai arm bị loại khá rõ.
 
-mốc đối chứng 0 bị A **dominate — lấn át**:
+mốc đối chứng 0 bị A **lấn át (dominate)**:
 
 - cùng lớp chi phí không-materialization;
 - nhưng A nhanh hơn.
@@ -816,7 +816,7 @@ B giảm steady-state độ trễ hơn.
 
 Hai phương án tạo thành:
 
-> **non-dominated frontier — tập các phương án mà mỗi phương án còn một lợi thế riêng, nên không thể loại chỉ bằng một tiêu chí.**
+> **biên không bị lấn át (non-dominated frontier)** — tập các phương án mà mỗi phương án còn một lợi thế riêng, nên không thể loại chỉ bằng một tiêu chí.
 
 Đây là một bước trưởng thành khác của cách nghĩ kiến trúc.
 
@@ -927,7 +927,7 @@ Những câu hỏi đó lớn hơn một shader Q4-down.
 2. **Hai cách tối ưu tốt riêng lẻ không nhất thiết cộng được với nhau.** A và B đều giảm độ trễ mạnh, nhưng AB lại chậm hơn B ở cả hai bài đo; tương tác được phân loại là đối kháng.
 3. **Kiến trúc không chỉ được chọn bằng độ trễ.** A không cần image phụ; B nhanh hơn nhưng cần materialization khoảng `231,64 ms` và thêm khoảng `550 MB` resident bộ nhớ. Kết quả đúng có thể là một frontier, không phải một phương án thắng duy nhất.
 
-**Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện**
+**Chương 17 — Khi một cách sắp dữ liệu trở thành một phần của kiến trúc**
 
 Thí nghiệm 2×2 vừa cho thấy một điều rất cụ thể:
 
