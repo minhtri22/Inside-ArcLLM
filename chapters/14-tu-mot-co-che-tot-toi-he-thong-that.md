@@ -19,16 +19,16 @@
 
 Chương 13 cho ta hai con đường khác nhau.
 
-Q6 dừng ở Mode C.
+Q6 dừng ở bước C — Xác nhận.
 
-Cùng một cơ chế Split-K và hình học thực thi đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi áp dụng sang Q6_K bằng phương án thử có bộ đọc packed-Q6 tương ứng.
+Cùng một cơ chế Split-K và hình học thực thi đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi áp dụng sang Q6_K bằng phương án thử có bộ đọc Q6 đóng gói tương ứng.
 
 Vì vậy:
 
 ```text
 Q6
-→ correctness FAIL
-→ STOP
+→ tính đúng: KHÔNG ĐẠT
+→ DỪNG
 ```
 
 Nhưng Q4 thì khác.
@@ -41,9 +41,9 @@ Tính đúng đã giữ.
 
 mức tăng tốc cũng đủ lớn.
 
-Q4 vì thế được quyền bước sang mode cuối cùng trong chuỗi E/M/C/T:
+Q4 vì thế được quyền bước sang chế độ cuối cùng trong chuỗi E/M/C/T:
 
-> **Mode T — Transfer, chuyển một cơ chế đã được xác nhận sang bối cảnh thực tế lớn hơn để xem bằng chứng có còn đứng vững hay không.**
+> **T — Kiểm tra toàn hệ: đưa một cơ chế đã được xác nhận sang bối cảnh thực tế lớn hơn để xem bằng chứng có còn đứng vững hay không.**
 
 Trong nghiên cứu ArcLLM, ta còn dùng từ:
 
