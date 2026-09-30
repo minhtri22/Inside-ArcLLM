@@ -1,49 +1,25 @@
-# Chương 10 — Khi “tự build được” vẫn chưa đủ
+# Chương 10 — Tự xây được vẫn chưa có nghĩa là tốt hơn
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Kết quả đối chứng
+>         ↓
+> ArcLLM còn cách xa
+>         ↓
+> [ kiểm tra lại bằng bằng chứng mới ]
+>         ↓
+> chấp nhận kết quả dù không có lợi
 > ```
->
-> ▶ **Đang mở ở chương này:** benchmark / giả thuyết âm tính / stop rule.
 
 
-> **Câu hỏi của chương:** Sau khi matched benchmark cho thấy một khoảng cách rất lớn, làm thế nào kiểm tra nghiêm túc xem kiến trúc ArcLLM hiện tại có còn một lợi thế thực tế nào đủ lớn và tái lập được hay không?
+> **Câu hỏi của chương:** Sau khi phép đo đối chứng cùng điều kiện cho thấy một khoảng cách rất lớn, làm thế nào kiểm tra nghiêm túc xem kiến trúc ArcLLM hiện tại có còn một lợi thế thực tế nào đủ lớn và tái lập được hay không?
 
 Chương 9 kết thúc ở một điểm hơi khó chịu.
 
-ArcLLM đã chạy được model 7B thật.
+ArcLLM đã chạy được mô hình 7B thật.
 
 Nó đã có:
 
@@ -61,23 +37,23 @@ matched benchmark với llama.cpp
 
 Nhưng bảng Q2 không đẹp.
 
-Ở hai workload đã khóa, llama.cpp có TTFT thấp hơn rất nhiều, decode throughput cao hơn rất nhiều và working set cũng thấp hơn.
+Ở hai bài đo đã khóa, llama.cpp có TTFT thấp hơn rất nhiều, giai đoạn sinh token thông lượng cao hơn rất nhiều và working set cũng thấp hơn.
 
 Một phản xạ rất tự nhiên lúc này là:
 
 > “Tối ưu thêm đi.”
 
-Có thể fuse thêm kernel.
+Có thể fuse thêm chương trình GPU.
 
-Đổi tile.
+Đổi khối xử lý.
 
 Đổi scheduler.
 
-Tìm workload khác.
+Tìm bài đo khác.
 
-Thử context khác.
+Thử ngữ cảnh khác.
 
-Hoặc nhìn vào một metric nhỏ đang có lợi rồi nói:
+Hoặc nhìn vào một chỉ số nhỏ đang có lợi rồi nói:
 
 > “Ít nhất ArcLLM vẫn thắng ở điểm này.”
 
@@ -91,7 +67,7 @@ Q3 được mở để ngăn chính điều đó.
 
 Q2 đã hoàn thành vai trò của nó:
 
-> **matched characterization — mô tả ArcLLM và baseline trên cùng một mặt phẳng đo.**
+> **matched mô tả đặc tính — mô tả ArcLLM và mốc đối chứng trên cùng một mặt phẳng đo.**
 
 Q3 có vai trò khác.
 
@@ -103,7 +79,7 @@ Giả thuyết được gọi là:
 
 Đọc bằng tiếng Việt:
 
-> **Trong hai workload W-S và W-C đã khóa, kiến trúc ArcLLM hiện tại chưa chứng minh được một lợi thế đủ có ý nghĩa thực tế và tái lập qua hai phiên chạy mới.**
+> **Trong hai bài đo W-S và W-C đã khóa, kiến trúc ArcLLM hiện tại chưa chứng minh được một lợi thế đủ có ý nghĩa thực tế và tái lập qua hai phiên chạy mới.**
 
 Từ **bounded — có phạm vi giới hạn** rất quan trọng.
 
@@ -113,7 +89,7 @@ Q3 không nói:
 
 Nó chỉ hỏi:
 
-> **Với chính kiến trúc hiện tại, chính hardware này, chính model này và hai regime đã khóa, có advantage thực tế nào vượt qua contract hay không?**
+> **Với chính kiến trúc hiện tại, chính hardware này, chính mô hình này và hai regime đã khóa, có advantage thực tế nào vượt qua tiêu chuẩn đã khóa hay không?**
 
 Đó là một claim nhỏ hơn.
 
@@ -121,15 +97,15 @@ Nhưng kiểm chứng được.
 
 ## Muốn bác bỏ giả thuyết âm tính thì phải làm gì?
 
-H-NPA không thể bị bác bỏ chỉ vì một metric nào đó đẹp lên ở một lần chạy.
+H-NPA không thể bị bác bỏ chỉ vì một chỉ số nào đó đẹp lên ở một lần chạy.
 
 Q3 đặt luật:
 
-> Phải có **cùng một workload + cùng một primary benefit dimension** vượt qua practical-advantage gate trong **cả hai fresh session**.
+> Phải có **cùng một bài đo + cùng một primary benefit dimension** vượt qua practical-advantage gate trong **cả hai fresh phiên đo**.
 
 Tách câu này ra.
 
-**Primary benefit dimension — chiều lợi ích chính** là một trong bốn metric được phép tạo advantage:
+**Primary benefit dimension — chiều lợi ích chính** là một trong bốn chỉ số được phép tạo advantage:
 
 ```text
 TTFT
@@ -138,17 +114,17 @@ E2E latency
 peak working set
 ```
 
-Nếu W-S thắng về TTFT ở Session A nhưng sang Session B lại chỉ thắng về memory, điều đó chưa đủ.
+Nếu W-S thắng về TTFT ở phiên đo A nhưng sang phiên đo B lại chỉ thắng về bộ nhớ, điều đó chưa đủ.
 
-Nếu W-S thắng TTFT ở Session A nhưng không lặp lại ở Session B, cũng chưa đủ.
+Nếu W-S thắng TTFT ở phiên đo A nhưng không lặp lại ở phiên đo B, cũng chưa đủ.
 
 Claim phải tái lập đúng nơi nó tuyên bố tồn tại.
 
-## “Practical advantage” phải được định nghĩa trước
+## “Lợi thế thực tế” phải được định nghĩa trước
 
 Không phải mọi thay đổi 1% đều nên được gọi là advantage có ý nghĩa thực tế.
 
-Q3 vì vậy khóa threshold trước execution.
+Q3 vì vậy khóa threshold trước thực thi.
 
 Đối với TTFT:
 
@@ -164,7 +140,7 @@ Ví dụ:
 baseline TTFT = 100 ms
 ```
 
-Muốn PASS benefit gate:
+Muốn ĐẠT (PASS) benefit gate:
 
 ```text
 ArcLLM TTFT <= 90 ms
@@ -176,7 +152,7 @@ vì:
 90 / 100 = 0,90
 ```
 
-Với decode throughput, hướng tốt lại ngược lại:
+Với giai đoạn sinh token thông lượng, hướng tốt lại ngược lại:
 
 ```text
 Arc / baseline >= 1,10
@@ -214,7 +190,7 @@ Arc / baseline <= 0,85
 
 tức thấp hơn ít nhất 15%.
 
-Ví dụ baseline dùng:
+Ví dụ mốc đối chứng dùng:
 
 ```text
 5 GB
@@ -229,19 +205,19 @@ thì ArcLLM phải xuống tối đa khoảng:
 
 mới vượt benefit gate về working set.
 
-Những threshold này là **contract của Q3**.
+Những threshold này là **tiêu chuẩn đã khóa của Q3**.
 
-Chúng không được tuyên bố là ngưỡng phổ quát cho mọi runtime hay mọi ứng dụng.
+Chúng không được tuyên bố là ngưỡng phổ quát cho mọi hệ thực thi hay mọi ứng dụng.
 
 Điều quan trọng là chúng được khóa **trước khi nhìn outcome Q3**.
 
-## Thắng một metric nhưng phá ba metric khác thì sao?
+## Tốt ở một chỉ số nhưng làm hỏng ba chỉ số khác thì sao?
 
 Đây là nơi Q3 thêm một lớp bảo vệ rất quan trọng:
 
-**blocking-harm guard — hàng rào ngăn một lợi ích nhỏ được gọi là advantage khi nó phải trả giá quá lớn ở những metric chính khác.**
+**blocking-harm guard — hàng rào ngăn một lợi ích nhỏ được gọi là advantage khi nó phải trả giá quá lớn ở những chỉ số chính khác.**
 
-Giả sử một runtime giảm memory 20%.
+Giả sử một hệ thực thi giảm bộ nhớ 20%.
 
 Nghe rất tốt.
 
@@ -253,11 +229,11 @@ decode chỉ còn một nửa
 E2E chậm gấp 3
 ```
 
-Có nên gọi nó là “practical advantage” chỉ vì memory tốt hơn?
+Có nên gọi nó là “practical advantage” chỉ vì bộ nhớ tốt hơn?
 
 Q3 nói: không.
 
-Ngoài việc phải thắng ít nhất một primary dimension, **tất cả** các metric chính khác phải không xấu hơn baseline quá 10%.
+Ngoài việc phải thắng ít nhất một primary dimension, **tất cả** các chỉ số chính khác phải không xấu hơn mốc đối chứng quá 10%.
 
 Guard được khóa:
 
@@ -275,7 +251,7 @@ working set:
 Arc / baseline <= 1,10
 ```
 
-Ví dụ một candidate có:
+Ví dụ một phương án thử có:
 
 ```text
 working set
@@ -291,7 +267,7 @@ TTFT
 = 1,50× baseline
 ```
 
-thì blocking-harm guard FAIL.
+thì blocking-harm guard KHÔNG ĐẠT (FAIL).
 
 Không được gọi là practical advantage.
 
@@ -299,11 +275,11 @@ Không được gọi là practical advantage.
 
 > **Không được dùng một điểm sáng nhỏ để che một cái giá lớn ở phần còn lại của hệ thống.**
 
-## Private bytes thấp hơn không đủ
+## Dùng ít bộ nhớ riêng hơn vẫn chưa đủ
 
 Trong Q2 có một con số nhìn qua khá hấp dẫn.
 
-Private bytes của ArcLLM thấp hơn baseline khoảng 3%.
+Private bytes của ArcLLM thấp hơn mốc đối chứng khoảng 3%.
 
 Nếu đang cố “tìm điểm thắng”, đây là chỗ rất dễ bám vào.
 
@@ -315,15 +291,15 @@ CPU utilization
 GPU counters
 ```
 
-chỉ là **supporting metrics — metric hỗ trợ**.
+chỉ là **supporting các chỉ số — chỉ số hỗ trợ**.
 
 Chúng vẫn được ghi.
 
-Nhưng không được tự mình tạo verdict advantage.
+Nhưng không được tự mình tạo kết luận advantage.
 
 Lý do khoa học ở đây không phải vì chúng vô giá trị.
 
-Mà vì contract đã xác định trước bốn primary dimension được dùng để adjudicate:
+Mà vì tiêu chuẩn đã khóa đã xác định trước bốn primary dimension được dùng để adjudicate:
 
 ```text
 TTFT
@@ -332,7 +308,7 @@ E2E
 working set
 ```
 
-Sau outcome, không được đổi luật và đưa một supporting metric lên thành primary chỉ vì nó thuận lợi.
+Sau outcome, không được đổi luật và đưa một supporting chỉ số lên thành primary chỉ vì nó thuận lợi.
 
 ## Không được sửa ArcLLM trước Q3
 
@@ -363,13 +339,13 @@ Nó hỏi:
 
 Không còn tuning theo outcome.
 
-## Vì sao cần fresh evidence?
+## Vì sao cần bằng chứng mới?
 
 Q2 đã cho ta bảng dữ liệu.
 
 Tại sao không dùng luôn bảng đó để adjudicate Q3?
 
-Bởi threshold Q3 được thiết kế sau khi Q2 đã cho thấy bề mặt performance.
+Bởi threshold Q3 được thiết kế sau khi Q2 đã cho thấy bề mặt hiệu năng.
 
 Nếu lại dùng chính Q2 để xác nhận claim, ta sẽ vừa dùng evidence để hình thành câu hỏi, vừa dùng cùng evidence đó để tự trả lời.
 
@@ -377,14 +353,14 @@ Q3 vì vậy yêu cầu:
 
 **fresh reproduction — bằng chứng mới được tạo sau khi hypothesis và threshold đã khóa.**
 
-Có hai session độc lập:
+Có hai phiên đo độc lập:
 
 ```text
 Session A
 Session B
 ```
 
-Mỗi session chạy:
+Mỗi phiên đo chạy:
 
 ```text
 2 systems
@@ -401,7 +377,7 @@ Tức:
 = 20 attempts/session
 ```
 
-Hai session:
+Hai phiên đo:
 
 ```text
 20 × 2
@@ -410,9 +386,9 @@ Hai session:
 
 Ngoài ra mỗi cell vẫn có warmup trước measurement.
 
-## Hai session còn đảo thứ tự chạy
+## Hai phiên đo còn đảo thứ tự chạy
 
-Session A:
+phiên đo A:
 
 ```text
 ArcLLM W-S
@@ -424,7 +400,7 @@ llama.cpp W-C
 ArcLLM W-C
 ```
 
-Session B đảo lại:
+phiên đo B đảo lại:
 
 ```text
 llama.cpp W-S
@@ -440,15 +416,15 @@ llama.cpp W-C
 
 Hình dung nếu GPU nóng dần theo thời gian.
 
-Nếu ArcLLM luôn chạy trước và llama.cpp luôn chạy sau, thứ tự có thể bị trộn với performance.
+Nếu ArcLLM luôn chạy trước và llama.cpp luôn chạy sau, thứ tự có thể bị trộn với hiệu năng.
 
-Đảo thứ tự ở session thứ hai không loại được mọi loại nhiễu.
+Đảo thứ tự ở phiên đo thứ hai không loại được mọi loại nhiễu.
 
 Nhưng nó giúp tránh một bias quá hiển nhiên.
 
-## Environment cũng phải giữ matched
+## Môi trường cũng phải giữ cùng điều kiện
 
-Hai fresh session vẫn khóa:
+Hai fresh phiên đo vẫn khóa:
 
 ```text
 cùng model
@@ -460,13 +436,13 @@ AC power
 cùng workloads
 ```
 
-Session A và Session B là hai process/run độc lập.
+phiên đo A và phiên đo B là hai process/run độc lập.
 
 Không phải cùng một process chạy hai vòng rồi gọi là reproduction.
 
 Q3 muốn kiểm tra:
 
-> kết quả có sống sót qua một lần khởi động execution mới hay không?
+> kết quả có sống sót qua một lần khởi động thực thi mới hay không?
 
 ## Và cả 40 lần đều chạy thành công
 
@@ -498,11 +474,11 @@ Vì vậy nếu outcome âm tính, không thể nói:
 
 Evidence đủ để adjudicate.
 
-Đây là lý do verdict sau cùng **không phải UNRESOLVED**.
+Đây là lý do kết luận sau cùng **không phải UNRESOLVED**.
 
-## Session A nói gì?
+## phiên đo A nói gì?
 
-Ở W-S, tỷ lệ ArcLLM so với baseline là:
+Ở W-S, tỷ lệ ArcLLM so với mốc đối chứng là:
 
 ```text
 TTFT
@@ -520,7 +496,7 @@ working set
 
 Nhắc lại cách đọc.
 
-Với latency:
+Với độ trễ:
 
 ```text
 > 1
@@ -528,7 +504,7 @@ Với latency:
 
 nghĩa là ArcLLM chậm hơn.
 
-Với throughput:
+Với thông lượng:
 
 ```text
 < 1
@@ -542,11 +518,11 @@ Với working set:
 > 1
 ```
 
-nghĩa là ArcLLM dùng working-set memory cao hơn.
+nghĩa là ArcLLM dùng working-set bộ nhớ cao hơn.
 
 Không primary benefit nào gần threshold.
 
-W-C Session A:
+W-C phiên đo A:
 
 ```text
 TTFT
@@ -562,13 +538,13 @@ working set
 = 1,829×
 ```
 
-Cũng không có benefit candidate.
+Cũng không có benefit phương án thử.
 
-Blocking-harm guard FAIL.
+Blocking-harm guard KHÔNG ĐẠT (FAIL).
 
-## Session B có đảo kết luận không?
+## phiên đo B có đảo kết luận không?
 
-Session B là fresh reproduction.
+phiên đo B là fresh reproduction.
 
 W-S:
 
@@ -614,21 +590,21 @@ và:
 blocking-harm guard FAIL
 ```
 
-ở cả hai workload.
+ở cả hai bài đo.
 
-Không có cùng workload + cùng primary dimension nào có thể reproduce advantage, bởi thậm chí **không có primary benefit nào PASS ngay trong một session**.
+Không có cùng bài đo + cùng primary dimension nào có thể reproduce advantage, bởi thậm chí **không có primary benefit nào ĐẠT (PASS) ngay trong một phiên đo**.
 
-## Private bytes và CPU vẫn có signal
+## Bộ nhớ riêng và CPU vẫn có tín hiệu
 
 Một chi tiết đáng chú ý vẫn tái lập.
 
-Private bytes của ArcLLM thấp hơn baseline khoảng 3%.
+Private bytes của ArcLLM thấp hơn mốc đối chứng khoảng 3%.
 
 CPU utilization được ghi nhận thấp hơn đáng kể.
 
 Q3 không giấu các kết quả đó.
 
-Nhưng contract nói rõ:
+Nhưng tiêu chuẩn đã khóa nói rõ:
 
 > chúng không được tự mình tạo regime advantage.
 
@@ -678,7 +654,7 @@ Vì thế:
 
 > **H-NPA không bị falsify — không bị bằng chứng bác bỏ.**
 
-Q3 đi tới verdict đã khóa từ trước:
+Q3 đi tới kết luận đã khóa từ trước:
 
 > **FEASIBLE_NO_DEMONSTRATED_ADVANTAGE**
 
@@ -700,7 +676,7 @@ Không phải:
 
 Chỉ là:
 
-> **Với model, hardware, workloads, baseline và architecture đã khóa, evidence không hỗ trợ một practical regime advantage.**
+> **Với mô hình, hardware, các bài đo, mốc đối chứng và architecture đã khóa, evidence không hỗ trợ một practical regime advantage.**
 
 Đó là phạm vi hợp lệ của kết luận.
 
@@ -734,9 +710,9 @@ production path
 matched benchmark
 ```
 
-Rất nhiều thứ PASS.
+Rất nhiều thứ ĐẠT (PASS).
 
-Thật dễ để tất cả PASS trước đó tạo ra một loại attachment:
+Thật dễ để tất cả ĐẠT (PASS) trước đó tạo ra một loại attachment:
 
 > “Đã đi xa thế này rồi, nhất định kiến trúc phải có lợi thế.”
 
@@ -758,9 +734,9 @@ Và matched evidence vẫn có thể nói:
 
 Hai điều đó không mâu thuẫn.
 
-## Stop rule mới là phần khó nhất
+## Quy tắc dừng mới là phần khó nhất
 
-Q3 đã khóa trước rằng nếu verdict là:
+Q3 đã khóa trước rằng nếu kết luận là:
 
 ```text
 FEASIBLE_NO_DEMONSTRATED_ADVANTAGE
@@ -780,11 +756,11 @@ Q3-C
 
 để tiếp tục thử cho tới khi thắng.
 
-Không search workload khác.
+Không search bài đo khác.
 
 Không hạ threshold.
 
-Không đổi baseline.
+Không đổi mốc đối chứng.
 
 Không dùng một project khác để “cứu” outcome.
 
@@ -821,7 +797,7 @@ Không dừng mới là nguy hiểm.
 
 Nó chỉ cấm:
 
-> **vá tiếp cùng kiến trúc để cố đảo verdict Q3.**
+> **vá tiếp cùng kiến trúc để cố đảo kết luận Q3.**
 
 Một architecture kế tiếp chỉ có thể được mở nếu có một **mechanism mới đủ độc lập và có lý do causal cụ thể**.
 
@@ -863,13 +839,13 @@ vì sao mechanism đó có thể thay đổi bottleneck
 
 ### Nhớ 3 điều
 
-1. **Q3 khóa practical advantage trước fresh evidence.** Performance cần ít nhất 10% benefit, working set cần ít nhất 15%, và không được trả giá quá 10% ở các primary dimension khác.
-2. **40/40 fresh attempts hoàn tất nhưng không có primary benefit nào PASS.** Hai session độc lập đều không bác bỏ H-NPA; private bytes và CPU utilization chỉ là supporting observations.
-3. **Verdict là `FEASIBLE_NO_DEMONSTRATED_ADVANTAGE`, không phải “ArcLLM không chạy được”.** Feasibility đã được chứng minh; thứ không được chứng minh là practical regime advantage của kiến trúc hiện tại. Vì vậy current architecture line phải đóng thay vì tuning vô hạn.
+1. **Q3 khóa practical advantage trước bằng chứng mới.** hiệu năng cần ít nhất 10% benefit, working set cần ít nhất 15%, và không được trả giá quá 10% ở các primary dimension khác.
+2. **40/40 fresh attempts hoàn tất nhưng không có primary benefit nào ĐẠT (PASS).** Hai phiên đo độc lập đều không bác bỏ H-NPA; private bytes và CPU utilization chỉ là supporting observations.
+3. **kết luận là `FEASIBLE_NO_DEMONSTRATED_ADVANTAGE`, không phải “ArcLLM không chạy được”.** Feasibility đã được chứng minh; thứ không được chứng minh là practical regime advantage của kiến trúc hiện tại. Vì vậy current architecture line phải đóng thay vì tuning vô hạn.
 
 **Chương 11 — Từ thất bại sang một câu hỏi đúng hơn**
 
-Q3 không cho ArcLLM một chiến thắng performance.
+Q3 không cho ArcLLM một chiến thắng hiệu năng.
 
 Nhưng nó cho thứ có giá trị hơn cho bước tiếp theo:
 
