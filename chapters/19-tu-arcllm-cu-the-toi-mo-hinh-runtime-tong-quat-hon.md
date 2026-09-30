@@ -1029,7 +1029,7 @@ Mà vì chúng đã bị thử phá.
 Tới đây các mảnh đã hội tụ:
 
 ```text
-một production path thật
+một đường chạy thực tế
 
 các cơ chế được đo
 
