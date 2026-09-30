@@ -1,5 +1,34 @@
 # Chương 13 — Khi correctness nói “không”
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: correctness gate / Confirm**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** correctness gate / Confirm.
+
+
 > **Câu hỏi của chương:** Nếu một cơ chế đã chứng minh rằng nó có thể chạy nhanh hơn, nhưng khi áp dụng sang một loại trọng số khác nó không còn giữ được kết quả đúng, ta nên sửa tiếp hay phải dừng?
 
 Chương 12 kết thúc với một kết quả rất hấp dẫn.
