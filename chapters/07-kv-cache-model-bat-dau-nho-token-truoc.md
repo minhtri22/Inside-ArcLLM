@@ -180,7 +180,7 @@ token mới
 
 P6 là lần đầu ArcLLM kiểm tra con đường này xuyên qua toàn bộ 28 lớp.
 
-## Hai giai đoạn: xử lý đầu vào (giai đoạn xử lý đầu vào) và sinh token (giai đoạn sinh token)
+## Hai giai đoạn: xử lý đầu vào (prefill) và sinh token (decode)
 
 Khi một người gửi cho mô hình một **đoạn đầu vào**, ví dụ:
 
