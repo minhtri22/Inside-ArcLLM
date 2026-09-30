@@ -1,5 +1,34 @@
 # Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: residency / acquisition / readiness / lifecycle**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** residency / acquisition / readiness / lifecycle.
+
+
 > **Câu hỏi của chương:** Nếu runtime biết một tensor hoặc một cách biểu diễn dữ liệu đang tồn tại trong bộ nhớ, thông tin đó đã đủ để quyết định có thể dùng nó ngay cho phép tính hay chưa?
 
 Ở Chương 6, một bước tiến rất lớn của ArcLLM là giữ trọng số mô hình trong vùng bộ nhớ mà GPU có thể truy cập.
