@@ -42,13 +42,13 @@ Câu hỏi tiếp theo vì vậy rất tự nhiên:
 
 > **Cùng một cách chia K cho 32 lane, giữ nguyên cơ chế đã thắng ở Q4_K, có tiếp tục hoạt động với Q6_K hay không?**
 
-Đây là lúc **Mode C — Confirm, chế độ xác nhận** trở thành nhân vật chính.
+Đây là lúc **chế độ C — Xác nhận (Confirm)** trở thành nhân vật chính.
 
 ## C — Xác nhận không hỏi “ta có thể làm nó chạy không?”
 
-Mode C hỏi một câu khó hơn:
+Chế độ C hỏi một câu khó hơn:
 
-> **Một cơ chế đã được định nghĩa trước có vượt qua tiêu chuẩn đã khóa đã khóa trước hay không?**
+> **Một cơ chế đã được định nghĩa trước có vượt qua tiêu chuẩn đã khóa trước hay không?**
 
 Điểm khác biệt rất lớn nằm ở hai chữ:
 
@@ -400,7 +400,7 @@ Một phản xạ rất tự nhiên là:
 
 > “Chạy lại để xem chính xác sai bao nhiêu.”
 
-Nhưng đó là lúc Mode C phải làm việc.
+Nhưng đó là lúc chế độ C — Xác nhận phải làm việc.
 
 ## Không được chạy lại chỉ vì ta tò mò
 
@@ -614,7 +614,7 @@ Một result mạnh vẫn có biên giới.
 
 Ở Mode M, ta giữ lại một mechanism.
 
-Mode C thay đổi thái độ hoàn toàn.
+chế độ C — Xác nhận thay đổi thái độ hoàn toàn.
 
 Trước thực thi:
 
@@ -806,7 +806,7 @@ Chỉ những thứ sống sót mới được quyền đi tiếp.
 
 ### Nhớ 3 điều
 
-1. **Mode C khóa luật trước rồi để evidence phán xét.** Q6 giữ nguyên cơ chế Split-K đã ĐẠT (PASS) ở Q4 và phải vượt tính đúng trước khi hiệu năng được phép đo.
+1. **chế độ C — Xác nhận khóa luật trước rồi để evidence phán xét.** Q6 giữ nguyên cơ chế Split-K đã ĐẠT (PASS) ở Q4 và phải vượt tính đúng trước khi hiệu năng được phép đo.
 2. **Q6 KHÔNG ĐẠT (FAIL) về tính đúng, không KHÔNG ĐẠT (FAIL) về hiệu năng.** hiệu năng không được chạy, số measurement pair bằng 0 và mô hình thật không được load; vì vậy không được nói Q6 nhanh hay chậm.
 3. **Một ĐẠT (PASS) không tự động tổng quát sang miền khác.** Q4 chứng minh cơ chế có giá trị trong phạm vi Q4_K đã thử. Q6 cho thấy cùng cơ chế giữ nguyên không vượt được tính đúng tiêu chuẩn đã khóa ở một định dạng lượng tử hóa khác.
 
