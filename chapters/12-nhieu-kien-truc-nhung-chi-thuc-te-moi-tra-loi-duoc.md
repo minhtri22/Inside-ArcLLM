@@ -129,7 +129,7 @@ Thứ đắt không còn chỉ là **mã nguồn**.
 
 Thứ đắt là:
 
-> **bằng chứng mới — bằng chứng mới chưa bị dùng để lựa chọn chính giả thuyết đang cần kiểm tra.**
+> **bằng chứng mới (fresh evidence)** — bằng chứng chưa bị dùng để lựa chọn chính giả thuyết đang cần kiểm tra.
 
 Một phép đo mới có thể tiêu thời gian máy, thời gian review, một cơ hội xác nhận độc lập và quan trọng nhất là ranh giới giữa:
 
@@ -147,7 +147,7 @@ Vì vậy không phải mọi ý tưởng AI sinh ra đều xứng đáng đư�
 
 ## E — Khám phá: được phép nghĩ rộng, nhưng chưa được tin
 
-**chế độ E — Khám phá — Explore, chế độ khám phá** là nơi AI có thể phát huy khả năng mở rộng không gian ý tưởng.
+**E — Khám phá (Explore)** là nơi AI có thể phát huy khả năng mở rộng không gian ý tưởng.
 
 Ta có thể hỏi:
 
@@ -185,7 +185,7 @@ Không phải nơi kết luận rộng.
 
 ## M — Kiểm tra cơ chế: giữ lại đúng một cơ chế
 
-Bước tiếp theo là **chế độ M — Kiểm tra cơ chế — Mechanism qualification, kiểm tra xem một cơ chế có đủ rõ để đáng thử hay không**.
+Bước tiếp theo là **M — Kiểm tra cơ chế (Mechanism qualification)** — kiểm tra xem một cơ chế có đủ rõ để đáng thử hay không.
 
 Thay vì hỏi:
 
@@ -207,7 +207,7 @@ cộng dần
 ghi kết quả
 ```
 
-Trong GPU, một đơn vị công việc nhỏ như vậy thường được gọi là **invocation — một lần thực thi nhỏ bên trong chương trình GPU**.
+Trong GPU, một đơn vị công việc nhỏ như vậy thường được gọi là **một lần thực thi (invocation)** — một đơn vị công việc nhỏ bên trong chương trình GPU.
 
 Với một phép nhân có:
 
@@ -221,7 +221,7 @@ Một cơ chế khác được chọn:
 
 > **Thay vì để một invocation tự làm cả chiều K, cho 32 lane GPU cùng chia phần việc của một hàng đầu ra.**
 
-Đó là **Split-K — chia chiều K của phép nhân cho nhiều đơn vị tính toán cùng xử lý**.
+Đó là **chia chiều K (Split-K)** — chia chiều K của phép nhân cho nhiều đơn vị tính toán cùng xử lý.
 
 Cách phân chia được khóa:
 
@@ -258,7 +258,7 @@ Sau đó các kết quả từng phần phải được cộng lại.
 
 Bước đó gọi là:
 
-> **nhóm con GPU reduction — phép gom và cộng kết quả giữa các lane trong cùng nhóm con GPU.**
+> **phép gom trong nhóm con GPU (subgroup reduction)** — gom và cộng kết quả giữa các làn tính toán trong cùng nhóm con GPU.
 
 Hình ảnh trực giác chuyển từ:
 
@@ -286,7 +286,7 @@ Nhưng cơ chế đã đủ rõ.
 
 Ta biết chính xác thứ đang thay đổi:
 
-> **work partitioning — cách chia công việc.**
+> **cách chia công việc (work partitioning).**
 
 Không đổi mô hình.
 
@@ -491,7 +491,7 @@ Trong khi vùng sau TTFT còn chiếm phần lớn thời gian.
 
 Khoảng còn có khả năng tạo tác động đó gọi là:
 
-> **headroom — khoảng không còn để cải thiện trước khi những phần khác của hệ thống trở thành giới hạn mới.**
+> **dư địa cải thiện (headroom)** — khoảng còn lại trước khi những phần khác của hệ thống trở thành giới hạn mới.
 
 Headroom không hứa rằng ta sẽ lấy được phần lợi ích đó.
 
