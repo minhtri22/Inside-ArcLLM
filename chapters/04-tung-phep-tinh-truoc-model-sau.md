@@ -376,15 +376,15 @@ Từ “nó” có thể cần liên hệ với một phần xuất hiện trư�
 
 Mô hình không làm việc này bằng cách “hiểu như con người” theo đúng nghĩa đời thường. Bên dưới vẫn là những phép toán tạo điểm số, chuẩn hóa chúng rồi kết hợp thông tin.
 
-P3 sử dụng một bài kiểm tra **bounded GQA cơ chế chú ý**.
+P3 sử dụng một phép thử **GQA cho cơ chế chú ý trong phạm vi giới hạn**.
 
 Ta tách cụm này ra:
 
 - **cơ chế chú ý**: cơ chế kết hợp thông tin theo mức liên quan;
 - **GQA — Grouped Query cơ chế chú ý**: một cách tổ chức cơ chế chú ý mà mô hình mục tiêu sử dụng;
-- **bounded**: P3 chỉ kiểm tra trong một phạm vi nhỏ, có kiểm soát, chưa phải toàn bộ mô hình.
+- **phạm vi giới hạn**: P3 chỉ kiểm tra trong một vùng nhỏ, có kiểm soát, chưa phải toàn bộ mô hình.
 
-Từ “bounded” rất quan trọng.
+Cụm **“trong phạm vi giới hạn”** rất quan trọng.
 
 Một phép cơ chế chú ý nhỏ ĐẠT (PASS) không có nghĩa:
 
@@ -495,7 +495,7 @@ không có so sánh CPU ↔ GPU
 không có verdict khoa học
 ```
 
-Sau khi phần đóng gói được sửa mà không thay đổi contract số học của P3, phép thử thật mới chạy.
+Sau khi phần đóng gói được sửa mà không thay đổi **tiêu chuẩn số học đã khóa** của P3, phép thử thật mới chạy.
 
 Khi đó bảy gate mới được adjudicate — **đánh giá theo tiêu chuẩn đã khóa** — là ĐẠT (PASS).
 
