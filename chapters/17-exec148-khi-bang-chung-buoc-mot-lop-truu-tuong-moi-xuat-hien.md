@@ -1,45 +1,21 @@
-# Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện
+# Chương 17 — Khi một cách sắp dữ liệu trở thành một phần của kiến trúc
 
 > **Mức đọc: Nâng cao**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở câu hỏi nào?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Dữ liệu logic
+>      ↓
+> nhiều cách sắp khác nhau
+>      ↓
+> [ lợi ích + chi phí riêng ]
+>      ↓
+> hệ thực thi phải quản lý
 > ```
->
-> ▶ **Đang mở ở chương này:** representation như đối tượng runtime.
 
 
-> **Câu hỏi của chương:** Khi cùng một tensor có thể được biểu diễn theo nhiều cách để phục vụ những đường thực thi khác nhau, runtime cần hiểu điều gì ngoài việc “tensor này đang nằm trong bộ nhớ”?
+> **Câu hỏi của chương:** Khi cùng một khối số có thể được biểu diễn theo nhiều cách để phục vụ những đường thực thi khác nhau, hệ thực thi cần hiểu điều gì ngoài việc “khối số này đang nằm trong bộ nhớ”?
 
 Chương 16 kết thúc ở một nơi mà ban đầu ArcLLM không định đi tới.
 
@@ -49,15 +25,15 @@ Ta xuất phát từ một câu hỏi rất cụ thể:
 
 Thí nghiệm 2×2 trả lời rằng cả hai đều có giá trị độc lập.
 
-Split-K32 thay đổi **cách thực thi (execution)** — tức cách GPU chia công việc — và giảm độ trễ rõ rệt.
+Split-K32 thay đổi **cách thực thi (cách thực thi)** — tức cách GPU chia công việc — và giảm độ trễ rõ rệt.
 
-EXEC148 thay đổi **cách biểu diễn dữ liệu (representation)** — tức cách cùng dữ liệu Q4_K được sắp xếp để đường thực thi đọc nó — và cũng giảm độ trễ rõ rệt.
+EXEC148 thay đổi **cách biểu diễn dữ liệu (cách biểu diễn dữ liệu)** — tức cách cùng dữ liệu Q4_K được sắp xếp để đường thực thi đọc nó — và cũng giảm độ trễ rõ rệt.
 
 Nhưng khi ghép hai thay đổi lại, lợi ích không cộng đẹp với nhau.
 
 Kết quả đó tạo ra một vấn đề kiến trúc mới.
 
-Trước đây, runtime có thể nghĩ đơn giản:
+Trước đây, hệ thực thi có thể nghĩ đơn giản:
 
 ```text
 tensor
@@ -69,7 +45,7 @@ kernel đọc trực tiếp các byte đó
 
 Sau EXEC148, hình ảnh ấy không còn đủ nữa.
 
-Cùng một tensor logic có thể có:
+Cùng một khối số logic có thể có:
 
 ```text
 dạng lưu trữ gốc
@@ -82,7 +58,7 @@ Cả hai cùng biểu diễn **một trọng số**.
 
 Nhưng chúng có kích thước khác nhau, chi phí tạo khác nhau, tốc độ thực thi khác nhau và có thể chỉ phù hợp trong những điều kiện sử dụng khác nhau.
 
-Đó là lúc một chi tiết từng nằm bên trong kernel bắt đầu đòi quyền trở thành một khái niệm riêng của runtime.
+Đó là lúc một chi tiết từng nằm bên trong chương trình GPU bắt đầu đòi quyền trở thành một khái niệm riêng của hệ thực thi.
 
 ## EXEC148 thực chất là gì?
 
@@ -106,7 +82,7 @@ Nó không thay đổi trọng số logic.
 
 Nó cũng không bung toàn bộ trọng số Q4_K thành FP16 hay F32.
 
-Thay vào đó, những thông tin mà kernel cần liên tục được sắp xếp lại thành một **bố cục dữ liệu (layout)** thuận tiện hơn cho việc tính toán.
+Thay vào đó, những thông tin mà chương trình GPU cần liên tục được sắp xếp lại thành một **bố cục dữ liệu (layout)** thuận tiện hơn cho việc tính toán.
 
 Block 148 byte có thể hình dung thành ba vùng:
 
@@ -126,7 +102,7 @@ Block 148 byte có thể hình dung thành ba vùng:
 
 Ở dạng lưu trữ gốc, một số thông tin được đóng gói chặt để tiết kiệm dung lượng.
 
-Ở EXEC148, một phần thông tin được làm trực tiếp hơn để kernel bớt phải giải mã cấu trúc phức tạp trong lúc đang tính.
+Ở EXEC148, một phần thông tin được làm trực tiếp hơn để chương trình GPU bớt phải giải mã cấu trúc phức tạp trong lúc đang tính.
 
 Đây là một sự đánh đổi rất quen thuộc:
 
@@ -134,7 +110,7 @@ Block 148 byte có thể hình dung thành ba vùng:
 
 Nhưng điểm quan trọng hơn là:
 
-> **EXEC148 không phải một model mới. Nó là một cách biểu diễn khác của cùng dữ liệu logic.**
+> **EXEC148 không phải một mô hình mới. Nó là một cách biểu diễn khác của cùng dữ liệu logic.**
 
 ## Làm sao biết dữ liệu thực sự vẫn là một?
 
@@ -167,7 +143,7 @@ trong họ FFN-down đang nghiên cứu.
 
 Kết quả:
 
-> **toàn bộ 14 tensor khớp chính xác về nội dung logic.**
+> **toàn bộ 14 khối số khớp chính xác về nội dung logic.**
 
 Đây là một phân biệt rất quan trọng:
 
@@ -181,9 +157,9 @@ Ta đã thay **cách mang dữ liệu**.
 
 Không thay **dữ liệu mà phép toán có nghĩa là sử dụng**.
 
-## Vì sao không cứ giấu EXEC148 bên trong kernel?
+## Vì sao không cứ giấu EXEC148 bên trong chương trình GPU?
 
-Nếu EXEC148 chỉ là một mẹo giúp kernel nhanh hơn, ta có thể nhét nó vào shader rồi kết thúc câu chuyện.
+Nếu EXEC148 chỉ là một mẹo giúp chương trình GPU nhanh hơn, ta có thể nhét nó vào shader rồi kết thúc câu chuyện.
 
 Nhưng bằng chứng ở Chương 16 khiến cách làm đó không còn đủ.
 
@@ -228,7 +204,7 @@ Vùng dữ liệu thực thi bổ sung trong thí nghiệm chiếm:
 ≈ 550 MB
 ```
 
-Khi một thứ vừa có lợi ích riêng vừa có chi phí riêng, runtime cần có khả năng nói về nó như một đối tượng riêng.
+Khi một thứ vừa có lợi ích riêng vừa có chi phí riêng, hệ thực thi cần có khả năng nói về nó như một đối tượng riêng.
 
 Nếu không, ta không thể trả lời những câu hỏi như:
 
@@ -246,7 +222,7 @@ Nếu không, ta không thể trả lời những câu hỏi như:
 
 Những câu hỏi đó không còn thuộc riêng shader.
 
-Chúng thuộc kiến trúc runtime.
+Chúng thuộc kiến trúc hệ thực thi.
 
 ## Bằng chứng tạo ra hai khối chức năng nền tảng khác nhau
 
@@ -282,7 +258,7 @@ B:
 Dữ liệu nên ở hình thức nào khi đường thực thi sử dụng nó?
 ```
 
-Đây là một ranh giới mà runtime trước đó chưa cần biểu diễn rõ.
+Đây là một ranh giới mà hệ thực thi trước đó chưa cần biểu diễn rõ.
 
 Bằng chứng đã buộc nó xuất hiện.
 
@@ -306,7 +282,7 @@ khoảng 36,1 token
 
 Nhưng điểm hòa vốn đó chỉ xét một phần của chi phí.
 
-Một runtime thật còn phải tính tới khoảng 550 MB bộ nhớ bổ sung.
+Một hệ thực thi thật còn phải tính tới khoảng 550 MB bộ nhớ bổ sung.
 
 Và nhiều thứ khác.
 
@@ -458,11 +434,11 @@ Nhưng cách gọi này trộn hai chuyện khác nhau.
 
 Một cách biểu diễn có:
 
-> **miền tính toán tạo ra nó (creator)**
+> **miền tính toán tạo ra nó (nơi tạo)**
 
 và:
 
-> **vùng bộ nhớ nơi nó cư trú khi được sử dụng (residency)**.
+> **vùng bộ nhớ nơi nó cư trú khi được sử dụng (trạng thái cư trú)**.
 
 Hai thứ không nhất thiết giống nhau.
 
@@ -472,7 +448,7 @@ Nhưng CPU ghi trực tiếp vào một Vulkan buffer mà cả CPU lẫn GPU đ�
 
 Máy đang dùng:
 
-> **UMA — kiến trúc bộ nhớ hợp nhất (Unified Memory Architecture)**, tức CPU và GPU dùng chung hệ thống bộ nhớ vật lý thay vì luôn có hai kho bộ nhớ hoàn toàn tách biệt.
+> **UMA — kiến trúc bộ nhớ hợp nhất (Unified bộ nhớ Architecture)**, tức CPU và GPU dùng chung hệ thống bộ nhớ vật lý thay vì luôn có hai kho bộ nhớ hoàn toàn tách biệt.
 
 Vì vậy:
 
@@ -487,11 +463,11 @@ dữ liệu nằm trong một vùng chỉ CPU dùng
 rồi bắt buộc phải sao chép sang một vùng khác cho GPU
 ```
 
-Tương tự, nếu sau này GPU tạo EXEC148, điều đó cũng không nhất thiết có nghĩa representation sẽ nằm ở một vùng bộ nhớ vật lý khác.
+Tương tự, nếu sau này GPU tạo EXEC148, điều đó cũng không nhất thiết có nghĩa cách biểu diễn dữ liệu sẽ nằm ở một vùng bộ nhớ vật lý khác.
 
 Đây là một thay đổi tư duy quan trọng.
 
-Runtime không nên hỏi một câu mơ hồ:
+Hệ thực thi không nên hỏi một câu mơ hồ:
 
 > “EXEC148 thuộc CPU hay GPU?”
 
@@ -509,7 +485,7 @@ có cần sao chép hay bàn giao dữ liệu không?
 
 ## Một cách biểu diễn bắt đầu có “hồ sơ” riêng
 
-Từ bằng chứng đó, bài toán bố trí được mô tả như một **bộ thuộc tính (tuple)**:
+Từ bằng chứng đó, bài toán bố trí được mô tả như một **bộ thuộc tính (bộ thuộc tính)**:
 
 ```text
 P
@@ -553,7 +529,7 @@ Về lý thuyết có thể là một bộ xử lý khác nếu nó thực sự 
 
 > khi nào giữ, khi nào bỏ, khi nào phải tạo lại.
 
-Đây chính là dấu hiệu của một **lớp trừu tượng (abstraction)** mới.
+Đây chính là dấu hiệu của một **lớp trừu tượng (lớp trừu tượng)** mới.
 
 Trước đây:
 
@@ -564,7 +540,7 @@ tensor
 
 là đủ cho nhiều trường hợp.
 
-Bây giờ runtime bắt đầu cần:
+Bây giờ hệ thực thi bắt đầu cần:
 
 ```text
 tensor logic
@@ -576,11 +552,11 @@ mỗi cách có danh tính và chi phí riêng
 đường thực thi yêu cầu một cách biểu diễn phù hợp
 ```
 
-Chưa cần thiết kế lớp code hay giao diện cụ thể để thấy nhu cầu đó.
+Chưa cần thiết kế lớp mã hay giao diện cụ thể để thấy nhu cầu đó.
 
 Bằng chứng đã tạo ra nhu cầu trước.
 
-Code sẽ phải đi theo sau.
+mã sẽ phải đi theo sau.
 
 ## CPU, GPU hay NPU không phải câu hỏi đầu tiên
 
@@ -620,9 +596,9 @@ Nếu ngay cả **giới hạn lạc quan nhất (optimistic bound)** cũng khô
 
 Một lớp trừu tượng tốt không tồn tại chỉ để làm hệ thống “trừu tượng hơn”.
 
-Nó phải giúp runtime đặt đúng những câu hỏi này.
+Nó phải giúp hệ thực thi đặt đúng những câu hỏi này.
 
-## Có thể tạo representation trước cả khi suy luận bắt đầu
+## Có thể tạo cách biểu diễn dữ liệu trước cả khi suy luận bắt đầu
 
 Một hướng khác cũng xuất hiện.
 
@@ -656,11 +632,11 @@ thực thi
 
 Một file dữ liệu phụ đi kèm file chính thường được gọi là:
 
-> **sidecar — file phụ đi kèm**.
+> **tệp phụ — file phụ đi kèm**.
 
 Như vậy chi phí biến đổi không còn nằm trên:
 
-> **đường thời gian quan trọng của suy luận (critical path)**.
+> **đường thời gian quan trọng của suy luận (đường thời gian quan trọng)**.
 
 Nhưng ta lại phải trả bằng:
 
@@ -668,7 +644,7 @@ Nhưng ta lại phải trả bằng:
 - thời gian nạp;
 - việc quản lý phiên bản tương thích;
 - khả năng lưu lại để tái sử dụng;
-- và việc bảo đảm file phụ đúng với model đang chạy.
+- và việc bảo đảm file phụ đúng với mô hình đang chạy.
 
 Điểm đáng chú ý không phải phương án này chắc chắn tốt.
 
@@ -676,7 +652,7 @@ Chưa có bằng chứng đó.
 
 Điểm đáng chú ý là:
 
-> **Ngay khi cách biểu diễn dữ liệu trở thành một khái niệm độc lập, không gian kiến trúc lập tức mở rộng vượt ra ngoài kernel.**
+> **Ngay khi cách biểu diễn dữ liệu trở thành một khái niệm độc lập, không gian kiến trúc lập tức mở rộng vượt ra ngoài chương trình GPU.**
 
 Ta có thể thay nơi tạo.
 
@@ -688,13 +664,13 @@ Thời gian sống.
 
 Không cần đổi phép toán logic.
 
-## Lớp trừu tượng không được sinh ra chỉ vì code “đẹp”
+## Lớp trừu tượng không được sinh ra chỉ vì mã “đẹp”
 
 Đây là một trong những nguyên tắc quan trọng nhất của cuốn sách.
 
 Nếu ta bắt đầu ArcLLM từ đầu bằng cách nói:
 
-> “Hãy thiết kế một hệ thống tổng quát với lớp quản lý cách biểu diễn tensor, chính sách bố trí và bộ quản lý vòng đời…”
+> “Hãy thiết kế một hệ thống tổng quát với lớp quản lý cách biểu diễn khối số, chính sách bố trí và bộ quản lý vòng đời…”
 
 ta có thể tạo ra một sơ đồ rất đẹp.
 
@@ -763,15 +739,15 @@ AB
 
 Chúng chính là lý do kiến trúc đó phải tồn tại.
 
-## Từ “tensor đang ở trong bộ nhớ” tới một câu hỏi khó hơn
+## Từ “khối số đang ở trong bộ nhớ” tới một câu hỏi khó hơn
 
 Ở Chương 6, một bước tiến rất lớn là:
 
-> **giữ toàn bộ trọng số model trong vùng bộ nhớ mà GPU có thể truy cập.**
+> **giữ toàn bộ trọng số mô hình trong vùng bộ nhớ mà GPU có thể truy cập.**
 
 Khi đó câu hỏi chính là:
 
-> Tensor có ở đó không?
+> khối số có ở đó không?
 
 EXEC148 làm câu hỏi này không còn đủ.
 
@@ -787,7 +763,7 @@ Nếu EXEC148 chưa tồn tại thì sao?
 
 Nếu đã tạo nhưng vừa bị loại khỏi bộ nhớ thì sao?
 
-Nếu representation đúng model nhưng sai phiên bản thì sao?
+Nếu cách biểu diễn dữ liệu đúng mô hình nhưng sai phiên bản thì sao?
 
 Nếu một đường thực thi khác chỉ cần Q4_K gốc thì sao?
 
@@ -809,15 +785,15 @@ cách biểu diễn đó sẵn sàng cho phép tính ngay lúc này
 
 ### Nhớ 3 điều
 
-1. **EXEC148 không thay đổi tensor logic; nó thay đổi cách cùng dữ liệu Q4_K được chuẩn bị cho phép tính.** Block tăng từ `144` lên `148 byte`, và toàn bộ 14 tensor đã được kiểm tra tương đương chính xác ở dạng logic.
-2. **Khi một cách biểu diễn có lợi ích và chi phí riêng, runtime phải hiểu nó như một đối tượng kiến trúc.** EXEC148 có độ trễ tốt hơn trong phạm vi đã đo, nhưng phải trả chi phí tạo một lần và khoảng `550 MB` vùng dữ liệu bổ sung trong thí nghiệm.
+1. **EXEC148 không thay đổi khối số logic; nó thay đổi cách cùng dữ liệu Q4_K được chuẩn bị cho phép tính.** Block tăng từ `144` lên `148 byte`, và toàn bộ 14 khối số đã được kiểm tra tương đương chính xác ở dạng logic.
+2. **Khi một cách biểu diễn có lợi ích và chi phí riêng, hệ thực thi phải hiểu nó như một đối tượng kiến trúc.** EXEC148 có độ trễ tốt hơn trong phạm vi đã đo, nhưng phải trả chi phí tạo một lần và khoảng `550 MB` vùng dữ liệu bổ sung trong thí nghiệm.
 3. **Lớp trừu tượng xuất hiện sau bằng chứng, không phải trước bằng chứng.** Thí nghiệm 2×2 buộc ArcLLM tách cách thực thi khỏi cách biểu diễn; từ đó mới nảy sinh các câu hỏi về ai tạo, nằm ở đâu, sống bao lâu và khi nào nên giữ hoặc bỏ.
 
 **Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu**
 
-Ta từng nghĩ một câu hỏi lớn của runtime là:
+Ta từng nghĩ một câu hỏi lớn của hệ thực thi là:
 
-> “Tensor đã ở trong memory chưa?”
+> “khối số đã ở trong bộ nhớ chưa?”
 
 Bây giờ câu hỏi phải dài hơn:
 
