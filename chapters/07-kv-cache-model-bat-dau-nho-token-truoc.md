@@ -718,7 +718,7 @@ Câu hỏi tiếp theo thay đổi:
 2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có vòng đi-về trung gian qua CPU đối với K/V.
 3. **P6 ĐẠT về tính đúng của quá trình sinh token, chưa phải kết luận về hiệu năng hay một sản phẩm hoàn thiện.** Hai token được chọn `[6228, 17]`, điểm dự đoán và chính bộ nhớ đệm K/V đều vượt qua các ngưỡng đã khóa.
 
-**Chương 8 — Từ “chạy được” tới một đường chạy thực tế**
+**Tiếp theo: [Chương 8 — Từ “chạy được” tới một đường chạy thực tế](08-production-path-khong-den-tu-mot-kernel-than-ky.md)**
 
 Hệ thực thi giờ đã có thể nhớ.
 
