@@ -66,7 +66,7 @@ nếu là EXEC148 thì...
 
 nếu là Split-K32 thì...
 
-nếu là representation phân đoạn thì...
+nếu là cách biểu diễn phân đoạn thì...
 ```
 
 thì ta chưa có một lớp trừu tượng tổng quát.
@@ -131,10 +131,10 @@ Ta có:
 đường dự phòng
 → A
 
-representation phụ
+cách biểu diễn phụ
 → có
 
-tạo representation
+tạo cách biểu diễn
 → tùy chọn, dựa trên mức tái sử dụng
 ```
 
@@ -147,14 +147,14 @@ Không có một đường dự phòng đã được xác nhận tương đươn
 Ta có:
 
 ```text
-representation cần thiết đã có
+cách biểu diễn cần thiết đã có
 → có thể đi tiếp
 
-representation chưa có
+cách biểu diễn chưa có
 nhưng có thể tạo
 → tạo
 
-representation chưa có
+cách biểu diễn chưa có
 và hiện không thể tạo
 → NOT_READY
 ```
@@ -328,7 +328,7 @@ sẵn sàng thực thi = có
 trong khi:
 
 ```text
-representation phụ = không tồn tại
+cách biểu diễn phụ = không tồn tại
 ```
 
 và hoàn toàn không có vấn đề gì.
@@ -351,7 +351,7 @@ Không dùng nó để biểu diễn:
 Nó chỉ nói:
 
 ```text
-representation phụ
+cách biểu diễn phụ
 có ở trong bộ nhớ hay không?
 ```
 
@@ -380,7 +380,7 @@ Loại thứ hai không được phép mang ngưỡng tái sử dụng.
 Nếu không có bằng chứng cho một bước tạo cách biểu diễn dữ liệu:
 
 ```text
-không được bịa ra acquisition
+không được bịa ra quá trình thu nhận
 ```
 
 Đó chính là điều giữ cho cơ chế trực tiếp vẫn là cơ chế trực tiếp.
@@ -394,8 +394,8 @@ Câu hỏi:
 Ví dụ:
 
 ```text
-model bị dỡ
-→ representation đi kèm phải mất hiệu lực
+Mô hình bị dỡ
+→ cách biểu diễn đi kèm phải mất hiệu lực
 ```
 
 hoặc:
@@ -414,7 +414,7 @@ executor tạm thời chưa sẵn sàng
 không tự động có nghĩa:
 
 ```text
-xóa representation
+xóa cách biểu diễn
 ```
 
 Một vùng dữ liệu đắt tiền vẫn có thể hoàn toàn hợp lệ và đáng giữ để dùng lại sau.
@@ -426,7 +426,7 @@ Một vùng dữ liệu đắt tiền vẫn có thể hoàn toàn hợp lệ và
 Hãy lấy một trạng thái giả định:
 
 ```text
-EXEC148 đúng model
+EXEC148 đúng mô hình
 → có
 
 EXEC148 đang trong bộ nhớ
@@ -465,7 +465,7 @@ mà không phải tạo EXEC148 lại
 Một ví dụ khác:
 
 ```text
-representation bắt buộc
+cách biểu diễn bắt buộc
 → chưa có
 
 có thể tạo
@@ -481,7 +481,7 @@ NOT_READY
 Không phải:
 
 ```text
-chạy đại một kernel khác
+chạy đại một chương trình GPU khác
 ```
 
 Sự tách biệt giữa các chiều làm những quyết định này trở nên rõ ràng.
@@ -505,7 +505,7 @@ Cần hiểu đúng con số này.
 Đây **không phải**:
 
 ```text
-114.688 lần chạy model
+114.688 lần chạy mô hình
 ```
 
 Nó là:
@@ -562,7 +562,7 @@ Thay vào đó, nó cố phá mô hình nhỏ nhất.
 Các tình huống được thử gồm:
 
 ```text
-representation hợp lệ
+cách biểu diễn hợp lệ
 nhưng executor tạm thời chưa sẵn sàng
 ```
 
@@ -576,7 +576,7 @@ cả ưu tiên lẫn dự phòng đều chưa sẵn sàng
 ```
 
 ```text
-đang có một acquisition
+đang có một quá trình thu nhận
 không được phát lệnh tạo lần thứ hai
 ```
 
@@ -701,15 +701,15 @@ hay:
 Nó chỉ cần các mô tả như:
 
 ```text
-có representation riêng không?
+có cách biểu diễn riêng không?
 
 có đường dự phòng không?
 
-việc tạo representation thuộc loại nào?
+việc tạo cách biểu diễn thuộc loại nào?
 
 đường ưu tiên có sẵn sàng không?
 
-representation có đang hợp lệ không?
+cách biểu diễn có đang hợp lệ không?
 
 điều kiện vòng đời là gì?
 ```
@@ -801,7 +801,7 @@ Nếu lấy harness thí nghiệm rồi coi nó là hệ thực thi, B sẽ bị
 Ta sẽ vô tình biến:
 
 ```text
-acquisition theo nhu cầu
+thu nhận theo nhu cầu
 ```
 
 thành:
@@ -895,9 +895,9 @@ bằng chứng nào đang chống đỡ nó
 Đầu cuốn sách, việc thêm một đường thực thi mới thường có nghĩa:
 
 ```text
-viết kernel
+viết chương trình GPU
 ↓
-gắn trực tiếp vào runtime
+gắn trực tiếp vào hệ thực thi
 ```
 
 Tới đây, hình ảnh đã khác.
@@ -911,11 +911,11 @@ executor nào tồn tại
 ↓
 khi nào executor sẵn sàng
 ↓
-có representation phụ không
+có cách biểu diễn phụ không
 ↓
 nếu thiếu thì tạo thế nào
 ↓
-representation sống bao lâu
+cách biểu diễn sống bao lâu
 ```
 
 Sau đó lớp thực thi phần cứng phần cứng cụ thể thực hiện các hành động đó.
@@ -981,11 +981,11 @@ Không ai ngồi ở Chương 1 rồi nói:
 ```text
 ArcLLM phải có:
 identity
-execution availability
-execution readiness
-residency
-acquisition
-lifecycle
+khả dụng thực thi
+sẵn sàng thực thi
+trạng thái cư trú
+quá trình thu nhận
+vòng đời
 ```
 
 Nếu làm vậy, đó chỉ là một thiết kế đẹp chưa có lý do.
@@ -993,21 +993,21 @@ Nếu làm vậy, đó chỉ là một thiết kế đẹp chưa có lý do.
 Thay vào đó:
 
 ```text
-tensor phải resident
+khối số phải nằm sẵn trong bộ nhớ
 ↓
 EXEC148 xuất hiện
 ↓
-representation có chi phí riêng
+cách biểu diễn có chi phí riêng
 ↓
-cần acquisition và lifecycle
+cần quá trình thu nhận và vòng đời
 ↓
 họ bắt buộc phá logic tái sử dụng
 ↓
-cơ chế trực tiếp phá liên kết readiness-residency
+cơ chế trực tiếp phá liên kết readiness-trạng thái cư trú
 ↓
 phản ví dụ chuyển tiếp thử phá readiness
 ↓
-backend thật thử phá toàn bộ mô hình
+lớp thực thi phần cứng thật thử phá toàn bộ mô hình
 ↓
 sáu chiều còn đứng vững
 ```
@@ -1035,15 +1035,15 @@ các cơ chế được đo
 
 PASS và FAIL được giữ lại
 
-representation tách khỏi execution
+cách biểu diễn tách khỏi cách thực thi
 
-acquisition tách khỏi residency
+quá trình thu nhận tách khỏi trạng thái cư trú
 
 readiness tách khỏi cả hai
 
 vòng đời có chủ thể quản lý
 
-backend thật tuân theo cùng semantics
+lớp thực thi phần cứng thật tuân theo cùng semantics
 ```
 
 Nhưng một câu hỏi cuối vẫn còn:
