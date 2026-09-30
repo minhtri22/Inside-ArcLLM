@@ -15,11 +15,11 @@
 > ```
 
 
-> **Câu hỏi của chương:** Một mô hình có hàng tỷ con số được đặt trong file như thế nào, và hệ thực thi có phải bung tất cả chúng ra trước khi dùng không?
+> **Câu hỏi của chương:** Một mô hình có hàng tỷ con số được đặt trong tệp như thế nào, và hệ thực thi có phải bung tất cả chúng ra trước khi dùng không?
 
-Ở cuối Chương 1, ArcLLM đã làm được một việc rất cơ bản nhưng quan trọng: xác nhận đúng file mô hình, đọc được định dạng GGUF và nhìn thấy bên trong có **338 khối số**.
+Ở cuối Chương 1, ArcLLM đã làm được một việc rất cơ bản nhưng quan trọng: xác nhận đúng tệp mô hình, đọc được định dạng GGUF và nhìn thấy bên trong có **338 khối số**.
 
-Con số 338 nói một điều đơn giản: file mô hình không phải một khối bí ẩn duy nhất. Bên trong nó có nhiều “gói dữ liệu”, mỗi gói có tên, hình dạng, kiểu lưu trữ và vị trí riêng.
+Con số 338 nói một điều đơn giản: tệp mô hình không phải một khối bí ẩn duy nhất. Bên trong nó có nhiều “gói dữ liệu”, mỗi gói có tên, hình dạng, kiểu lưu trữ và vị trí riêng.
 
 Chương này chỉ hỏi:
 
@@ -33,15 +33,15 @@ Việc trước mắt chỉ là **mở chiếc hộp cho đúng cách**.
 
 ## GGUF giống một kho hàng có mục lục
 
-**GGUF là viết tắt của GGML Universal File** — một định dạng file nhị phân trong hệ sinh thái GGML, được dùng để lưu mô hình cùng những thông tin cần thiết để hệ thực thi có thể đọc và sử dụng nó.
+**GGUF là viết tắt của GGML Universal tệp** — một định dạng tệp nhị phân trong hệ sinh thái GGML, được dùng để lưu mô hình cùng những thông tin cần thiết để hệ thực thi có thể đọc và sử dụng nó.
 
-mô hình mà ArcLLM dùng trong giai đoạn này được lưu trong một file **GGUF**.
+Mô hình mà ArcLLM dùng trong giai đoạn này được lưu trong một tệp **GGUF**.
 
 Có thể hình dung GGUF giống một kho hàng được sắp xếp khá cẩn thận.
 
 Ở đầu kho có phần thông tin mô tả: đây là mô hình thuộc kiến trúc nào, có bao nhiêu khối số, một số thông số chung là gì.
 
-Sau đó là một danh mục cho biết từng khối số tên gì, có kích thước ra sao, dùng kiểu dữ liệu nào và nằm ở vị trí nào trong file.
+Sau đó là một danh mục cho biết từng khối số tên gì, có kích thước ra sao, dùng kiểu dữ liệu nào và nằm ở vị trí nào trong tệp.
 
 Cuối cùng mới tới phần “hàng thật”: những byte chứa dữ liệu của mô hình.
 
@@ -79,13 +79,13 @@ Còn những món thực sự nằm trong thùng mới là dữ liệu chính.
 
 GGUF cũng gần như vậy.
 
-Nhờ có phần mô tả này, hệ thực thi không phải nhìn vào byte thứ một triệu trong file rồi đoán:
+Nhờ có phần mô tả này, hệ thực thi không phải nhìn vào byte thứ một triệu trong tệp rồi đoán:
 
 > “Không biết số này thuộc phần nào của mô hình?”
 
 Nó có một bản đồ.
 
-## khối số thực ra là gì?
+## Khối số thực ra là gì?
 
 Ở chương trước, tôi tạm gọi khối số là “một bảng số”.
 
@@ -122,9 +122,9 @@ Hiện tại chỉ cần nhớ:
 
 Nhiệm vụ trước mắt đơn giản hơn nhiều:
 
-> **Đếm đúng chúng và biết chính xác mỗi khối số nằm ở đâu trong file.**
+> **Đếm đúng chúng và biết chính xác mỗi khối số nằm ở đâu trong tệp.**
 
-Kết quả của file đã được khóa từ P0 là:
+Kết quả của tệp đã được khóa từ P0 là:
 
 ```text
 F32   : 141 tensor
@@ -181,7 +181,7 @@ Thay vì lưu mỗi trọng số với độ chi tiết rất cao, ta tìm cách
 
 Mục tiêu là giảm dung lượng và giảm lượng dữ liệu phải di chuyển.
 
-Trong file đang được ArcLLM nghiên cứu, hai dạng quan trọng là **Q4_K** và **Q6_K**.
+Trong tệp đang được ArcLLM nghiên cứu, hai dạng quan trọng là **Q4_K** và **Q6_K**.
 
 Ở đây ta chưa cần học cấu trúc chi tiết của chúng. Chỉ cần biết đây là hai cách đóng gói trọng số theo từng khối.
 
@@ -237,7 +237,7 @@ Cách khác là giữ mọi thứ gọn trong dạng đóng gói, và lấy đú
 
 P1 chọn tư duy thứ hai.
 
-Nếu Q4_K trong file đã được đóng gói rất gọn, hệ thực thi không nên bắt đầu bằng việc mở toàn bộ chúng thành F32 rồi tạo thêm một bản sao lớn trong RAM.
+Nếu Q4_K trong tệp đã được đóng gói rất gọn, hệ thực thi không nên bắt đầu bằng việc mở toàn bộ chúng thành F32 rồi tạo thêm một bản sao lớn trong RAM.
 
 ArcLLM muốn:
 
@@ -251,7 +251,7 @@ Tên nghe khá kỹ thuật, nhưng ý tưởng lại rất đời thường.
 
 ## Thay vì bê cả kho vào nhà, hãy mở một cánh cửa nhìn vào kho
 
-Một cách dễ nghĩ khi đọc file là:
+Một cách dễ nghĩ khi đọc tệp là:
 
 ```text
 Mở file
@@ -265,23 +265,23 @@ Bắt đầu sử dụng
 
 Cách đó có thể hoạt động.
 
-Nhưng với file mô hình lớn, nó có nghĩa ta vừa có file gốc, vừa tạo thêm một vùng nhớ lớn để chứa bản sao của file.
+Nhưng với tệp mô hình lớn, nó có nghĩa ta vừa có tệp gốc, vừa tạo thêm một vùng nhớ lớn để chứa bản sao của tệp.
 
-P1 dùng một cơ chế của hệ điều hành gọi là **bộ nhớ mapping — ánh xạ file vào không gian bộ nhớ của chương trình**.
+P1 dùng một cơ chế của hệ điều hành gọi là **bộ nhớ mapping — ánh xạ tệp vào không gian bộ nhớ của chương trình**.
 
-Có thể hình dung hệ điều hành mở cho ArcLLM một “cửa sổ” nhìn vào file.
+Có thể hình dung hệ điều hành mở cho ArcLLM một “cửa sổ” nhìn vào tệp.
 
-hệ thực thi có thể truy cập một vùng trong file gần giống như đang truy cập bộ nhớ, thay vì tự đọc toàn bộ file rồi chép nó sang một vùng nhớ khác.
+Hệ thực thi có thể truy cập một vùng trong tệp gần giống như đang truy cập bộ nhớ, thay vì tự đọc toàn bộ tệp rồi chép nó sang một vùng nhớ khác.
 
 Trong P1, cửa sổ này là **read-only — chỉ đọc**.
 
-ArcLLM không được phép dùng nó để sửa file mô hình.
+ArcLLM không được phép dùng nó để sửa tệp mô hình.
 
 Ánh xạ chỉ đọc giúp tránh ghi đè mô hình gốc và cho phép dùng GGUF như một:
 
 > **kho các khối số — kho khối số.**
 
-hệ thực thi biết khối số mình cần nằm ở đâu, rồi truy cập đúng vùng byte tương ứng.
+Hệ thực thi biết khối số mình cần nằm ở đâu, rồi truy cập đúng vùng byte tương ứng.
 
 P1 gọi cách truy cập này là **direct zero-copy view**.
 
@@ -289,7 +289,7 @@ Nhưng chữ “zero-copy” rất dễ làm người đọc tưởng tượng q
 
 Nó **không có nghĩa** dữ liệu từ ổ đĩa bằng cách nào đó bay thẳng vào phép tính mà không liên quan tới RAM.
 
-Hệ điều hành vẫn quản lý việc đưa những phần dữ liệu cần thiết từ file vào bộ nhớ vật lý.
+Hệ điều hành vẫn quản lý việc đưa những phần dữ liệu cần thiết từ tệp vào bộ nhớ vật lý.
 
 “Zero-copy” trong phạm vi P1 có nghĩa hẹp hơn:
 
@@ -336,13 +336,13 @@ P1 vì vậy kiểm tra hai điều.
 
 Thứ nhất là **bounds — giới hạn**.
 
-Nếu file kết thúc ở byte 10.000 nhưng một khối số tuyên bố dữ liệu của nó kéo dài tới byte 10.200, rõ ràng có vấn đề.
+Nếu tệp kết thúc ở byte 10.000 nhưng một khối số tuyên bố dữ liệu của nó kéo dài tới byte 10.200, rõ ràng có vấn đề.
 
 Thứ hai là overlap.
 
 Hai khối số không được vô tình trỏ vào những vùng dữ liệu chồng lên nhau.
 
-Kết quả P1 cho file thật:
+Kết quả P1 cho tệp thật:
 
 ```text
 338 tensor
@@ -360,9 +360,9 @@ Nếu địa chỉ sai, một chương trình chạy nhanh hơn chỉ có nghĩa
 
 ## Q4_K được giữ nguyên dạng đóng gói
 
-Một mục tiêu quan trọng khác của P1 là xác nhận ArcLLM có thể đi thẳng tới dữ liệu **Q4_K packed — Q4_K vẫn còn nguyên dạng đóng gói trong file**.
+Một mục tiêu quan trọng khác của P1 là xác nhận ArcLLM có thể đi thẳng tới dữ liệu **Q4_K packed — Q4_K vẫn còn nguyên dạng đóng gói trong tệp**.
 
-P1 đã PASS điều đó.
+P1 đã ĐẠT (PASS) điều đó.
 
 Nói đơn giản, hệ thực thi có thể đi theo chuỗi:
 
@@ -396,7 +396,7 @@ Nó chỉ chứng minh một điều:
 
 > **Lớp lưu trữ đã đủ đáng tin để bước tiếp.**
 
-## Hai lần dừng mà chưa phải FAIL khoa học
+## Hai lần dừng nhưng chưa phải kết quả KHÔNG ĐẠT về khoa học
 
 P1 còn để lại một bài học rất đáng giữ.
 
@@ -408,7 +408,7 @@ Sau khi sửa lỗi đó, lần tiếp theo đi xa hơn nhưng quá trình build
 
 Cả hai lần đều chưa chạy xong.
 
-Nhưng trong lịch sử nghiên cứu ArcLLM, chúng **không được coi là bằng chứng P1 FAIL**.
+Nhưng trong lịch sử nghiên cứu ArcLLM, chúng **không được coi là bằng chứng P1 KHÔNG ĐẠT (FAIL)**.
 
 Tại sao?
 
@@ -444,7 +444,7 @@ chưa có bằng chứng khoa học
 
 Sau khi hai lỗi hạ tầng được sửa mà không thay đổi câu hỏi của P1, phép thử mới thực sự chạy.
 
-Và lần này P1 PASS.
+Và lần này P1 ĐẠT (PASS).
 
 Đây cũng là một nguyên tắc mà chúng ta sẽ gặp lại nhiều lần trong cuốn sách:
 
@@ -454,7 +454,7 @@ Muốn kết luận điều gì, trước hết phải chắc rằng thứ cần
 
 ## P1 đã chứng minh được gì?
 
-Đến cuối P1, ArcLLM biết rằng file GGUF đã khóa từ P0 có thể được dùng như một **kho các khối số chỉ đọc**.
+Đến cuối P1, ArcLLM biết rằng tệp GGUF đã khóa từ P0 có thể được dùng như một **kho các khối số chỉ đọc**.
 
 338 khối số được nhận diện:
 
@@ -464,7 +464,7 @@ Muốn kết luận điều gì, trước hết phải chắc rằng thứ cần
  29 Q6_K
 ```
 
-Tất cả vùng byte đều nằm trong giới hạn file.
+Tất cả vùng byte đều nằm trong giới hạn tệp.
 
 Không khối số nào chồng lên khối số khác.
 
@@ -492,12 +492,12 @@ Câu hỏi tiếp theo vì thế trở nên tự nhiên:
 
 ### Nhớ 3 điều
 
-1. **GGUF không chỉ là một “file mô hình”.** Nó chứa thông tin mô tả, danh mục khối số và dữ liệu giúp hệ thực thi biết chính xác từng khối số nằm ở đâu.
+1. **GGUF không chỉ là một “tệp mô hình”.** Nó chứa thông tin mô tả, danh mục khối số và dữ liệu giúp hệ thực thi biết chính xác từng khối số nằm ở đâu.
 2. **lượng tử hóa giúp lưu trọng số gọn hơn.** P1 giữ Q4_K và Q6_K ở dạng đóng gói thay vì mở toàn bộ thành F32 ngay từ đầu.
-3. **Script hỏng hoặc build hỏng không tự động là FAIL của giả thuyết.** Chỉ khi phép thử thực sự chạy, evidence mới được quyền trả lời câu hỏi.
+3. **Script hỏng hoặc build hỏng không tự động là KHÔNG ĐẠT (FAIL) của giả thuyết.** Chỉ khi phép thử thực sự chạy, evidence mới được quyền trả lời câu hỏi.
 
 **Chương 3 — Xây phần lõi Vulkan**
 
-Ở Chương 2, dữ liệu vẫn chủ yếu nằm phía file và bộ nhớ do hệ điều hành quản lý.
+Ở Chương 2, dữ liệu vẫn chủ yếu nằm phía tệp và bộ nhớ do hệ điều hành quản lý.
 
-Chương tiếp theo sẽ đưa chúng ta sang phía GPU: device là gì, queue là gì, vì sao cần những vùng bộ nhớ tồn tại lâu dài, và làm thế nào để biết GPU đã thật sự nhận và hoàn thành một công việc.
+Chương tiếp theo sẽ đưa chúng ta sang phía GPU: thiết bị là gì, hàng đợi là gì, vì sao cần những vùng bộ nhớ tồn tại lâu dài, và làm thế nào để biết GPU đã thật sự nhận và hoàn thành một công việc.
