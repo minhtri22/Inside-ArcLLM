@@ -67,7 +67,7 @@ Một mũi tên có thể đứt ở bất kỳ đâu.
 
 ## Phép thử nhỏ và mô hình thật không phải cùng một thế giới
 
-Ở phép thử Q4 trước đó, ta dùng các **fixture — bộ dữ liệu kiểm thử cố định**.
+Ở phép thử Q4 trước đó, ta dùng các **bộ dữ liệu kiểm thử cố định (fixture)**.
 
 Chúng rất hữu ích.
 
@@ -87,16 +87,16 @@ Nhưng mô hình thật phức tạp hơn.
 
 Trọng số là trọng số thật của mô hình 7B.
 
-`Activation — dữ liệu trung gian do model tạo ra trong lúc chạy` không còn là fixture nhân tạo.
+**Dữ liệu trung gian (activation)** — dữ liệu do mô hình tạo ra trong lúc chạy — không còn là dữ liệu nhân tạo của bài thử.
 
 Nó phụ thuộc vào:
 
-- prompt;
+- đoạn đầu vào;
 - lớp hiện tại;
 - token hiện tại;
 - trạng thái trước đó của mô hình.
 
-Một chương trình GPU có thể rất đẹp trên fixture nhưng khi gặp dữ liệu thật lại:
+Một chương trình GPU có thể rất đẹp trên **bài thử cố định** nhưng khi gặp dữ liệu thật lại:
 
 ```text
 sai số lớn hơn
@@ -428,7 +428,7 @@ Nói dễ hiểu:
 
 > **Cơ chế không chỉ vừa đủ vượt tính đúng gate. Nó còn có khoảng cách khá lớn so với giới hạn đã khóa.**
 
-Đây là bằng chứng đầu tiên rằng hiệu ứng từ fixture đã chuyển được sang trọng số và dữ liệu trung gian thật.
+Đây là bằng chứng đầu tiên rằng hiệu ứng từ **bài thử cố định** đã chuyển được sang trọng số và dữ liệu trung gian thật.
 
 ## Còn tốc độ thành phần thì sao?
 
@@ -471,7 +471,7 @@ Phép yếu nhất vẫn đạt khoảng:
 
 Ta không còn chỉ biết:
 
-> “Một fixture Q4 có thể chạy nhanh.”
+> “Một bài thử Q4 cố định có thể chạy nhanh.”
 
 Ta đã biết:
 
@@ -813,7 +813,7 @@ Ví dụ thấy thành phần đã ĐẠT (PASS), AI có thể đề xuất:
 - tối ưu thêm vài chương trình GPU khác trước khi tích hợp;
 - thay luôn FFN-down;
 - thêm gộp phép tính;
-- chỉnh scheduler;
+- chỉnh cách lập lịch;
 - làm sạch một vài nút thắt “tiện thể”.
 
 Những thay đổi đó có thể làm hệ thực thi nhanh hơn.
