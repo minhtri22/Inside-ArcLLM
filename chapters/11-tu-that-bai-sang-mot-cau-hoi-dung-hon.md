@@ -132,7 +132,7 @@ Chưa phải một kiến trúc đã được chấp nhận.
 Trong đường sinh từng token mới của ArcLLM có một con số rất dễ gây hiểu nhầm:
 
 ```text
-469 dispatch / token
+469 lần giao việc / token
 ```
 
 **Một lần giao việc cho GPU (dispatch)** có thể hiểu là:
@@ -146,7 +146,7 @@ Nhìn thấy 469, ta rất dễ nghĩ:
 Nhưng Q2/Q3 đã xác nhận:
 
 ```text
-1 submit / decode token
+1 lần gửi lệnh / token sinh ra
 ```
 
 `Submit` ở đây là:
@@ -162,11 +162,11 @@ gửi một chuỗi lệnh
 
 GPU
 ↓
-dispatch 1
-dispatch 2
-dispatch 3
+lần giao việc 1
+lần giao việc 2
+lần giao việc 3
 ...
-dispatch 469
+lần giao việc 469
 ```
 
 chứ không phải:
@@ -193,7 +193,7 @@ Nếu muốn hiểu vì sao giai đoạn sinh token chậm, ta phải nhìn ti�
 
 ## Gần một nửa đồ thị sinh token là các phép nhân lớn
 
-Mỗi token mới đi qua 28 decoder lớp.
+Mỗi token mới đi qua 28 sinh tokenr lớp.
 
 Trong mỗi lớp có các bước như:
 
@@ -241,9 +241,9 @@ Trong machine learning, loại phép tính này thường được gọi bằng 
 Có:
 
 ```text
-7 phép / layer
+7 phép / lớp
 ×
-28 layer
+28 lớp
 =
 196 phép GEMM / token
 ```
@@ -269,7 +269,7 @@ Nhưng nó cho ta một vùng đủ lớn và đủ cụ thể để bắt đầ
 giai đoạn xử lý đầu vào đã có những đường tính toán chuyên biệt như:
 
 ```text
-Q/K/V/O được chia tile
+Q/K/V/O được chia thành các khối xử lý
 gate + up được gộp
 FFN-down có đường tính toán riêng
 ```
@@ -283,10 +283,10 @@ Nhưng khi chuyển sang **giai đoạn sinh token — giai đoạn mỗi lần 
 Ta có sự bất đối xứng:
 
 ```text
-prefill
+xử lý đầu vào
 → đã được chuyên biệt hóa khá sâu
 
-decode
+sinh token
 → vẫn chủ yếu dùng đường GEMM chung
 ```
 
@@ -394,15 +394,15 @@ Do đó việc mở SA cần hai nguồn lý do.
 Thứ nhất là **bằng chứng nội tại của ArcLLM**:
 
 ```text
-decode chậm hơn llama.cpp rất lớn
+sinh token chậm hơn llama.cpp rất lớn
 +
-cùng model
+cùng mô hình
 +
 cùng máy
 +
-decode vẫn dùng nhiều đường GEMM batch-1 dùng chung
+sinh token vẫn dùng nhiều đường GEMM xử lý mỗi lần một token dùng chung
 +
-prefill đã được chuyên biệt hóa sâu hơn decode
+xử lý đầu vào đã được chuyên biệt hóa sâu hơn sinh token
 ```
 
 Thứ hai là:
@@ -427,7 +427,7 @@ Ta không cần đi sâu vào từng bài báo khoa học ở đây.
 Một bài báo khoa học không được phép biến thành lập luận:
 
 ```text
-paper A nhanh 2×
+bài báo A nhanh 2×
 ↓
 ArcLLM cũng sẽ nhanh 2×
 ```
@@ -513,17 +513,17 @@ Trong hệ thực thi, **chương trình GPU gộp phép tính — gộp chươn
 Ví dụ:
 
 ```text
-kernel A
+chương trình GPU A
 ↓
 ghi kết quả trung gian
 ↓
-kernel B đọc lại
+chương trình GPU B đọc lại
 ```
 
 có thể, nếu semantics cho phép, được biến thành:
 
 ```text
-một kernel
+một chương trình GPU
 ↓
 làm A rồi tiếp tục B
 ```
@@ -557,14 +557,14 @@ Nếu gộp Q, K và V vào một chương trình GPU:
 mỗi lớp tiết kiệm:
 
 ```text
-2 dispatch
+2 lần giao việc
 ```
 
 28 lớp:
 
 ```text
 2 × 28
-= 56 dispatch
+= 56 lần giao việc
 ```
 
 Gate và up cũng có thể từ:
@@ -579,14 +579,14 @@ tiết kiệm thêm:
 
 ```text
 1 × 28
-= 28 dispatch
+= 28 lần giao việc
 ```
 
 Tổng cộng:
 
 ```text
 56 + 28
-= 84 dispatch
+= 84 lần giao việc
 ```
 
 giai đoạn sinh token đồ thị có thể từ:
@@ -785,7 +785,7 @@ Không tối ưu chỉ vì một phần nhìn có vẻ lớn.
 ```text
 Q3 đóng kiến trúc cũ
 ↓
-xác định vùng decode đáng nghi
+xác định vùng sinh token đáng nghi
 ↓
 đối chiếu với nghiên cứu đã công bố
 ↓
@@ -839,7 +839,7 @@ Chỉ có nghĩa:
 SA-H1 có thể cần những khả năng phần cứng như:
 
 ```text
-subgroup
+nhóm con GPU
 FP16
 INT8
 cooperative matrix
@@ -877,13 +877,13 @@ Kết quả trên target machine xác nhận những khả năng nền tảng nh
 Vulkan compute
 → có
 
-subgroup
+nhóm con GPU
 → có
 
-subgroup size
+kích thước nhóm con GPU
 → 32
 
-shared memory cho compute workgroup
+bộ nhớ dùng chung cho nhóm làm việc GPU
 → 49.152 byte
 
 tối đa workgroup invocation
@@ -895,11 +895,11 @@ Ngoài ra **thiết bị** còn công bố hỗ trợ:
 ```text
 FP16
 INT8
-subgroup-size control
+kiểm soát kích thước nhóm con GPU
 cooperative matrix
 ```
 
-**Nhóm con GPU (subgroup)** có thể hiểu gần đúng là:
+**Nhóm con GPU (nhóm con GPU)** có thể hiểu gần đúng là:
 
 > **một nhóm nhỏ các lane GPU có thể phối hợp chặt chẽ khi thực hiện cùng một công việc.**
 
@@ -942,7 +942,7 @@ cơ sở nhân quả
 khả năng phần cứng
 → có
 
-gộp kernel đơn thuần
+chỉ gộp chương trình GPU
 → không đủ làm lời giải chính
 
 đường GEMM Q4_K/Q6_K batch-1 chuyên biệt
@@ -1005,7 +1005,7 @@ Và SA0 trả lời:
 Toàn bộ Phần II có thể thu lại thành:
 
 ```text
-runtime chạy được
+hệ thực thi chạy được
 ↓
 đưa vào phép đối chứng cùng điều kiện
 ↓
