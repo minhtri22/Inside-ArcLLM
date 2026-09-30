@@ -106,7 +106,7 @@ GPU khác.
 
 Quant khác.
 
-Prompt khác.
+Đầu vào khác.
 
 ngữ cảnh khác.
 
@@ -132,7 +132,7 @@ Trong ArcLLM, từ được dùng là:
 
 ArcLLM và llama.cpp không có cùng kiến trúc bên trong.
 
-Nếu ép chúng có cùng chương trình GPU, cùng scheduler và cùng cách tổ chức bộ nhớ thì ta không còn so hai hệ thực thi nữa.
+Nếu ép chúng có cùng chương trình GPU, cùng **cách lập lịch** và cùng cách tổ chức bộ nhớ thì ta không còn so hai hệ thực thi nữa.
 
 Điều cần match là **bài toán chúng phải giải**.
 
@@ -236,7 +236,7 @@ b29c606e...
 
 ## Cùng tên mô hình vẫn chưa đủ
 
-Cả ArcLLM và llama.cpp phải đọc **đúng cùng một file mô hình theo byte**.
+Cả ArcLLM và llama.cpp phải đọc **đúng cùng một tệp mô hình theo từng byte**.
 
 Target là Qwen2.5-Coder 7B Q4_K_M với kích thước:
 
@@ -254,7 +254,7 @@ Mà là:
 
 Tại sao phải khó tính như vậy?
 
-Hai file cùng tên mô hình có thể khác metadata.
+Hai tệp cùng tên mô hình có thể khác **thông tin mô tả** bên trong.
 
 Khác lượng tử hóa build.
 
@@ -262,7 +262,7 @@ Khác tensor layout.
 
 Thậm chí khác một vài byte.
 
-Nếu ArcLLM chạy file A còn mốc đối chứng chạy file B, ta đã thêm một biến mới vào experiment.
+Nếu ArcLLM chạy tệp A còn mốc đối chứng chạy tệp B, ta đã thêm một biến mới vào **thí nghiệm**.
 
 Q2 loại biến đó.
 
@@ -274,7 +274,7 @@ Không để ArcLLM tokenizer một kiểu còn llama.cpp tokenizer kiểu khác
 
 Không chat template khác nhau.
 
-Không system prompt được thêm âm thầm.
+Không **chỉ dẫn hệ thống** nào được thêm âm thầm.
 
 phép đo so sánh bắt đầu từ:
 
@@ -349,9 +349,9 @@ Q2 khóa hai bài thử.
 
 Bài đầu:
 
-**W-S — short/giai đoạn sinh token-dominant**, tức prompt ngắn để phần sinh token chiếm tỷ trọng lớn hơn.
+**W-S — đầu vào ngắn, phần sinh token chiếm ưu thế**, tức phần văn bản ban đầu ngắn để chi phí sinh token hiện rõ hơn.
 
-Prompt:
+Đầu vào:
 
 ```text
 4 token
@@ -365,9 +365,9 @@ Output:
 
 Bài thứ hai:
 
-**W-C — ngữ cảnh/giai đoạn xử lý đầu vào-sensitive**, tức prompt dài hơn để chi phí xử lý ngữ cảnh ban đầu hiện rõ hơn.
+**W-C — nhạy với phần xử lý đầu vào dài**, tức đoạn đầu vào dài hơn để chi phí xử lý ngữ cảnh ban đầu hiện rõ hơn.
 
-Prompt:
+Đầu vào:
 
 ```text
 256 token
@@ -407,7 +407,7 @@ Q2 đo ba chỉ số hiệu năng chính.
 
 Đầu tiên là:
 
-**TTFT — Time To First Token, thời gian từ lúc bắt đầu xử lý prompt tới khi token đầu tiên sẵn sàng.**
+**TTFT — thời gian tới token đầu tiên (Time To First Token)**: thời gian từ lúc bắt đầu xử lý đầu vào tới khi token đầu tiên sẵn sàng.
 
 Ví dụ:
 
@@ -538,7 +538,7 @@ Vì sao cần nhiều lần?
 
 Máy tính không phải một chiếc đồng hồ lý tưởng.
 
-Driver có trạng thái.
+Trình điều khiển phần cứng cũng có trạng thái.
 
 bộ nhớ đệm có trạng thái.
 
@@ -698,7 +698,7 @@ GPU utilization cũng được thử thu thập.
 
 Nhưng Windows GPU Engine counters cho một số ArcLLM sample báo peak vượt 100%.
 
-Một counter như vậy không còn đủ đáng tin cho claim.
+Một **bộ đếm phần cứng** như vậy không còn đủ đáng tin để làm căn cứ cho kết luận.
 
 Q2 không “sửa” số đó.
 
@@ -708,7 +708,7 @@ Nó ghi:
 
 > **GPU-utilization peak unreliable.**
 
-và loại chỉ số đó khỏi validity/advantage claim.
+và loại chỉ số đó khỏi việc đánh giá **tính hợp lệ và lợi thế**.
 
 Một measurement không đáng tin không trở thành bằng chứng chỉ vì ta muốn có thêm cột trong bảng.
 
@@ -865,7 +865,7 @@ Q3
 
 và:
 
-> **xác nhận một claim đã định nghĩa trước.**
+> **xác nhận một kết luận đã được định nghĩa trước.**
 
 ## Một kết quả âm tính cũng cần được thiết kế nghiêm túc
 
@@ -875,7 +875,7 @@ Private bytes thấp hơn một chút.
 
 CPU utilization có những khác biệt mô tả.
 
-Nhưng Q2 không được phép biến các tín hiệu nhỏ đó thành claim mới chỉ để cứu một kết quả mong muốn.
+Nhưng Q2 không được phép biến các tín hiệu nhỏ đó thành **kết luận mới** chỉ để cứu một kết quả mong muốn.
 
 Vì vậy câu hỏi của Chương 10 sẽ mạnh hơn nhiều:
 
