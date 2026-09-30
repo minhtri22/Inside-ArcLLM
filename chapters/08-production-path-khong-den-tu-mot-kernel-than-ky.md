@@ -280,7 +280,7 @@ lần giao việc C
 → mất bao lâu?
 ```
 
-Sau đó các lần giao việc cho GPU có quan hệ về cấu trúc hoặc cùng cơ chế được gom thành một **họ tác vụ tính toán (compute/chương trình GPU family)**.
+Sau đó các lần giao việc cho GPU có quan hệ về cấu trúc hoặc cùng cơ chế được gom thành một **họ tác vụ tính toán (compute/kernel family)**.
 
 Ví dụ:
 
