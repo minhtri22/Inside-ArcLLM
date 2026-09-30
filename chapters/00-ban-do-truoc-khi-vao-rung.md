@@ -2,7 +2,7 @@
 
 > **Mức đọc: Nền tảng**
 >
-> Nếu bạn chưa biết AI, mô hình, token, CPU hay GPU là gì, hãy bắt đầu ở đây. Không cần ghi nhớ thuật ngữ. Mục tiêu chỉ là hiểu từng vai trò một.
+> Nếu bạn chưa biết AI, mô hình, token, RAM, CPU hay GPU là gì, hãy bắt đầu ở đây. Không cần ghi nhớ thuật ngữ. Mục tiêu chỉ là hiểu từng vai trò một.
 
 ## Bắt đầu từ thứ quen thuộc nhất
 
@@ -272,7 +272,7 @@ Một bức tranh đơn giản:
 giữ tệp mô hình lâu dài
         ↓
 Bộ nhớ
-giữ dữ liệu đang cần dùng
+giữ dữ liệu đang cần dùng (RAM)
         ↓
 CPU / GPU
 thực hiện phép tính
