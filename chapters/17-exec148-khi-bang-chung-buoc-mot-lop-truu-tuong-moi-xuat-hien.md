@@ -94,7 +94,7 @@ Block 148 byte có thể hình dung thành ba vùng:
 → dmin, cũng giữ nguyên raw FP16 bits
 
 16 byte tiếp
-→ 8 cặp scale/min được đặt trực tiếp dưới dạng uint8
+→ 8 cặp hệ số scale/min được đặt trực tiếp dưới dạng uint8
 
 128 byte còn lại
 → các giá trị Q4 được sắp lại theo thứ tự K
@@ -125,7 +125,7 @@ Dạng dữ liệu nguồn và EXEC148 đều được giải mã về một d�
 ```text
 d
 dmin
-8 cặp scale/min
+8 cặp hệ số scale/min
 256 giá trị q
 ```
 
@@ -607,7 +607,7 @@ Tại sao phải tạo EXEC148 khi phiên suy luận bắt đầu?
 Nếu EXEC148 chỉ phụ thuộc vào:
 
 ```text
-model
+mô hình
 +
 kiểu lượng tử hóa
 +
@@ -621,7 +621,7 @@ Ví dụ:
 ```text
 Mô hình Q4_K
 +
-file EXEC148 đi kèm
+tệp EXEC148 đi kèm
 ↓
 nạp dữ liệu
 ↓
