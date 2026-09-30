@@ -1,5 +1,34 @@
 # Chương 14 — Từ một cơ chế tốt tới hệ thống thật
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: Transfer / carry-through**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** Transfer / carry-through.
+
+
 > **Câu hỏi của chương:** Một cơ chế đã PASS trong phép thử thành phần có còn tạo ra lợi ích khi nó phải làm việc với model thật, dữ liệu thật và toàn bộ đường sinh token hay không?
 
 Chương 13 cho ta hai con đường khác nhau.
