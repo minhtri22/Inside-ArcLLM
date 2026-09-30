@@ -48,14 +48,14 @@ Cuối cùng mới tới phần “hàng thật”: những byte chứa dữ li�
 Có thể hình dung:
 
 ```text
-FILE GGUF
+TỆP GGUF
 
 ┌──────────────────────────────┐
-│ Thông tin chung / metadata   │
+│ Thông tin chung / thông tin mô tả   │
 ├──────────────────────────────┤
 │ Danh mục tensor              │
 │ tên / kích thước / kiểu      │
-│ vị trí trong file            │
+│ vị trí trong tệp            │
 ├──────────────────────────────┤
 │                              │
 │ Dữ liệu tensor               │
@@ -254,9 +254,9 @@ Tên nghe khá kỹ thuật, nhưng ý tưởng lại rất đời thường.
 Một cách dễ nghĩ khi đọc tệp là:
 
 ```text
-Mở file
+Mở tệp
    ↓
-Đọc toàn bộ file
+Đọc toàn bộ tệp
    ↓
 Chép tất cả vào một vùng RAM mới
    ↓
