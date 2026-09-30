@@ -67,7 +67,7 @@ Một mũi tên có thể đứt ở bất kỳ đâu.
 
 ## Phép thử nhỏ và mô hình thật không phải cùng một thế giới
 
-Ở phép thử Q4 trước đó, ta dùng các **bộ dữ liệu kiểm thử cố định (bài thử cố định)**.
+Ở phép thử Q4 trước đó, ta dùng các **bộ dữ liệu kiểm thử cố định (fixture)**.
 
 Chúng rất hữu ích.
 
