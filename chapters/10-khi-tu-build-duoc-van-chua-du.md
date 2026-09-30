@@ -1,5 +1,34 @@
 # Chương 10 — Khi “tự build được” vẫn chưa đủ
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: benchmark / giả thuyết âm tính / stop rule**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** benchmark / giả thuyết âm tính / stop rule.
+
+
 > **Câu hỏi của chương:** Sau khi matched benchmark cho thấy một khoảng cách rất lớn, làm thế nào kiểm tra nghiêm túc xem kiến trúc ArcLLM hiện tại có còn một lợi thế thực tế nào đủ lớn và tái lập được hay không?
 
 Chương 9 kết thúc ở một điểm hơi khó chịu.
