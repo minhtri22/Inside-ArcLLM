@@ -909,7 +909,7 @@ Ta mất:
 
 Tên cuốn sách là:
 
-> **Inside ArcLLM — Xây dựng một hệ thực thi LLM từ những nguyên lý đầu tiên**
+> **Inside ArcLLM — Xây dựng hệ thực thi cho mô hình ngôn ngữ lớn từ những nguyên lý đầu tiên**
 >
 > *Building an LLM hệ thực thi from First Principles*
 
