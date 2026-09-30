@@ -897,7 +897,7 @@ Nó tồn tại để tìm ra kiến trúc đó **thực sự làm được gì 
 2. **TTFT, giai đoạn sinh token thông lượng và E2E là ba câu hỏi khác nhau.** Một chữ “nhanh” không thay thế được ba chỉ số này; nhiều lần đo và trung vị giúp tránh để một run bất thường định nghĩa toàn bộ kết quả.
 3. **Q2 hoàn thành mô tả đặc tính, không chọn phương án thắng.** 20/20 attempt thành công tạo ra một mặt phẳng evidence đủ hợp lệ; việc một practical advantage có tồn tại hay không phải được khóa thành câu hỏi riêng và kiểm tra bằng bằng chứng mới ở Q3.
 
-**Chương 10 — Tự xây được vẫn chưa có nghĩa là tốt hơn**
+**Tiếp theo: [Chương 10 — Tự xây được vẫn chưa có nghĩa là tốt hơn](10-khi-tu-build-duoc-van-chua-du.md)**
 
 Ở chương tiếp theo, ArcLLM sẽ làm điều khó nhất đối với một project đã đầu tư rất nhiều công sức:
 
