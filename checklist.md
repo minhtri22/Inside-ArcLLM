@@ -644,3 +644,300 @@ Patch commits:
 - Chương 20: `e8d538961512444740bdb882a6c659220101cbc3`
 
 Post-patch QA xác nhận các đoạn đã sửa vẫn khớp final scientific evidence. Bonus không sửa theo quyết định tác giả vì đây là hướng mở; finding QA-08 được giữ lại trong checklist như lịch sử QA thay vì xóa.
+
+
+---
+
+# PEDAGOGICAL QA REOPEN — 2026-10-01
+
+> **Nguồn kích hoạt QA:** phản hồi độc giả thực tế sau khi đọc hai chương đầu.
+>
+> **Phạm vi:** khả năng đọc của người bắt đầu từ số 0 về công nghệ/AI. Đây là QA sư phạm và ngôn ngữ, **không mở lại các verdict khoa học đã QA ở trên**.
+>
+> **Trạng thái:** **OPEN — REWRITE REQUIRED**
+
+## Tiêu chuẩn mới
+
+Một đoạn chỉ được coi là đạt cho độc giả số 0 khi đồng thời thỏa:
+
+1. **Tiếng Việt trước, thuật ngữ gốc sau.** Nếu có cách gọi tiếng Việt đủ đúng và dễ hiểu, dùng tiếng Việt làm câu chính; thuật ngữ tiếng Anh chỉ đặt trong ngoặc ở lần đầu cần tham chiếu.
+2. **Không dùng trước khi dạy.** Một khái niệm không được xuất hiện như thể người đọc đã biết nó trước khi có một hình dung cơ bản.
+3. **Dạy theo bậc thang.** Có thể bắt đầu bằng một mô hình gần đúng, nói rõ đây là cách hiểu tạm thời, rồi mới sửa dần tới bản chất chính xác hơn.
+4. **Ví dụ đời thường trước sơ đồ kỹ thuật.** Sơ đồ chỉ củng cố một ý đã hiểu, không thay thế việc giải thích.
+5. **Một đoạn chỉ nên đưa vào số ít khái niệm mới.** Không dồn một “từ điển thuật ngữ” vào đầu chương.
+6. **Tên chương cũng phải đọc được.** Không được coi tiêu đề như vùng miễn trừ cho tiếng Anh chuyên môn.
+7. **Tên riêng/chuẩn kỹ thuật được giữ nguyên khi cần** (ví dụ Vulkan, GGUF, llama.cpp, Q4_K), nhưng phải giải thích vai trò bằng tiếng Việt trước khi dựa vào tên đó.
+8. **PASS/FAIL và các nhãn nghiên cứu phải có nghĩa tiếng Việt trước khi trở thành ký hiệu quen thuộc.**
+9. **Độc giả không được buộc phải nhớ định nghĩa từ chương trước chỉ để hiểu câu hiện tại.** Khi một khái niệm quay lại sau khoảng cách dài, cần một lời nhắc tự nhiên nếu ngữ cảnh đòi hỏi.
+10. **Bài kiểm tra cuối:** xóa các từ tiếng Anh không phải tên riêng khỏi đoạn văn; nếu ý chính trở nên khó hiểu hoặc mất nghĩa, đoạn đó chưa đủ Việt hóa.
+
+## Kết quả tổng quan
+
+**Verdict: FAIL — CURRENT EDITION DOES NOT YET MEET THE CLAIM “BẮT ĐẦU TỪ SỐ 0”.**
+
+Lý do không nằm ở độ sâu khoa học. Vấn đề chính là **cách dựng cầu tới độ sâu đó**.
+
+Vòng sửa trước đã bổ sung Phần 0, glossary nội tuyến, mức đọc và sơ đồ xuyên suốt. Những thay đổi này có ích nhưng chưa giải quyết triệt để hai lỗi:
+
+- câu văn vẫn trộn tiếng Việt và thuật ngữ Anh quá thường xuyên;
+- sơ đồ/thuật ngữ xuất hiện trước khi người đọc có mô hình đời thường để bám vào.
+
+## Findings
+
+### PQA-01 — HIGH — README tự mâu thuẫn với tuyên bố “không giả định đã biết AI”
+
+README nói sách dành cho người bắt đầu từ số 0 nhưng ngay phần giới thiệu và mục lục dùng dày đặc:
+
+- model;
+- token;
+- tensor;
+- runtime;
+- CPU/GPU;
+- decoder layer;
+- residency;
+- production path;
+- kernel;
+- benchmark;
+- correctness;
+- representation;
+- execution.
+
+**Yêu cầu sửa:** README phải là phần dễ đọc nhất của repository. Dùng tiếng Việt làm chính; thuật ngữ gốc chỉ tham chiếu trong ngoặc khi cần.
+
+---
+
+### PQA-02 — HIGH — Phần 0 đang hoạt động như “từ điển nén”, chưa phải cầu nhập môn
+
+Ngay phần mở đầu đã yêu cầu người đọc nhìn đồng thời nhiều tầng:
+
+`model → parameter/weight → dense → Transformer → token → tensor → CPU/GPU → runtime → quantization`.
+
+Bản đồ hiện tại còn hiển thị trước các thuật ngữ như:
+
+`parameters / weights`, `Decoder-only Transformer`, `RMSNorm / Attention / FFN`, `representation / lifecycle`.
+
+Đây là tải nhận thức quá lớn cho người chưa có điểm tựa.
+
+**Yêu cầu sửa:** Phần 0 phải đi từ một trải nghiệm quen thuộc — “gõ một câu, máy trả lời” — rồi mở từng hộp một. Không trình bày toàn bộ cây thuật ngữ trước.
+
+---
+
+### PQA-03 — HIGH — Chương 1 chưa tạo được hình dung chắc chắn về “mô hình” và “hệ thực thi”
+
+Cách giải thích hiện tại đúng về kỹ thuật nhưng vẫn trừu tượng:
+
+> model chứa cấu trúc và hàng tỷ con số...
+>
+> runtime là hệ thực thi model...
+
+Độc giả số 0 chưa có hình dung “một file mô hình nằm yên” khác “chương trình chạy mô hình” ở đâu.
+
+**Yêu cầu sửa:** trước thuật ngữ phải có một ví dụ đời thường duy nhất, nhất quán. Ví dụ phải giúp phân biệt:
+
+```text
+thứ chứa những gì đã học
+≠
+thứ đọc và thực hiện nó
+≠
+phần cứng làm phép tính
+```
+
+Sau khi người đọc hiểu ba vai trò mới gắn nhãn:
+
+`mô hình (model)`, `hệ thực thi (runtime)`, `bộ xử lý`.
+
+---
+
+### PQA-04 — HIGH — Cần “định nghĩa bậc thang”, không cố chính xác tuyệt đối ngay câu đầu
+
+Phản hồi độc giả về token chỉ đúng hướng ở phương pháp, không phải ở định nghĩa literal “mỗi từ cách nhau bằng dấu cách”.
+
+Cách dạy phù hợp:
+
+**Bậc 1 — đủ để đi tiếp**
+
+> “Tạm hình dung token là một mảnh văn bản nhỏ; thường nó trông giống một từ hoặc một phần của từ.”
+
+**Bậc 2 — sửa mô hình gần đúng**
+
+> “Nó không nhất thiết là một từ. Bộ mã hóa của từng mô hình quyết định cách chia.”
+
+**Bậc 3 — khi cần chính xác hơn**
+
+> token ID, tokenizer vocabulary, khoảng trắng/dấu câu/subword...
+
+**Yêu cầu sửa:** áp dụng cùng phương pháp cho tensor, layer, attention, cache, benchmark, quantization, representation và các khái niệm khó khác.
+
+---
+
+### PQA-05 — HIGH — “Bản đồ xuyên suốt” hiện tại vi phạm luật không dùng trước khi dạy
+
+Bản đồ hai cột được đặt ở đầu hầu hết chương và chứa cả các khái niệm của nhiều chương sau.
+
+Với độc giả có nền, nó là định hướng.
+
+Với độc giả số 0, nó trở thành một danh sách từ lạ lặp lại 20 lần.
+
+**Yêu cầu sửa:** không tái sử dụng nguyên bản đồ đầy đủ ở đầu mọi chương.
+
+Thay bằng **bản đồ mở dần**:
+
+```text
+Chương 1:
+câu hỏi → mô hình → hệ thực thi → phần cứng
+
+Chương 2:
+câu hỏi → mô hình → [tệp mô hình / các khối số] → hệ thực thi → phần cứng
+
+...
+
+chỉ hiện thuật ngữ sau khi nó đã được dạy.
+```
+
+Nguyên tắc: bản đồ phải thể hiện kiến thức người đọc **đã có tới thời điểm đó**, không phải toàn bộ kiến thức tác giả đã biết.
+
+---
+
+### PQA-06 — HIGH — Tiêu đề chương dùng tiếng Anh như thể người đọc đã biết
+
+Các ví dụ nổi bật:
+
+- “GGUF ... tensor store”
+- “Full decoder residency”
+- “KV cache”
+- “Production path ... kernel”
+- “Benchmark phải có đối chứng”
+- “correctness”
+- “Experiment 2×2: representation / execution”
+
+**Yêu cầu sửa:** tiêu đề tiếng Việt trước. Thuật ngữ chuẩn có thể đặt sau trong ngoặc hoặc trong phần thân.
+
+Ví dụ định hướng, chưa phải title final:
+
+- “Bên trong tệp mô hình có gì? (GGUF)”
+- “Giữ toàn bộ các lớp xử lý sẵn trong bộ nhớ”
+- “Bộ nhớ giúp mô hình không phải tính lại từ đầu (KV cache)”
+- “Đo tốc độ phải có một mốc để so sánh”
+- “Nhanh nhưng sai thì vẫn là sai”
+- “Tách cách sắp dữ liệu khỏi cách thực hiện phép tính”
+
+---
+
+### PQA-07 — HIGH — Tần suất câu Việt–Anh trộn quá cao trên toàn sách
+
+Audit từ Chương 1–20 cho thấy các từ `model`, `runtime`, `token`, `tensor`, `kernel`, `benchmark`, `decode`, `representation`, `execution`, `correctness`, `workload`, `baseline`, `speedup`... xuất hiện lặp lại dày đặc trong câu tiếng Việt.
+
+Đây không còn là vấn đề “glossary lần đầu”; nó tạo cảm giác ngôn ngữ lai xuyên suốt.
+
+**Yêu cầu sửa:** thiết lập canonical Vietnamese terminology và dùng nhất quán. Ví dụ:
+
+- model → **mô hình**;
+- runtime → **hệ thực thi**;
+- token → giữ **token** sau khi đã định nghĩa vì không có một từ Việt thay thế đủ chính xác và phổ biến; trong giải thích dùng “mảnh văn bản” khi phù hợp;
+- tensor → **khối số (tensor)** ở giai đoạn nhập môn, sau đó có thể dùng tensor khi người đọc đã quen;
+- layer → **lớp**;
+- decoder layer → **lớp giải mã**;
+- benchmark → **phép đo so sánh / phép đối chứng hiệu năng** tùy ngữ cảnh;
+- kernel → **chương trình tính toán nhỏ trên GPU (kernel)** rồi ưu tiên “phép tính GPU/chương trình GPU” trong văn xuôi;
+- correctness → **tính đúng**;
+- representation → **cách biểu diễn dữ liệu**;
+- execution → **cách thực thi**;
+- workload → **tải công việc / bài đo**;
+- baseline → **mốc đối chứng**;
+- speedup → **mức tăng tốc**;
+- latency → **độ trễ**;
+- throughput → **thông lượng / số token mỗi giây**, ưu tiên diễn giải bằng đại lượng cụ thể;
+- memory → **bộ nhớ**;
+- cache → **bộ nhớ đệm**.
+
+Không áp dụng thay thế máy móc; câu phải được viết lại tự nhiên.
+
+---
+
+### PQA-08 — MEDIUM/HIGH — PASS/FAIL đang đúng về nghiên cứu nhưng chưa thân thiện với độc giả nhập môn
+
+PASS/FAIL là ngôn ngữ quản trị thí nghiệm của dự án và có giá trị lịch sử, nhưng xuất hiện dày có thể khiến sách giống báo cáo nghiên cứu.
+
+**Yêu cầu sửa:** lần đầu và trong văn xuôi ưu tiên:
+
+- **ĐẠT (PASS)**
+- **KHÔNG ĐẠT (FAIL)**
+- **CHƯA KẾT LUẬN ĐƯỢC (UNRESOLVED)**
+
+Trong bảng/tóm tắt kỹ thuật có thể giữ ký hiệu PASS/FAIL sau khi người đọc đã quen.
+
+---
+
+### PQA-09 — MEDIUM — Các phần nâng cao vẫn cần tiếng Việt, không được dùng nhãn “Nâng cao” để miễn giải thích
+
+Chương 16–19 có mật độ rất cao của:
+
+`representation`, `execution`, `residency`, `acquisition`, `lifecycle`, `creator`, `sidecar`, `critical path`, `abstraction`.
+
+Đây là nơi dễ quay lại văn phong tài liệu kỹ thuật nhất.
+
+**Yêu cầu sửa:** giữ độ sâu khoa học nhưng chuyển câu hỏi sang tiếng Việt:
+
+```text
+dữ liệu được biểu diễn thế nào?
+ai tạo nó?
+nó nằm ở đâu?
+lấy nó bằng cách nào?
+khi nào sẵn sàng?
+giữ nó bao lâu?
+```
+
+Sau đó mới chỉ ra thuật ngữ gốc nếu nó giúp người đọc tra cứu.
+
+---
+
+### PQA-10 — HIGH — Cần một “zero-reader regression test” cho mọi chương
+
+QA hiện tại chủ yếu kiểm factual/scientific correctness. Cần thêm kiểm thử sư phạm.
+
+Mỗi chương phải trả lời được:
+
+1. Ba khái niệm mới đầu tiên là gì?
+2. Chúng đã được giải thích **trước lần dùng có ý nghĩa đầu tiên** chưa?
+3. Có câu nào bắt người đọc phải hiểu 3+ thuật ngữ mới cùng lúc không?
+4. Có thể thay một từ Anh bằng tiếng Việt mà không mất nghĩa không?
+5. Có ví dụ đời thường trước abstraction không?
+6. Đoạn đầu tiên có khiến người đọc hiểu “chương này định giải quyết chuyện gì” mà không cần tra Google không?
+7. “Nhớ 3 điều” cuối chương có viết bằng ngôn ngữ người mới có thể kể lại cho người khác không?
+
+Chỉ khi cả 7 câu đều đạt mới coi chương là **PEDAGOGICAL-QA-CLEAN**.
+
+## Thứ tự sửa bắt buộc
+
+Không sửa theo kiểu search/replace toàn sách.
+
+Thứ tự phải là:
+
+```text
+README
+↓
+Lời nói đầu
+↓
+Phần 0
+↓
+Chương 1
+↓
+đọc thử như người số 0
+↓
+khóa giọng văn + bộ thuật ngữ tiếng Việt
+↓
+Chương 2–8
+↓
+QA hồi quy
+↓
+Chương 9–15
+↓
+QA hồi quy
+↓
+Chương 16–20 + Bonus
+↓
+full-book zero-reader QA
+```
+
+**Không được coi glossary là cách chữa cho một câu vốn đã khó hiểu.** Nếu câu chỉ hiểu được sau khi tra nghĩa của ba thuật ngữ, câu phải được viết lại.
+
