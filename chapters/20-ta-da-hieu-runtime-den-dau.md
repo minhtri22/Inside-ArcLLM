@@ -157,7 +157,7 @@ Nhưng các kết quả nghiên cứu này vẫn phải hội tụ thành một 
 
 Mục tiêu lúc này là tạo một:
 
-> **hệ thực thi chuẩn đã hội tụ (canonical hệ thực thi)**.
+> **hệ thực thi chuẩn đã hội tụ (canonical runtime)**.
 
 Từ “chuẩn” ở đây không có nghĩa:
 
