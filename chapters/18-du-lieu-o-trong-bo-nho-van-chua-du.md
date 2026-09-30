@@ -252,7 +252,7 @@ chỉ cắt tại ranh giới hàng
 mỗi segment <= 256 MiB
 ```
 
-Đây là **row-aligned physical segmentation — phân đoạn vật lý theo ranh giới hàng**.
+Đây là **phân đoạn vật lý theo ranh giới hàng (row-aligned physical segmentation)**.
 
 Tổng dữ liệu logic không đổi.
 
@@ -262,7 +262,7 @@ Chỉ cách cùng khối số logic được ánh xạ thành các **mảnh vậ
 
 Trong nghiên cứu Phase2 về semantics của hệ thực thi, chính trường hợp P8 có giới hạn này được dùng như một:
 
-> **có giới hạn mandatory-feasibility phép kiểm tra — một trường hợp đối chứng có phạm vi giới hạn, trong đó cách biểu diễn dữ liệu cần thiết là điều kiện để đường thực thi đó khả thi.**
+> **phép kiểm tra khả thi bắt buộc trong phạm vi giới hạn (bounded mandatory-feasibility oracle)** — trường hợp đối chứng trong đó cách biểu diễn dữ liệu cần thiết là điều kiện để đường thực thi đó khả thi.
 
 Không có một đường dự phòng đã được xác nhận tương đương như A trong trường hợp EXEC148.
 
@@ -448,7 +448,7 @@ Nhưng nghiên cứu chưa chứng minh rằng ta được phép coi kết quả
 
 Khi ấy trạng thái đúng là:
 
-> **OUTSIDE_VALIDATED_CAPABILITY — nằm ngoài phạm vi khả năng đã được xác nhận.**
+> **nằm ngoài phạm vi khả năng đã được xác nhận (`OUTSIDE_VALIDATED_CAPABILITY`)**.
 
 Nói đơn giản:
 
@@ -857,7 +857,7 @@ Hoặc:
 
 Thao tác loại cách biểu diễn dữ liệu khỏi bộ nhớ thường được gọi là:
 
-> **evict — loại khỏi bộ nhớ**.
+> **loại khỏi bộ nhớ (evict)**.
 
 Nếu sau này cần lại, hệ thực thi có thể phải tạo hoặc nạp lại.
 
@@ -1145,7 +1145,7 @@ Bằng chứng không cho phép nói vậy.
 2. **Không phải mọi cách tạo cách biểu diễn dữ liệu đều giống nhau.** EXEC148 là cách biểu diễn dữ liệu tùy chọn có thể chỉ đáng tạo khi tái sử dụng đủ lâu; một cách biểu diễn dữ liệu cần để phép tính khả thi thì phải được tạo bất kể mức tái sử dụng thấp hay chưa biết.
 3. **Vòng đời là một quyết định độc lập.** cách biểu diễn dữ liệu đã tạo có thể được giữ để tái sử dụng, bị loại khi hết hiệu lực hoặc khi chính sách bộ nhớ yêu cầu; việc đường thực thi tạm thời chưa sẵn sàng không tự động có nghĩa phải xóa dữ liệu.
 
-**Chương 19 — Từ ArcLLM cụ thể tới một mô hình hệ thực thi tổng quát hơn**
+**Chương 19 — Từ ArcLLM tới một cách mô tả hệ thực thi tổng quát hơn**
 
 Ta đã có sáu câu hỏi riêng:
 
