@@ -327,7 +327,7 @@ P5 dùng chính khối số Q6_K đóng gói đó cho cả phép nhúng và lớ
 
 Điều này cũng tạo thêm một bài kiểm tra gián tiếp tốt: cùng một khối dữ liệu phải được dùng đúng trong hai vai trò khác nhau của graph.
 
-## Lớp tạo điểm đầu ra (lớp tạo điểm đầu ra (LM head)) quá lớn để xử lý như một cục duy nhất
+## Lớp tạo điểm đầu ra (LM head) quá lớn để xử lý như một cục duy nhất
 
 lớp tạo điểm đầu ra (LM head) phải tạo điểm cho rất nhiều token trong vocabulary — **tập các token mà mô hình biết**.
 
