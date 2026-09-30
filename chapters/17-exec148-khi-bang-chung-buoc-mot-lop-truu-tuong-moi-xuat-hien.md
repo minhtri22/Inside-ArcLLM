@@ -434,11 +434,11 @@ Nhưng cách gọi này trộn hai chuyện khác nhau.
 
 Một cách biểu diễn có:
 
-> **miền tính toán tạo ra nó (nơi tạo)**
+> **miền tính toán tạo ra nó (creator domain)**
 
 và:
 
-> **vùng bộ nhớ nơi nó cư trú khi được sử dụng (trạng thái cư trú)**.
+> **vùng bộ nhớ nơi nó cư trú khi được sử dụng (residency domain)**.
 
 Hai thứ không nhất thiết giống nhau.
 
@@ -448,7 +448,7 @@ Nhưng CPU ghi trực tiếp vào một **vùng nhớ Vulkan** mà cả CPU lẫ
 
 Máy đang dùng:
 
-> **UMA — kiến trúc bộ nhớ hợp nhất (Unified bộ nhớ Architecture)**, tức CPU và GPU dùng chung hệ thống bộ nhớ vật lý thay vì luôn có hai kho bộ nhớ hoàn toàn tách biệt.
+> **kiến trúc bộ nhớ hợp nhất (Unified Memory Architecture, UMA)**, tức CPU và GPU dùng chung hệ thống bộ nhớ vật lý thay vì luôn có hai kho bộ nhớ hoàn toàn tách biệt.
 
 Vì vậy:
 
@@ -485,7 +485,7 @@ có cần sao chép hay bàn giao dữ liệu không?
 
 ## Một cách biểu diễn bắt đầu có “hồ sơ” riêng
 
-Từ bằng chứng đó, bài toán bố trí được mô tả như một **bộ thuộc tính (bộ thuộc tính)**:
+Từ bằng chứng đó, bài toán bố trí được mô tả như một **bộ thuộc tính (tuple)**:
 
 ```text
 P
@@ -529,7 +529,7 @@ Về lý thuyết có thể là một bộ xử lý khác nếu nó thực sự 
 
 > khi nào giữ, khi nào bỏ, khi nào phải tạo lại.
 
-Đây chính là dấu hiệu của một **lớp trừu tượng (lớp trừu tượng)** mới.
+Đây chính là dấu hiệu của một **lớp trừu tượng (abstraction)** mới.
 
 Trước đây:
 
@@ -636,7 +636,7 @@ Một **tệp dữ liệu phụ** đi kèm tệp chính thường được gọi
 
 Như vậy chi phí biến đổi không còn nằm trên:
 
-> **đường thời gian quan trọng của suy luận (đường thời gian quan trọng)**.
+> **đường thời gian quan trọng của suy luận (critical path)**.
 
 Nhưng ta lại phải trả bằng:
 
