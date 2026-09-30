@@ -42,7 +42,7 @@ Câu hỏi tiếp theo vì vậy rất tự nhiên:
 
 > **Cùng một cách chia K cho 32 lane, giữ nguyên cơ chế đã thắng ở Q4_K, có tiếp tục hoạt động với Q6_K hay không?**
 
-Đây là lúc **chế độ C — Xác nhận (Confirm)** trở thành nhân vật chính.
+Đây là lúc **C — Xác nhận (Confirm)** trở thành nhân vật chính.
 
 ## C — Xác nhận không hỏi “ta có thể làm nó chạy không?”
 
@@ -102,7 +102,7 @@ Ta đã tạo ra một hypothesis mới.
 
 Cả Q4_K và Q6_K đều là những cách lưu trọng số đã được lượng tử hóa và đóng gói.
 
-**lượng tử hóa — lượng tử hóa** có thể hiểu là:
+**lượng tử hóa (quantization)** có thể hiểu là:
 
 > thay vì lưu mọi trọng số bằng một số thực lớn như F32, ta biểu diễn chúng bằng ít bit hơn cùng một số **hệ số tỉ lệ** cần thiết để tái tạo giá trị gần đúng khi tính toán.
 
@@ -163,7 +163,7 @@ tính đúng tiêu chuẩn đã khóa dùng hai đại lượng quen thuộc.
 
 Thứ nhất:
 
-> **max_abs — sai lệch tuyệt đối lớn nhất giữa hai kết quả.**
+> **sai lệch tuyệt đối lớn nhất (max_abs)** giữa hai kết quả.
 
 Ngưỡng:
 
@@ -173,7 +173,7 @@ max_abs <= 0,02
 
 Thứ hai:
 
-> **RMSE — căn trung bình bình phương sai số**, dùng để nhìn sai lệch tổng thể thay vì chỉ điểm tệ nhất.
+> **căn trung bình bình phương sai số (RMSE)**, dùng để nhìn sai lệch tổng thể thay vì chỉ điểm tệ nhất.
 
 Ngưỡng:
 
@@ -357,7 +357,7 @@ Có một chi tiết rất đáng học từ đây.
 
 Harness dùng kiểu:
 
-> **fail-fast — gặp lỗi đầu tiên thì dừng ngay.**
+> **dừng ngay khi gặp lỗi đầu tiên (fail-fast).**
 
 Vì vậy khi `candidate_cpu` KHÔNG ĐẠT (FAIL), chương trình dừng.
 
@@ -806,11 +806,11 @@ Chỉ những thứ sống sót mới được quyền đi tiếp.
 
 ### Nhớ 3 điều
 
-1. **chế độ C — Xác nhận khóa luật trước rồi để evidence phán xét.** Q6 giữ nguyên cơ chế Split-K đã ĐẠT (PASS) ở Q4 và phải vượt tính đúng trước khi hiệu năng được phép đo.
+1. **C — Xác nhận (Confirm)** khóa luật trước rồi để bằng chứng phán xét. Q6 giữ nguyên cơ chế Split-K đã ĐẠT (PASS) ở Q4 và phải vượt tính đúng trước khi hiệu năng được phép đo.
 2. **Q6 KHÔNG ĐẠT (FAIL) về tính đúng, không KHÔNG ĐẠT (FAIL) về hiệu năng.** hiệu năng không được chạy, số measurement pair bằng 0 và mô hình thật không được load; vì vậy không được nói Q6 nhanh hay chậm.
 3. **Một ĐẠT (PASS) không tự động tổng quát sang miền khác.** Q4 chứng minh cơ chế có giá trị trong phạm vi Q4_K đã thử. Q6 cho thấy cùng cơ chế giữ nguyên không vượt được tính đúng tiêu chuẩn đã khóa ở một định dạng lượng tử hóa khác.
 
-**Chương 14 — Từ một cơ chế tốt tới hệ thống thật**
+**Chương 14 — Từ một phép tính tốt tới cả hệ thống thật**
 
 Q6 dừng trước khi được chuyển tiếp.
 
