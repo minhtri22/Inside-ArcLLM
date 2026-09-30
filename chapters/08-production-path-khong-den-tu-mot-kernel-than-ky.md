@@ -19,7 +19,7 @@
 
 Ở cuối Chương 7, ArcLLM đã làm được một việc rất quan trọng.
 
-mô hình không chỉ chạy một lượt rồi dừng.
+Mô hình không chỉ chạy một lượt rồi dừng.
 
 Nó đã có:
 
@@ -35,7 +35,7 @@ token mới
 tiếp tục dùng trạng thái cũ
 ```
 
-CPU và GPU cho cùng hai token greedy:
+CPU và GPU cho cùng hai token chọn token có điểm cao nhất:
 
 ```text
 [6228, 17]
@@ -43,11 +43,11 @@ CPU và GPU cho cùng hai token greedy:
 
 điểm dự đoán đúng trong gate.
 
-K/V bộ nhớ đệm đúng trong gate.
+bộ nhớ đệm K/V đúng trong gate.
 
 Không có `intermediate host round-trip` đối với bộ nhớ đệm KV.
 
-P6 PASS.
+P6 ĐẠT (PASS).
 
 Nếu chỉ nhìn vào tính đúng — **tính đúng** — đây đã là một hệ thực thi tối thiểu khá hoàn chỉnh.
 
@@ -59,7 +59,7 @@ Nhưng nếu thử dùng con đường đó cho một lượng công việc lớ
 
 Và P7 sẽ dạy chúng ta một bài học quan trọng:
 
-> **Performance hiếm khi được giải quyết bằng cách đoán ra một “chương trình GPU thần kỳ”.**
+> **hiệu năng hiếm khi được giải quyết bằng cách đoán ra một “chương trình GPU thần kỳ”.**
 
 Con đường thực tế hơn thường là:
 
@@ -105,7 +105,7 @@ Vì vậy chữ `Q4_K_M` trong tên mô hình **không có nghĩa 338 khối s�
 
 Các trọng số — **trọng số** — tiếp tục ở dạng packed — **đóng gói** — như những chương trước đã xây dựng.
 
-## Từ bài thử nhỏ sang 512 token
+## Từ bài thử nhỏ sang chuỗi 512 token
 
 P6 cố ý rất nhỏ.
 
@@ -124,8 +124,8 @@ tg128
 
 Trong phạm vi P7:
 
-- **pp512 — prompt processing 512 token**, tức pha prefill xử lý 512 token đầu vào;
-- **tg128 — token generation 128 token**, tức vòng decode sinh tiếp 128 token.
+- **pp512 — prompt processing 512 token**, tức pha giai đoạn xử lý đầu vào xử lý 512 token đầu vào;
+- **tg128 — token generation 128 token**, tức vòng giai đoạn sinh token sinh tiếp 128 token.
 
 Có thể hình dung:
 
@@ -146,17 +146,17 @@ Tổng ngữ cảnh đi tới 640 vị trí.
 
 Đây đã khác rất xa bài thử bốn token của P6.
 
-## Một số thứ buộc phải thay đổi khi scale
+## Một số thứ buộc phải thay đổi khi mở rộng quy mô
 
 Một cơ chế chạy được ở 4 hoặc 16 vị trí chưa chắc chạy được ở 512.
 
 P7-A vì vậy phải thay một số phần đã đủ cho proof nhưng chưa đủ cho bài đo lớn hơn.
 
-cơ chế chú ý prefill chuyển sang **online softmax — cách tính softmax theo luồng để không phụ thuộc vào một mảng cố định chỉ chứa được số lượng token nhỏ**.
+cơ chế chú ý giai đoạn xử lý đầu vào chuyển sang **online softmax — cách tính softmax theo luồng để không phụ thuộc vào một mảng cố định chỉ chứa được số lượng token nhỏ**.
 
 Các phép nhân trọng số Q4_K/Q6_K cho batch 512 được tổ chức thành **2-D packed GEMM — phép nhân ma trận GPU chia công việc theo hai chiều trong khi vẫn đọc trọng số đóng gói**.
 
-Ngoài ra, những đối tượng Vulkan tốn công chuẩn bị như pipeline và descriptor set được chuẩn bị rồi giữ lại để tái sử dụng qua các bước decode.
+Ngoài ra, những đối tượng Vulkan tốn công chuẩn bị như pipeline và descriptor set được chuẩn bị rồi giữ lại để tái sử dụng qua các bước giai đoạn sinh token.
 
 Nhắc ngắn:
 
@@ -183,7 +183,7 @@ P7-A vẫn vượt qua các regression gate — **các cổng kiểm tra để c
 
 Tức tính đúng không bị phá.
 
-Nhưng performance của `pp512` là khoảng:
+Nhưng hiệu năng của `pp512` là khoảng:
 
 ```text
 7,10 token/giây
@@ -207,19 +207,19 @@ R8-VK reference
 
 Cần đọc thật cẩn thận.
 
-Những con số R8-VK ở đây **không phải PASS threshold — không phải ngưỡng mà P7-A buộc phải vượt qua**.
+Những con số R8-VK ở đây **không phải ĐẠT (PASS) threshold — không phải ngưỡng mà P7-A buộc phải vượt qua**.
 
 Vì vậy ta không được viết:
 
-> “P7-A FAIL vì chậm hơn reference.”
+> “P7-A KHÔNG ĐẠT (FAIL) vì chậm hơn reference.”
 
-Scientific verdict của P7-A là:
+Scientific kết luận của P7-A là:
 
-> **Measurement PASS — phép đo đã chạy hợp lệ, tính đúng vẫn giữ, và evidence cho thấy đường chạy thực tế hiện tại còn một khoảng cách performance rất lớn.**
+> **Measurement ĐẠT (PASS) — phép đo đã chạy hợp lệ, tính đúng vẫn giữ, và evidence cho thấy đường chạy thực tế hiện tại còn một khoảng cách hiệu năng rất lớn.**
 
 Đây là một khác biệt quan trọng.
 
-PASS của phép đo không có nghĩa performance tốt.
+ĐẠT (PASS) của phép đo không có nghĩa hiệu năng tốt.
 
 Nó chỉ có nghĩa:
 
@@ -259,7 +259,7 @@ Nhưng nó loại được một giả thuyết lớn:
 
 > **Host orchestration — phần điều phối phía CPU — không phải nút thắt chính đầu tiên cần đánh.**
 
-Evidence chỉ về **device-side thực thi — phần tính toán phía GPU**.
+Evidence chỉ về **thiết bị-side thực thi — phần tính toán phía GPU**.
 
 Từ đây P7-B mở đo đạc hiệu năng — **đo thời gian bên trong từng nhóm công việc GPU**.
 
@@ -316,15 +316,15 @@ P7-C vì vậy chỉ đụng vào **một họ tác vụ có quan hệ chặt v�
 
 Không sửa cơ chế chú ý cùng lúc.
 
-Không sửa LM head.
+Không sửa lớp tạo điểm đầu ra (LM head).
 
-Không sửa decode.
+Không sửa giai đoạn sinh token.
 
 ## Một thay đổi đầu tiên tạo khác biệt lớn
 
 P7-C thử **tiling — chia phép nhân ma trận thành các khối nhỏ để GPU có thể tái sử dụng dữ liệu hiệu quả hơn** cho FFN Q4_K và Q6_K.
 
-Các regression số học vẫn PASS.
+Các regression số học vẫn ĐẠT (PASS).
 
 điểm dự đoán vẫn đúng.
 
@@ -360,7 +360,7 @@ Gate đã khóa cho option này là:
 >= 1,10×
 ```
 
-Nên P7-C PASS.
+Nên P7-C ĐẠT (PASS).
 
 Đây là một cải thiện lớn.
 
@@ -400,7 +400,7 @@ Gate:
 >= 1,10×
 ```
 
-PASS.
+ĐẠT (PASS).
 
 Rồi lại đo.
 
@@ -412,7 +412,7 @@ Kết quả:
 ≈ 1,225×
 ```
 
-PASS.
+ĐẠT (PASS).
 
 Ta bắt đầu thấy một pattern:
 
@@ -470,7 +470,7 @@ Lưu ý quan trọng:
 
 Ta đang dùng chúng như một cách đọc và quản trị những nghiên cứu tương tự từ đây về sau.
 
-### Mode E — Explore
+### E — Khám phá (Explore)
 
 **Mode E — khám phá nhanh** dùng khi câu hỏi còn là:
 
@@ -493,7 +493,7 @@ Các timestamp profile P7-B, P7-D, P7-H, P7-M là hình ảnh rất dễ hiểu 
 → nhìn evidence trước
 ```
 
-### Mode M — Mechanism qualification
+### M — Kiểm tra cơ chế (Mechanism qualification)
 
 Sau khi Mode E chỉ ra một candidate, **Mode M — kiểm tra mechanism có đủ cơ sở để đáng chạy confirmatory hay không**.
 
@@ -511,9 +511,9 @@ Không mở năm ý tưởng cùng lúc.
 
 Câu hỏi phải đủ hẹp để kết quả có thể giết hoặc giữ chính mechanism đó.
 
-### Mode C — Confirm
+### C — Xác nhận (Confirm)
 
-Nếu mechanism sống sót, mới đi sang **Mode C — phép xác nhận PASS/FAIL đã khóa trước**.
+Nếu mechanism sống sót, mới đi sang **Mode C — phép xác nhận ĐẠT (PASS)/KHÔNG ĐẠT (FAIL) đã khóa trước**.
 
 Ví dụ P7 thường dùng:
 
@@ -530,11 +530,11 @@ Quan trọng nhất:
 
 > **Không hạ gate sau khi nhìn outcome.**
 
-FAIL là FAIL.
+KHÔNG ĐẠT (FAIL) là KHÔNG ĐẠT (FAIL).
 
-### Mode T — Transfer / carry-through
+### T — Kiểm tra khi đưa lên toàn hệ (Transfer / carry-through)
 
-Chỉ khi Mode C PASS mới có lý do đưa mechanism sang đường lớn hơn.
+Chỉ khi Mode C ĐẠT (PASS) mới có lý do đưa mechanism sang đường lớn hơn.
 
 Đó là **Mode T — mang bằng chứng đã qua xác nhận vào hệ thống tiếp theo và kiểm tra nó còn giữ được giá trị hay không**.
 
@@ -574,9 +574,9 @@ Một ý tưởng tự nhiên là:
 
 P7-I thử đúng câu đó.
 
-tính đúng PASS.
+tính đúng ĐẠT (PASS).
 
-Nhưng performance:
+Nhưng hiệu năng:
 
 ```text
 speedup
@@ -589,7 +589,7 @@ Gate:
 >= 1,10×
 ```
 
-FAIL.
+KHÔNG ĐẠT (FAIL).
 
 Không thử tile64 chỉ vì tile32 chưa thắng.
 
@@ -597,9 +597,9 @@ P7-I được giữ như một negative result — **kết quả âm tính**.
 
 Tiếp theo P7-J thử một loader vec4 để đọc/dequant nhiều trọng số liên tiếp hiệu quả hơn.
 
-tính đúng vẫn PASS.
+tính đúng vẫn ĐẠT (PASS).
 
-Performance:
+hiệu năng:
 
 ```text
 ≈ 0,9822×
@@ -607,7 +607,7 @@ Performance:
 
 Không những không đạt 1,10×, nó còn chậm hơn mốc đối chứng.
 
-FAIL.
+KHÔNG ĐẠT (FAIL).
 
 P7-K thử tăng output-row khối xử lý từ 8 lên 16.
 
@@ -627,11 +627,11 @@ Nhưng gate đã khóa là:
 1,10×
 ```
 
-Vậy verdict vẫn là:
+Vậy kết luận vẫn là:
 
-> **FAIL.**
+> **KHÔNG ĐẠT (FAIL).**
 
-Trong nghiên cứu, “có cải thiện” và “PASS contract” là hai câu khác nhau.
+Trong nghiên cứu, “có cải thiện” và “ĐẠT (PASS) contract” là hai câu khác nhau.
 
 Nếu một công việc mất 100 giây, mức tăng tốc 1,068× tương ứng còn khoảng:
 
@@ -648,7 +648,7 @@ Không được thấy 1,068 rồi sửa gate từ 1,10 xuống 1,05.
 
 Nếu làm vậy, gate chỉ còn là cách hợp thức hóa outcome.
 
-## P7-L: gộp phép tính thực sự vượt gate
+## P7-L: gộp phép tính thực sự vượt ngưỡng đã khóa
 
 Sau những negative đó, P7-L thử một mechanism khác.
 
@@ -676,7 +676,7 @@ Kết quả:
 → 28 fused dispatch
 ```
 
-tính đúng PASS.
+tính đúng ĐẠT (PASS).
 
 Full điểm dự đoán và top1 giữ nguyên trong các trial.
 
@@ -692,7 +692,7 @@ Gate:
 >= 1,10×
 ```
 
-PASS.
+ĐẠT (PASS).
 
 P7-L được freeze — **đóng băng làm production candidate**.
 
@@ -702,23 +702,23 @@ Bước tiếp theo vẫn là:
 
 > **profile lại winner.**
 
-## Winner cũng phải bị soi lại
+## Phương án đang tốt nhất cũng phải bị soi lại
 
 P7-M đo chính graph P7-L đã thắng.
 
-Prefill lúc này có:
+giai đoạn xử lý đầu vào lúc này có:
 
 ```text
 441 dispatch
 ```
 
-Một cached decode step có:
+Một cached giai đoạn sinh token step có:
 
 ```text
 469 dispatch
 ```
 
-Trong prefill, tỷ trọng thời gian GPU xấp xỉ:
+Trong giai đoạn xử lý đầu vào, tỷ trọng thời gian GPU xấp xỉ:
 
 ```text
 fused gate/up       44,40%
@@ -740,7 +740,7 @@ Một thông điệp rất rõ xuất hiện:
 
 Phần lớn chi phí vẫn nằm trong những phép tính thật.
 
-## Một PASS không có nghĩa mọi gộp phép tính tiếp theo đều tốt
+## Một kết quả ĐẠT không có nghĩa mọi cách gộp phép tính tiếp theo đều tốt
 
 P7-L gộp phép tính thành công.
 
@@ -750,9 +750,9 @@ Một phản xạ dễ mắc là:
 
 P7-N thử gộp tiếp SwiGLU vào gate+up.
 
-tính đúng PASS.
+tính đúng ĐẠT (PASS).
 
-Performance cũng tăng:
+hiệu năng cũng tăng:
 
 ```text
 ≈ 1,0516×
@@ -764,7 +764,7 @@ Nhưng gate vẫn là:
 >= 1,10×
 ```
 
-FAIL.
+KHÔNG ĐẠT (FAIL).
 
 Không rescue.
 
@@ -774,9 +774,9 @@ Không nói:
 
 P7-O sau đó thử một mechanism độc lập ở FFN-down: tăng K khối xử lý từ 32 lên 64.
 
-tính đúng PASS sau khi implementation defect được sửa.
+tính đúng ĐẠT (PASS) sau khi implementation defect được sửa.
 
-Performance:
+hiệu năng:
 
 ```text
 ≈ 0,8837×
@@ -784,7 +784,7 @@ Performance:
 
 Chậm hơn rõ rệt.
 
-FAIL.
+KHÔNG ĐẠT (FAIL).
 
 Và lần này quyết định không phải:
 
@@ -817,7 +817,7 @@ Không phải vì code không thể tối ưu thêm.
 
 Mà vì evidence hiện tại không còn biện minh cho việc tiếp tục kéo dài P7.
 
-## đường chạy thực tế cuối P7 gồm những gì?
+## Đường chạy thực tế cuối P7 gồm những gì?
 
 Đường được freeze giữ:
 
@@ -884,7 +884,7 @@ Vì vậy các quyết định tối ưu dựa chủ yếu vào:
 
 Lý do trực giác rất đơn giản.
 
-Nếu hôm thứ Hai máy nóng, có process nền và trạng thái driver khác hôm thứ Ba, so:
+Nếu hôm thứ Hai máy nóng, có process nền và trạng thái trình điều khiển khác hôm thứ Ba, so:
 
 ```text
 A hôm thứ Hai
@@ -892,7 +892,7 @@ với
 B hôm thứ Ba
 ```
 
-rất dễ trộn performance của chương trình GPU với trạng thái của cả máy.
+rất dễ trộn hiệu năng của chương trình GPU với trạng thái của cả máy.
 
 So A/B xen kẽ trong cùng run giúp giảm phần nhiễu đó.
 
@@ -960,8 +960,8 @@ Phần II bắt đầu từ đó.
 
 ### Nhớ 3 điều
 
-1. **Performance optimization phải bắt đầu bằng measurement, không bằng danh sách ý tưởng.** P7 liên tục profile → chọn một nút thắt → thử một mechanism → đo lại.
-2. **Một candidate có nhanh hơn vẫn có thể FAIL.** P7-K tăng khoảng 6,8% nhưng không vượt gate `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn FAIL. Gate không được sửa sau outcome.
+1. **hiệu năng optimization phải bắt đầu bằng measurement, không bằng danh sách ý tưởng.** P7 liên tục profile → chọn một nút thắt → thử một mechanism → đo lại.
+2. **Một candidate có nhanh hơn vẫn có thể KHÔNG ĐẠT (FAIL).** P7-K tăng khoảng 6,8% nhưng không vượt gate `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn KHÔNG ĐẠT (FAIL). Gate không được sửa sau outcome.
 3. **P7-L là production-path winner, không phải bằng chứng ArcLLM thắng hệ thực thi khác.** Muốn đưa ra claim đó, cuốn sách phải chuyển sang phép đo so sánh matched ở Chương 9.
 
 **Chương 9 — phép đo so sánh phải có đối chứng**
