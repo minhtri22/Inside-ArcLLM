@@ -164,7 +164,7 @@ Vì vậy P2 giữ toàn bộ payload trong **4 persistent trọng số arenas �
 
 Điểm quan trọng ở đây: 256 MiB là cách P2 tổ chức bộ nhớ cho bước này; không nên đọc nó thành “GPU chỉ cấp được tối đa 256 MiB”.
 
-Bốn vùng bộ nhớ lớn là quyết định của hệ thực thi trong contract P2.
+Bốn vùng bộ nhớ lớn là quyết định của hệ thực thi trong **bộ quy tắc kỹ thuật đã khóa ở P2**.
 
 ## Một bàn làm việc riêng: vùng nhớ tạm (vùng nhớ tạm)
 
@@ -305,9 +305,9 @@ Kết quả là cả bốn vùng bộ nhớ lớn đều vượt qua kiểm tra 
 
 Điều đó cho P2 bằng chứng rằng payload vẫn nhất quán trong các vùng bộ nhớ mới. Nhưng đây chưa phải bằng chứng mọi khối số sẽ tính đúng: P2 chưa thực hiện phép toán mô hình.
 
-Nó chỉ chứng minh **đường đưa và giữ dữ liệu đã hoạt động theo contract — tức hợp đồng kỹ thuật về cách các lớp phải phối hợp với nhau: ArcLLM ↔ Vulkan ↔ CPU/GPU**.
+Nó chỉ chứng minh **đường đưa và giữ dữ liệu đã hoạt động đúng theo bộ quy tắc kỹ thuật đã khóa: ArcLLM ↔ Vulkan ↔ CPU/GPU**.
 
-> **Ghi chú nhỏ:** “Contract” trong sách không phải hợp đồng pháp lý. Nó là tập những điều đã được xác định trước rằng mỗi lớp phải làm đúng: ArcLLM yêu cầu gì, Vulkan chuyển và đồng bộ yêu cầu đó thế nào, CPU/GPU phải tạo ra dấu hiệu/kết quả nào để phép thử được coi là đạt.
+> **Ghi chú nhỏ:** Khi sách dùng từ **bộ quy tắc kỹ thuật đã khóa (contract)**, đó không phải hợp đồng pháp lý. Nó chỉ là tập những điều được xác định trước rằng mỗi phần phải làm đúng: ArcLLM yêu cầu gì, Vulkan chuyển và đồng bộ yêu cầu đó thế nào, CPU/GPU phải tạo ra dấu hiệu hoặc kết quả nào để phép thử được coi là đạt.
 
 ## P2 ĐẠT thực sự có nghĩa gì?
 
