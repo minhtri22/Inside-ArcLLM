@@ -45,7 +45,7 @@ P6 là bước ArcLLM bắt đầu làm việc này.
 
 Và để hiểu P6, chúng ta cần làm quen với một khái niệm rất quan trọng:
 
-**bộ nhớ đệm KV — vùng nhớ giữ lại một phần kết quả cơ chế chú ý của các token đã xử lý để có thể tái sử dụng ở bước sau.**
+**bộ nhớ đệm khóa–giá trị (KV cache)** — vùng nhớ giữ lại một phần kết quả cơ chế chú ý của các token đã xử lý để có thể tái sử dụng ở bước sau.
 
 ## Nếu không nhớ, mô hình phải làm lại rất nhiều việc
 
@@ -151,7 +151,7 @@ Ta có thể giữ chúng.
 
 ## bộ nhớ đệm nghĩa là “giữ thứ đã tính rồi”
 
-Từ **bộ nhớ đệm — bộ nhớ đệm/tái sử dụng** xuất hiện rất nhiều trong máy tính.
+Từ **bộ nhớ đệm (cache)** xuất hiện rất nhiều trong máy tính.
 
 Ý tưởng chung rất đơn giản:
 
@@ -188,11 +188,11 @@ Khi một người gửi cho mô hình một **đoạn đầu vào**, ví dụ:
 
 Mô hình trước hết phải xử lý những token đã có.
 
-Giai đoạn đó thường được gọi là **giai đoạn xử lý đầu vào — pha xử lý toàn bộ các token đầu vào ban đầu để xây trạng thái cần thiết cho việc sinh tiếp**.
+Giai đoạn đó thường được gọi là **giai đoạn xử lý đầu vào (prefill)** — pha xử lý toàn bộ các token đầu vào ban đầu để xây trạng thái cần thiết cho việc sinh tiếp.
 
 Sau đó mô hình bắt đầu sinh từng token mới.
 
-Mỗi bước như vậy được gọi là **giai đoạn sinh token — pha xử lý token mới nhất dựa trên trạng thái đã tích lũy trước đó**.
+Mỗi bước như vậy được gọi là **giai đoạn sinh token (decode)** — pha xử lý token mới nhất dựa trên trạng thái đã tích lũy trước đó.
 
 Hình dung:
 
@@ -221,7 +221,7 @@ sau đó
 → 1 bước sinh token nối tiếp
 ```
 
-**Autoregressive — tự hồi quy** ở đây chỉ có nghĩa:
+**tự hồi quy (autoregressive)** ở đây chỉ có nghĩa:
 
 > token vừa được chọn trở thành một phần đầu vào cho bước sinh token kế tiếp.
 
@@ -260,8 +260,8 @@ max_ctx = 16
 
 Nhắc lại:
 
-- **RoPE position — vị trí dùng trong phép mã hóa vị trí**;
-- **max_ctx — giới hạn số vị trí ngữ cảnh được cấp cho bài test này**.
+- **vị trí RoPE (RoPE position)**;
+- **giới hạn ngữ cảnh (`max_ctx`)** — số vị trí ngữ cảnh được cấp cho bài thử này.
 
 Các giá trị này không phải thông số tối ưu cho mọi mô hình.
 
@@ -277,7 +277,7 @@ P6 không mang những dữ liệu này về CPU.
 
 Thay vào đó, chúng được ghi vào:
 
-> **persistent Vulkan các vùng nhớ — những vùng nhớ Vulkan được giữ lại để dùng ở bước tiếp theo.**
+> **các vùng nhớ Vulkan được giữ lâu (persistent Vulkan buffers)** — những vùng nhớ được giữ lại để dùng ở bước tiếp theo.
 
 Ta có thể hình dung mỗi lớp có một cuốn sổ:
 
@@ -317,7 +317,7 @@ ArcLLM đọc điểm dự đoán về phía CPU để tìm token đứng đầu
 
 P6 cố tình dùng cách đơn giản và hoàn toàn xác định:
 
-**chọn token có điểm cao nhất argmax — chọn token có logit cao nhất.**
+**chọn vị trí có điểm cao nhất (argmax)** — chọn token có logit cao nhất.
 
 P6 chỉ cần một quy tắc cố định để trả lời câu hỏi tính đúng.
 
@@ -380,7 +380,7 @@ GPU
 → tiếp tục sinh token
 ```
 
-Đây là **orchestration boundary — ranh giới điều phối giữa CPU và GPU** của P6.
+Đây là **ranh giới điều phối (orchestration boundary)** giữa CPU và GPU của P6.
 
 Một điều rất quan trọng cần phân biệt:
 
@@ -398,7 +398,7 @@ Làm sao biết bộ nhớ đệm GPU đúng?
 
 Như các chương trước, GPU không tự chấm bài.
 
-P6 chạy một **independent CPU reference — cách tính tham chiếu độc lập trên CPU**.
+P6 chạy một **cách tính tham chiếu độc lập trên CPU (independent CPU reference)**.
 
 Nhưng lần này CPU reference cũng phải có bộ nhớ đệm KV riêng của nó.
 
@@ -448,8 +448,8 @@ RMSE    <= 0,01
 
 Nhắc lại:
 
-- **max_abs — sai số tuyệt đối lớn nhất**;
-- **RMSE — căn trung bình bình phương sai số, phản ánh sai lệch tổng thể của dãy**.
+- **sai số tuyệt đối lớn nhất (max_abs)**;
+- **căn trung bình bình phương sai số (RMSE)** — phản ánh sai lệch tổng thể của dãy.
 
 Ngoài ra token chọn token có điểm cao nhất — **token đứng đầu theo logit** — phải giống hệt giữa CPU và GPU.
 
@@ -529,7 +529,7 @@ Toàn bộ hai token đầu ra của bài thử vì vậy là:
 [6228, 17]
 ```
 
-Đây là **exact agreement — khớp chính xác token ID**, không phải chỉ gần nhau về điểm số.
+Đây là **khớp chính xác (exact agreement)** về mã token, không phải chỉ gần nhau về điểm số.
 
 giai đoạn sinh token điểm dự đoán cũng ĐẠT (PASS):
 
@@ -718,7 +718,7 @@ Câu hỏi tiếp theo thay đổi:
 2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có vòng đi-về trung gian qua CPU đối với K/V.
 3. **P6 ĐẠT về tính đúng của quá trình sinh token, chưa phải kết luận về hiệu năng hay một sản phẩm hoàn thiện.** Hai token được chọn `[6228, 17]`, điểm dự đoán và chính bộ nhớ đệm K/V đều vượt qua các ngưỡng đã khóa.
 
-**Chương 8 — đường chạy thực tế không đến từ một chương trình GPU thần kỳ**
+**Chương 8 — Từ “chạy được” tới một đường chạy thực tế**
 
 Hệ thực thi giờ đã có thể nhớ.
 
