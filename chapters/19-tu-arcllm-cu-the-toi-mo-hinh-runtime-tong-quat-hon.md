@@ -1,45 +1,25 @@
-# Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn
+# Chương 19 — Từ ArcLLM tới một cách mô tả hệ thực thi tổng quát hơn
 
 > **Mức đọc: Nâng cao**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở câu hỏi nào?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Danh tính
+>    ↓
+> có thể thực thi?
+>    ↓
+> sẵn sàng chưa?
+>    ↓
+> đang ở đâu?
+>    ↓
+> lấy bằng cách nào?
+>    ↓
+> giữ bao lâu?
 > ```
->
-> ▶ **Đang mở ở chương này:** mô hình runtime sáu chiều.
 
 
-> **Câu hỏi của chương:** Sáu câu hỏi mà ArcLLM vừa phải tách ra có thể trở thành một mô hình chung cho nhiều kiểu đường thực thi khác nhau hay không — mà không nhét luật riêng của từng trường hợp vào lõi runtime?
+> **Câu hỏi của chương:** Sáu câu hỏi mà ArcLLM vừa phải tách ra có thể trở thành một mô hình chung cho nhiều kiểu đường thực thi khác nhau hay không — mà không nhét luật riêng của từng trường hợp vào lõi hệ thực thi?
 
 Cuối Chương 18, ta có sáu câu hỏi.
 
@@ -77,7 +57,7 @@ Nhìn riêng từng câu, không có gì quá đặc biệt.
 
 Điều khó nằm ở chỗ:
 
-> **Một mô hình runtime chỉ có giá trị nếu nhiều loại cơ chế rất khác nhau cùng đi qua được sáu chiều đó mà không cần lõi chính sách biết tên từng cơ chế.**
+> **Một mô hình hệ thực thi chỉ có giá trị nếu nhiều loại cơ chế rất khác nhau cùng đi qua được sáu chiều đó mà không cần lõi chính sách biết tên từng cơ chế.**
 
 Nếu lõi phải viết:
 
@@ -95,7 +75,7 @@ Ta chỉ có một danh sách `if/else` được đặt tên đẹp hơn.
 
 ## Vì sao cần thử trên nhiều loại cơ chế?
 
-EXEC148 đã dạy cho runtime về cách biểu diễn dữ liệu.
+EXEC148 đã dạy cho hệ thực thi về cách biểu diễn dữ liệu.
 
 Nhưng nếu ta thiết kế toàn bộ mô hình chỉ từ EXEC148, rất dễ vô tình biến những đặc điểm riêng của nó thành luật chung.
 
@@ -108,11 +88,11 @@ Ví dụ EXEC148 có:
 
 Nếu ta nhìn riêng trường hợp đó, rất dễ nghĩ:
 
-> “Mọi đường thực thi ưu tiên đều phải có representation riêng.”
+> “Mọi đường thực thi ưu tiên đều phải có cách biểu diễn dữ liệu riêng.”
 
 Hoặc:
 
-> “Mọi acquisition đều phải có ngưỡng tái sử dụng.”
+> “Mọi quá trình thu nhận đều phải có ngưỡng tái sử dụng.”
 
 Nhưng Chương 18 đã cho thấy cả hai đều sai.
 
@@ -126,7 +106,7 @@ Mà là những cơ chế đã tồn tại trước đó, với bằng chứng r
 
 Tới thời điểm này, ArcLLM có ba kiểu đủ khác nhau để thử mô hình.
 
-### Họ thứ nhất — representation tùy chọn
+### Họ thứ nhất — cách biểu diễn dữ liệu tùy chọn
 
 Đây là câu chuyện A/B của Chương 16 và 17.
 
@@ -158,9 +138,9 @@ tạo representation
 → tùy chọn, dựa trên mức tái sử dụng
 ```
 
-### Họ thứ hai — representation bắt buộc trong bounded P8 oracle
+### Họ thứ hai — cách biểu diễn bắt buộc trong phép kiểm tra P8 có giới hạn
 
-Ở bounded P8 case đã được kiểm tra, cách biểu diễn phân đoạn là điều kiện để đường thực thi có thể hoạt động trong đúng phạm vi evidence đó.
+Ở có giới hạn P8 case đã được kiểm tra, cách biểu diễn phân đoạn là điều kiện để đường thực thi có thể hoạt động trong đúng phạm vi evidence đó.
 
 Không có một đường dự phòng đã được xác nhận tương đương.
 
@@ -183,9 +163,9 @@ và hiện không thể tạo
 
 > “Có đủ token để hoàn vốn không?”
 
-Bởi việc tạo representation là điều kiện để phép tính khả thi.
+Bởi việc tạo cách biểu diễn dữ liệu là điều kiện để phép tính khả thi.
 
-### Họ thứ ba — không có representation phụ
+### Họ thứ ba — không có cách biểu diễn phụ
 
 Đây là cơ chế Split-K32 của Chương 14.
 
@@ -201,7 +181,7 @@ Không tạo image phụ.
 
 Không cần bước thu nhận dữ liệu mới.
 
-Không có vòng đời representation riêng.
+Không có vòng đời cách biểu diễn dữ liệu riêng.
 
 Nếu đường này sẵn sàng:
 
@@ -217,27 +197,27 @@ Nếu không:
 
 Ba họ này khác nhau đủ để bắt đầu thử xem sáu khái niệm có thực sự độc lập hay không.
 
-## Phiên bản trước đã FAIL vì một giả định ẩn
+## Phiên bản trước đã KHÔNG ĐẠT vì một giả định ẩn
 
 Mô hình trước đó xử lý được hai họ đầu.
 
 Nó biết:
 
-- representation có thể có hoặc không;
+- cách biểu diễn dữ liệu có thể có hoặc không;
 - có thể có đường dự phòng hoặc không;
-- việc tạo representation có thể dựa trên tái sử dụng hoặc bắt buộc để khả thi.
+- việc tạo cách biểu diễn dữ liệu có thể dựa trên tái sử dụng hoặc bắt buộc để khả thi.
 
-Nhưng khi đưa cơ chế trực tiếp của Chương 14 vào như một phép thử độc lập, mô hình FAIL.
+Nhưng khi đưa cơ chế trực tiếp của Chương 14 vào như một phép thử độc lập, mô hình KHÔNG ĐẠT (FAIL).
 
 Lý do ta đã gặp ở Chương 18:
 
-> **Nó vẫn ngầm gắn “sẵn sàng thực thi” với “representation đang ở trong bộ nhớ”.**
+> **Nó vẫn ngầm gắn “sẵn sàng thực thi” với “cách biểu diễn dữ liệu đang ở trong bộ nhớ”.**
 
-Cơ chế trực tiếp không có representation riêng.
+Cơ chế trực tiếp không có cách biểu diễn dữ liệu riêng.
 
 Vì vậy không thể mô tả nó trung thực mà không giả vờ rằng một thứ không tồn tại đang `resident`.
 
-FAIL đó dẫn tới một thay đổi rất nhỏ:
+KHÔNG ĐẠT (FAIL) đó dẫn tới một thay đổi rất nhỏ:
 
 ```text
 execution_ready
@@ -261,7 +241,7 @@ Tên nội bộ là **v4**.
 
 `v4` ở đây không có nghĩa toàn bộ ArcLLM đã trở thành “ArcLLM phiên bản 4”.
 
-Nó chỉ là phiên bản thứ tư của **bề mặt khái niệm dùng để mô tả các đường thực thi và representation**.
+Nó chỉ là phiên bản thứ tư của **bề mặt khái niệm dùng để mô tả các đường thực thi và cách biểu diễn dữ liệu**.
 
 Ta đi từng chiều.
 
@@ -271,7 +251,7 @@ Câu hỏi:
 
 > **Ta đang nói về chính xác thứ gì?**
 
-Một representation không chỉ cần tên:
+Một cách biểu diễn dữ liệu không chỉ cần tên:
 
 ```text
 EXEC148
@@ -280,12 +260,12 @@ EXEC148
 Nó còn phải gắn với đúng:
 
 - mô hình;
-- tensor;
+- khối số;
 - định dạng;
 - phiên bản;
 - bằng chứng đã xác nhận nó.
 
-Nếu một vùng dữ liệu được tạo cho model A nhưng runtime đang chạy model B, việc nó vẫn nằm trong bộ nhớ không làm nó hợp lệ.
+Nếu một vùng dữ liệu được tạo cho mô hình A nhưng hệ thực thi đang chạy mô hình B, việc nó vẫn nằm trong bộ nhớ không làm nó hợp lệ.
 
 Vì vậy:
 
@@ -303,7 +283,7 @@ Câu hỏi:
 
 > **Đường thực thi có tồn tại và về nguyên tắc có thể dùng hay không?**
 
-Ví dụ binary kernel tương ứng có thể đã được build và backend biết cách gọi nó.
+Ví dụ binary chương trình GPU tương ứng có thể đã được build và lớp thực thi phần cứng biết cách gọi nó.
 
 Khi ấy ta có thể nói:
 
@@ -335,7 +315,7 @@ có đường
 
 Điều quan trọng hơn:
 
-> **Sẵn sàng thực thi độc lập với việc có representation phụ hay không.**
+> **Sẵn sàng thực thi độc lập với việc có cách biểu diễn dữ liệu phụ hay không.**
 
 Cơ chế Split-K32 trực tiếp chứng minh điều này.
 
@@ -357,9 +337,9 @@ và hoàn toàn không có vấn đề gì.
 
 Câu hỏi:
 
-> **Một representation được tạo riêng có đang tồn tại trong vùng bộ nhớ cần thiết hay không?**
+> **Một cách biểu diễn dữ liệu được tạo riêng có đang tồn tại trong vùng bộ nhớ cần thiết hay không?**
 
-Đây là nghĩa hẹp của **residency — trạng thái cư trú trong bộ nhớ**.
+Đây là nghĩa hẹp của **trạng thái cư trú — trạng thái cư trú trong bộ nhớ**.
 
 Không dùng nó để biểu diễn:
 
@@ -381,7 +361,7 @@ Một trạng thái — một câu hỏi.
 
 Câu hỏi:
 
-> **Nếu representation cần thiết chưa có, runtime có con đường hợp lệ nào để làm nó xuất hiện không?**
+> **Nếu cách biểu diễn dữ liệu cần thiết chưa có, hệ thực thi có con đường hợp lệ nào để làm nó xuất hiện không?**
 
 ArcLLM hiện có bằng chứng cho ít nhất hai loại.
 
@@ -397,7 +377,7 @@ tạo bắt buộc để phép tính khả thi
 
 Loại thứ hai không được phép mang ngưỡng tái sử dụng.
 
-Nếu không có bằng chứng cho một bước tạo representation:
+Nếu không có bằng chứng cho một bước tạo cách biểu diễn dữ liệu:
 
 ```text
 không được bịa ra acquisition
@@ -409,7 +389,7 @@ không được bịa ra acquisition
 
 Câu hỏi:
 
-> **Representation đang có mặt thì khi nào giữ, khi nào loại và khi nào mất hiệu lực?**
+> **cách biểu diễn dữ liệu đang có mặt thì khi nào giữ, khi nào loại và khi nào mất hiệu lực?**
 
 Ví dụ:
 
@@ -459,13 +439,13 @@ EXEC148 đang trong bộ nhớ
 → không
 ```
 
-Nếu chỉ có biến `resident`, runtime rất dễ nói:
+Nếu chỉ có biến `resident`, hệ thực thi rất dễ nói:
 
 > “Dữ liệu có rồi, dùng B.”
 
 Sai.
 
-Nếu cứ thấy `execution_ready = false` rồi xóa representation:
+Nếu cứ thấy `execution_ready = false` rồi xóa cách biểu diễn dữ liệu:
 
 > cũng sai.
 
@@ -534,7 +514,7 @@ Nó là:
 
 Ví dụ các trạng thái có thể khác nhau ở:
 
-- representation đã có hay chưa;
+- cách biểu diễn dữ liệu đã có hay chưa;
 - danh tính còn hợp lệ hay không;
 - mức tái sử dụng;
 - khả năng bắt đầu tạo dữ liệu;
@@ -552,11 +532,11 @@ quyết định cũ phải giữ nguyên.
 
 Không được sửa I002 rồi làm EXEC148 đổi hành vi.
 
-Không được sửa representation bắt buộc rồi phá đường A/B.
+Không được sửa cách biểu diễn dữ liệu bắt buộc rồi phá đường A/B.
 
 Đó là một dạng:
 
-> **regression oracle — bộ đối chứng hồi quy**, dùng để bảo đảm lớp trừu tượng mới không viết lại những gì trước đó đã được chứng minh.
+> **regression phép kiểm tra — bộ đối chứng hồi quy**, dùng để bảo đảm lớp trừu tượng mới không viết lại những gì trước đó đã được chứng minh.
 
 ## Một biến đúng/sai có thực sự đủ không?
 
@@ -623,11 +603,11 @@ Không cần một máy trạng thái lớn hơn.
 
 Sáu chiều không chỉ cần tồn tại.
 
-Runtime còn phải dùng chúng theo một thứ tự có nghĩa.
+Hệ thực thi còn phải dùng chúng theo một thứ tự có nghĩa.
 
 Một ví dụ quan trọng:
 
-> **Nếu identity hoặc vòng đời cho biết representation đã không còn hợp lệ, phải xử lý việc đó trước khi xét đường thực thi có sẵn sàng hay không.**
+> **Nếu identity hoặc vòng đời cho biết cách biểu diễn dữ liệu đã không còn hợp lệ, phải xử lý việc đó trước khi xét đường thực thi có sẵn sàng hay không.**
 
 Tại sao?
 
@@ -639,9 +619,9 @@ EXEC148 vẫn nằm trong bộ nhớ
 execution_ready = true
 ```
 
-nhưng representation đó thuộc model cũ.
+nhưng cách biểu diễn dữ liệu đó thuộc mô hình cũ.
 
-Nếu nhìn readiness trước, runtime có thể route vào dữ liệu sai.
+Nếu nhìn readiness trước, hệ thực thi có thể route vào dữ liệu sai.
 
 Vì vậy:
 
@@ -657,7 +637,7 @@ Tương tự:
 
 > **Một đường thực thi chỉ được route khi vừa khả dụng, vừa sẵn sàng.**
 
-Nếu nó còn cần representation riêng thì representation đó còn phải:
+Nếu nó còn cần cách biểu diễn dữ liệu riêng thì cách biểu diễn dữ liệu đó còn phải:
 
 - đang cư trú;
 - đúng danh tính;
@@ -669,7 +649,7 @@ Nếu nó còn cần representation riêng thì representation đó còn phải:
 
 Một giả định rất dễ mắc là:
 
-> “Nếu đường ưu tiên lỗi thì cứ dùng baseline.”
+> “Nếu đường ưu tiên lỗi thì cứ dùng mốc đối chứng.”
 
 Nhưng đường dự phòng cũng là một đường thực thi thật.
 
@@ -742,11 +722,11 @@ if family == X
 
 vào lõi chung, đó là dấu hiệu lớp trừu tượng có thể vẫn thiếu một khái niệm.
 
-## Nhưng generic trên giấy chưa đủ
+## Nhưng tổng quát trên giấy vẫn chưa đủ
 
 Tới đây ta vẫn có thể mắc một sai lầm.
 
-Một mô hình chính sách có thể PASS mọi phép thử logic nhưng khi gắn vào Vulkan thật lại buộc backend phải lén làm thêm những việc mà lõi không biết.
+Một mô hình chính sách có thể ĐẠT (PASS) mọi phép thử logic nhưng khi gắn vào Vulkan thật lại buộc lớp thực thi phần cứng phải lén làm thêm những việc mà lõi không biết.
 
 Khi ấy lớp trừu tượng chỉ đúng trên giấy.
 
@@ -783,21 +763,21 @@ B bị loại
 → quay về A khi A là đường hợp lệ
 ```
 
-Tất cả đều PASS.
+Tất cả đều ĐẠT (PASS).
 
 Điều quan trọng là:
 
-> **Backend thật không cần sửa nghĩa của sáu chiều và không cần thêm một nhánh chính sách bí mật dành riêng cho Q4.**
+> **lớp thực thi phần cứng thật không cần sửa nghĩa của sáu chiều và không cần thêm một nhánh chính sách bí mật dành riêng cho Q4.**
 
-## Một FAIL khác lại giúp phân biệt experiment với runtime
+## Một kết quả KHÔNG ĐẠT khác lại giúp phân biệt thí nghiệm với hệ thực thi
 
-Quá trình gắn vào backend không PASS ngay từ lần đầu.
+Quá trình gắn vào lớp thực thi phần cứng không ĐẠT (PASS) ngay từ lần đầu.
 
-Có một FAIL đáng giữ.
+Có một KHÔNG ĐẠT (FAIL) đáng giữ.
 
 Nguyên nhân không phải sáu chiều sai.
 
-Nó đến từ việc một **harness thí nghiệm 4-arm** trước đó được dùng như thể nó là backend vòng đời thật.
+Nó đến từ việc một **harness thí nghiệm 4-arm** trước đó được dùng như thể nó là lớp thực thi phần cứng vòng đời thật.
 
 Nhắc lại mục tiêu của thí nghiệm 2×2:
 
@@ -808,15 +788,15 @@ B
 AB
 ```
 
-Để so bốn arm công bằng, harness đó chủ động chuẩn bị B theo thiết kế của experiment.
+Để so bốn arm công bằng, harness đó chủ động chuẩn bị B theo thiết kế của Thí nghiệm.
 
 Điều này hoàn toàn đúng cho thí nghiệm.
 
-Nhưng runtime thật lại cần:
+Nhưng hệ thực thi thật lại cần:
 
 > **chỉ tạo B khi chính sách quyết định rằng B cần được tạo.**
 
-Nếu lấy harness thí nghiệm rồi coi nó là runtime, B sẽ bị tạo quá sớm.
+Nếu lấy harness thí nghiệm rồi coi nó là hệ thực thi, B sẽ bị tạo quá sớm.
 
 Ta sẽ vô tình biến:
 
@@ -832,15 +812,15 @@ luôn tạo B
 
 và phá chính semantics vừa xây.
 
-Sau khi tách đúng lớp kết nối Vulkan theo nhu cầu, phép kiểm tra lại PASS.
+Sau khi tách đúng lớp kết nối Vulkan theo nhu cầu, phép kiểm tra lại ĐẠT (PASS).
 
 Bài học rất quan trọng:
 
-> **Một công cụ thí nghiệm đúng không mặc nhiên là một kiến trúc runtime đúng.**
+> **Một công cụ thí nghiệm đúng không mặc nhiên là một kiến trúc hệ thực thi đúng.**
 
 Harness được thiết kế để trả lời một câu hỏi khoa học.
 
-Runtime được thiết kế để thực hiện một chính sách trong đời sống hệ thống.
+Hệ thực thi được thiết kế để thực hiện một chính sách trong đời sống hệ thống.
 
 Hai mục tiêu khác nhau.
 
@@ -874,21 +854,21 @@ Nó giữ nguyên:
 
 quyết định của họ đầu tiên.
 
-Nó biểu diễn được trường hợp representation bắt buộc trong bounded P8 oracle đã kiểm tra.
+Nó biểu diễn được trường hợp cách biểu diễn dữ liệu bắt buộc trong có giới hạn P8 phép kiểm tra đã kiểm tra.
 
-Nó biểu diễn được cơ chế trực tiếp không cần representation phụ.
+Nó biểu diễn được cơ chế trực tiếp không cần cách biểu diễn dữ liệu phụ.
 
 Và một lớp kết nối Vulkan thật có thể tuân theo các ranh giới đó.
 
 Nhưng vẫn phải giữ giới hạn.
 
-## v4 chưa phải “kiến trúc phổ quát cho mọi AI runtime”
+## v4 chưa phải “kiến trúc phổ quát cho mọi hệ thực thi AI”
 
-Tên “generic” rất dễ tạo cảm giác lớn hơn evidence.
+Tên “tổng quát” rất dễ tạo cảm giác lớn hơn evidence.
 
 Bằng chứng hiện tại không cho phép nói:
 
-> “Mọi primitive trong mọi model, mọi GPU và mọi runtime đều chỉ cần sáu chiều này.”
+> “Mọi primitive trong mọi mô hình, mọi GPU và mọi hệ thực thi đều chỉ cần sáu chiều này.”
 
 Điều được chứng minh nhỏ hơn:
 
@@ -938,7 +918,7 @@ nếu thiếu thì tạo thế nào
 representation sống bao lâu
 ```
 
-Sau đó backend phần cứng cụ thể thực hiện các hành động đó.
+Sau đó lớp thực thi phần cứng phần cứng cụ thể thực hiện các hành động đó.
 
 Ta bắt đầu có một ranh giới:
 
@@ -967,11 +947,11 @@ Mà là:
 
 > **một ranh giới tối thiểu đã đủ để những cơ chế thật khác nhau cùng đi qua mà không phá lõi.**
 
-## Và vẫn chưa có claim hiệu năng mới
+## Và vẫn chưa có kết luận hiệu năng mới
 
 Có một chi tiết cần giữ thật rõ.
 
-Các bước xây v4, kiểm tra 114.688 trạng thái và gắn vào backend Vulkan không phải một benchmark hiệu năng mới.
+Các bước xây v4, kiểm tra 114.688 trạng thái và gắn vào lớp thực thi phần cứng Vulkan không phải một benchmark hiệu năng mới.
 
 Chúng xác nhận:
 
@@ -980,19 +960,19 @@ Chúng xác nhận:
 - quá trình tạo dữ liệu;
 - vòng đời;
 - tính đúng;
-- và ranh giới giữa lõi chung với backend.
+- và ranh giới giữa lõi chung với lớp thực thi phần cứng.
 
 Chúng **không** xác nhận:
 
 > “v4 làm ArcLLM nhanh hơn.”
 
-Không có claim đó.
+Không có kết luận đó.
 
 Một kiến trúc phần mềm có thể tốt hơn về khả năng mô tả và quản lý hệ thống mà chưa tạo ra một speedup mới.
 
-Đây là một loại PASS khác.
+Đây là một loại ĐẠT (PASS) khác.
 
-## Abstraction cuối cùng lại quay về cùng nguyên tắc đầu sách
+## Lớp trừu tượng cuối cùng lại quay về cùng nguyên tắc đầu sách
 
 Chúng ta không bắt đầu với sáu chiều.
 
@@ -1041,10 +1021,10 @@ Mà vì chúng đã bị thử phá.
 ### Nhớ 3 điều
 
 1. **v4 tách sáu câu hỏi độc lập:** danh tính, khả dụng thực thi, sẵn sàng thực thi, trạng thái cư trú, quá trình thu nhận và vòng đời. Mỗi chiều chỉ nên trả lời một câu hỏi.
-2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được bounded P8 mandatory-feasibility case và cơ chế trực tiếp không có representation phụ.
+2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được có giới hạn P8 mandatory-feasibility case và cơ chế trực tiếp không có cách biểu diễn dữ liệu phụ.
 3. **“Tổng quát” không có nghĩa “phổ quát”.** v4 chỉ được xác nhận trong các lớp đã có bằng chứng. Một phản ví dụ tương lai có quyền mở lại kiến trúc.
 
-**Chương 20 — Ta đã hiểu runtime đến đâu?**
+**Chương 20 — Ta đã hiểu hệ thực thi đến đâu?**
 
 Tới đây các mảnh đã hội tụ:
 
@@ -1068,4 +1048,4 @@ backend thật tuân theo cùng semantics
 
 Nhưng một câu hỏi cuối vẫn còn:
 
-> **Khi đưa toàn bộ những phần đã được xác nhận trở lại một runtime hoàn chỉnh, điều gì thực sự đã được chứng minh — và ranh giới nào vẫn phải để mở?**
+> **Khi đưa toàn bộ những phần đã được xác nhận trở lại một hệ thực thi hoàn chỉnh, điều gì thực sự đã được chứng minh — và ranh giới nào vẫn phải để mở?**
