@@ -1,51 +1,27 @@
-# Chương 14 — Từ một cơ chế tốt tới hệ thống thật
+# Chương 14 — Từ một phép tính tốt tới cả hệ thống thật
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Phép thử nhỏ
+>     ↓
+> trọng số thật + dữ liệu thật
+>     ↓
+> mô hình thật
+>     ↓
+> [ toàn đường sinh token ]
 > ```
->
-> ▶ **Đang mở ở chương này:** Transfer / carry-through.
 
 
-> **Câu hỏi của chương:** Một cơ chế đã PASS trong phép thử thành phần có còn tạo ra lợi ích khi nó phải làm việc với model thật, dữ liệu thật và toàn bộ đường sinh token hay không?
+> **Câu hỏi của chương:** Một cơ chế đã ĐẠT (PASS) trong phép thử thành phần có còn tạo ra lợi ích khi nó phải làm việc với mô hình thật, dữ liệu thật và toàn bộ đường sinh token hay không?
 
 Chương 13 cho ta hai con đường khác nhau.
 
 Q6 dừng ở Mode C.
 
-Cùng một cơ chế Split-K và hình học thực thi đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi áp dụng sang Q6_K bằng candidate có bộ đọc packed-Q6 tương ứng.
+Cùng một cơ chế Split-K và hình học thực thi đã hoạt động tốt với Q4_K nhưng không giữ được tính đúng khi áp dụng sang Q6_K bằng phương án thử có bộ đọc packed-Q6 tương ứng.
 
 Vì vậy:
 
@@ -63,7 +39,7 @@ Cơ chế đã rõ.
 
 Tính đúng đã giữ.
 
-Speedup cũng đủ lớn.
+mức tăng tốc cũng đủ lớn.
 
 Q4 vì thế được quyền bước sang mode cuối cùng trong chuỗi E/M/C/T:
 
@@ -71,7 +47,7 @@ Q4 vì thế được quyền bước sang mode cuối cùng trong chuỗi E/M/C
 
 Trong nghiên cứu ArcLLM, ta còn dùng từ:
 
-> **carry-through — lợi ích có thực sự truyền xuyên qua các tầng của hệ thống hay không.**
+> **khả năng giữ lợi ích khi đi lên toàn hệ — lợi ích có thực sự truyền xuyên qua các tầng của hệ thống hay không.**
 
 Đây không phải là một cách nói hoa mỹ.
 
@@ -89,7 +65,7 @@ toàn bộ lượt sinh token có nhanh hơn?
 
 Một mũi tên có thể đứt ở bất kỳ đâu.
 
-## Phép thử nhỏ và model thật không phải cùng một thế giới
+## Phép thử nhỏ và mô hình thật không phải cùng một thế giới
 
 Ở phép thử Q4 trước đó, ta dùng các **fixture — bộ dữ liệu kiểm thử cố định**.
 
@@ -101,26 +77,26 @@ Biết dữ liệu nào được đưa vào.
 
 Biết phép tính nào được chạy.
 
-Có thể so kernel cũ và kernel mới trong một môi trường rất sạch.
+Có thể so chương trình GPU cũ và chương trình GPU mới trong một môi trường rất sạch.
 
 Nhờ vậy ta có thể trả lời khá chắc chắn:
 
 > **Cách chia K mới có làm phép tính Q4_K này nhanh hơn không?**
 
-Nhưng model thật phức tạp hơn.
+Nhưng mô hình thật phức tạp hơn.
 
-Trọng số là trọng số thật của model 7B.
+Trọng số là trọng số thật của mô hình 7B.
 
 `Activation — dữ liệu trung gian do model tạo ra trong lúc chạy` không còn là fixture nhân tạo.
 
 Nó phụ thuộc vào:
 
 - prompt;
-- layer hiện tại;
+- lớp hiện tại;
 - token hiện tại;
-- trạng thái trước đó của model.
+- trạng thái trước đó của mô hình.
 
-Một kernel có thể rất đẹp trên fixture nhưng khi gặp dữ liệu thật lại:
+Một chương trình GPU có thể rất đẹp trên fixture nhưng khi gặp dữ liệu thật lại:
 
 ```text
 sai số lớn hơn
@@ -147,11 +123,11 @@ Nó hỏi một câu mới:
 
 ## Trước khi chuyển, phải biết chính xác chuyển vào đâu
 
-Một local speedup không đáng được tích hợp chỉ vì nó lớn.
+Một local mức tăng tốc không đáng được tích hợp chỉ vì nó lớn.
 
-Ta vẫn cần biết phần đó có thực sự quan trọng trong model thật hay không.
+Ta vẫn cần biết phần đó có thực sự quan trọng trong mô hình thật hay không.
 
-Một phép đo riêng trên exact model 7B cho thấy họ phép tính:
+Một phép đo riêng trên exact mô hình 7B cho thấy họ phép tính:
 
 ```text
 FFN gate + up
@@ -163,13 +139,13 @@ chiếm trung vị khoảng:
 59,67%
 ```
 
-thời gian của chuỗi công việc GPU trong decode.
+thời gian của chuỗi công việc GPU trong giai đoạn sinh token.
 
 Nói đơn giản:
 
-> **Trong phần công việc GPU đã đo của một token decode, gần 60% thời gian nằm ở gate và up.**
+> **Trong phần công việc GPU đã đo của một token giai đoạn sinh token, gần 60% thời gian nằm ở gate và up.**
 
-Đây là một khác biệt rất lớn so với việc chọn kernel chỉ vì nó “có vẻ đáng tối ưu”.
+Đây là một khác biệt rất lớn so với việc chọn chương trình GPU chỉ vì nó “có vẻ đáng tối ưu”.
 
 Ta đã có hai mảnh bằng chứng độc lập:
 
@@ -186,9 +162,9 @@ Hai mảnh ghép vào nhau.
 
 Bây giờ mới xuất hiện một ứng viên transfer đủ mạnh:
 
-> **Mang đúng cơ chế Split-K đã PASS vào đúng 56 phép gate/up Q4_K trong decode của model thật.**
+> **Mang đúng cơ chế Split-K đã ĐẠT (PASS) vào đúng 56 phép gate/up Q4_K trong giai đoạn sinh token của mô hình thật.**
 
-Không phải tất cả kernel.
+Không phải tất cả chương trình GPU.
 
 Không phải toàn bộ FFN.
 
@@ -237,7 +213,7 @@ S
 ≈ 1,94×
 ```
 
-Tức nếu hiệu ứng thành phần chuyển sang model thật một cách thuận lợi, ta có lý do kỳ vọng một chuyển động lớn cỡ gần 2× trong chuỗi decode liên quan.
+Tức nếu hiệu ứng thành phần chuyển sang mô hình thật một cách thuận lợi, ta có lý do kỳ vọng một chuyển động lớn cỡ gần 2× trong chuỗi giai đoạn sinh token liên quan.
 
 Nhưng cần đọc câu này rất cẩn thận:
 
@@ -249,7 +225,7 @@ Nó giúp ta quyết định:
 
 Nó không được dùng thay cho measurement.
 
-## Mode T cũng phải khóa phạm vi
+## T — Kiểm tra toàn hệ cũng phải khóa phạm vi
 
 Đây là chỗ rất dễ phá hỏng một transfer study.
 
@@ -265,7 +241,7 @@ Hoặc:
 
 > “Thử local size khác để chắc chắn có bản tốt nhất.”
 
-Nếu làm vậy, dù runtime nhanh hơn, ta sẽ không còn biết:
+Nếu làm vậy, dù hệ thực thi nhanh hơn, ta sẽ không còn biết:
 
 > **Hiệu ứng Q4 Split-K có thực sự transfer không?**
 
@@ -318,18 +294,18 @@ Mode T không phải:
 
 Nó là:
 
-> **“Mang đúng thứ đã PASS sang môi trường thật mà không để các thay đổi khác che mất câu trả lời.”**
+> **“Mang đúng thứ đã ĐẠT (PASS) sang môi trường thật mà không để các thay đổi khác che mất câu trả lời.”**
 
-## Bước đầu tiên: trọng số thật và activation thật
+## Bước đầu tiên: trọng số thật và dữ liệu trung gian thật
 
-Transfer đầu tiên chưa chạy toàn bộ benchmark.
+Transfer đầu tiên chưa chạy toàn bộ phép đo so sánh.
 
-Nó lấy chính model 7B và kiểm tra cơ chế trên:
+Nó lấy chính mô hình 7B và kiểm tra cơ chế trên:
 
 - trọng số Q4_K thật;
-- activation thật do baseline tạo ra.
+- dữ liệu trung gian thật do mốc đối chứng tạo ra.
 
-Ba layer được lấy mẫu:
+Ba lớp được lấy mẫu:
 
 ```text
 0
@@ -337,7 +313,7 @@ Ba layer được lấy mẫu:
 27
 ```
 
-Ba vị trí decode:
+Ba vị trí giai đoạn sinh token:
 
 ```text
 0
@@ -352,14 +328,14 @@ gate
 up
 ```
 
-và hai workload:
+và hai bài đo:
 
 ```text
 W-S
 W-C
 ```
 
-Mỗi tổ hợp session/workload có:
+Mỗi tổ hợp phiên đo/bài đo có:
 
 ```text
 3 layer
@@ -388,14 +364,14 @@ nên tổng cộng:
 72 phép so sánh
 ```
 
-Tất cả 72 phải vượt correctness gate cũ:
+Tất cả 72 phải vượt tính đúng gate cũ:
 
 ```text
 max_abs <= 0,02
 RMSE    <= 0,005
 ```
 
-## Kết quả thật còn sát hơn contract rất nhiều
+## Kết quả thật còn tốt hơn nhiều so với ngưỡng đã khóa
 
 Cả:
 
@@ -403,7 +379,7 @@ Cả:
 72 / 72
 ```
 
-phép so sánh đều PASS.
+phép so sánh đều ĐẠT (PASS).
 
 Sai lệch lớn nhất quan sát được:
 
@@ -450,13 +426,13 @@ xấp xỉ **1 378 lần** — tức khoảng một nghìn ba trăm bảy mươi
 
 Nói dễ hiểu:
 
-> **Cơ chế không chỉ vừa đủ vượt correctness gate. Nó còn có khoảng cách khá lớn so với giới hạn đã khóa.**
+> **Cơ chế không chỉ vừa đủ vượt tính đúng gate. Nó còn có khoảng cách khá lớn so với giới hạn đã khóa.**
 
-Đây là bằng chứng đầu tiên rằng hiệu ứng từ fixture đã chuyển được sang trọng số và activation thật.
+Đây là bằng chứng đầu tiên rằng hiệu ứng từ fixture đã chuyển được sang trọng số và dữ liệu trung gian thật.
 
 ## Còn tốc độ thành phần thì sao?
 
-Ngưỡng đã khóa yêu cầu trung vị speedup ở mỗi cell phải ít nhất:
+Ngưỡng đã khóa yêu cầu trung vị mức tăng tốc ở mỗi cell phải ít nhất:
 
 ```text
 1,50×
@@ -464,14 +440,14 @@ Ngưỡng đã khóa yêu cầu trung vị speedup ở mỗi cell phải ít nh�
 
 Kết quả:
 
-| Cell | Trung vị speedup thành phần |
+| Cell | Trung vị mức tăng tốc thành phần |
 |---|---:|
 | A/W-S | 3,69× |
 | A/W-C | 7,79× |
 | B/W-C | 6,30× |
 | B/W-S | 9,00× |
 
-Không chỉ bốn trung vị PASS.
+Không chỉ bốn trung vị ĐẠT (PASS).
 
 Toàn bộ:
 
@@ -499,11 +475,11 @@ Ta không còn chỉ biết:
 
 Ta đã biết:
 
-> **Chính cơ chế đó vẫn giữ tính đúng và vẫn tạo speedup lớn khi gặp trọng số và activation thật của model.**
+> **Chính cơ chế đó vẫn giữ tính đúng và vẫn tạo mức tăng tốc lớn khi gặp trọng số và dữ liệu trung gian thật của mô hình.**
 
 Nhưng Mode T vẫn chưa kết thúc.
 
-## Một component thật vẫn chưa phải toàn bộ model
+## Một thành phần thật vẫn chưa phải toàn bộ mô hình
 
 Ta có thể tưởng tượng chuỗi:
 
@@ -513,13 +489,13 @@ fixture
 real weights + real activation
 ```
 
-đã PASS.
+đã ĐẠT (PASS).
 
 Nhưng còn một bước rất quan trọng:
 
-> Nếu thay 56 node đó trong một lượt inference thật, token model sinh ra có còn giống baseline không?
+> Nếu thay 56 node đó trong một lượt suy luận thật, token mô hình sinh ra có còn giống mốc đối chứng không?
 
-Bởi một sai lệch số rất nhỏ có thể truyền qua nhiều layer.
+Bởi một sai lệch số rất nhỏ có thể truyền qua nhiều lớp.
 
 Một giá trị logit có thể thay đổi.
 
@@ -527,9 +503,9 @@ Top-1 có thể đổi.
 
 Một token đổi có thể làm toàn bộ chuỗi token sau đó rẽ sang đường khác.
 
-Vì vậy trước khi đo performance toàn hệ, model phải vượt **semantic guard — hàng rào kiểm tra rằng ý nghĩa đầu ra vẫn được giữ**.
+Vì vậy trước khi đo hiệu năng toàn hệ, mô hình phải vượt **semantic guard — hàng rào kiểm tra rằng ý nghĩa đầu ra vẫn được giữ**.
 
-Trong phép thử này, baseline và candidate đều sinh:
+Trong phép thử này, mốc đối chứng và phương án thử đều sinh:
 
 ```text
 32 token
@@ -553,21 +529,21 @@ candidate token IDs
 baseline token IDs
 ```
 
-Logits hữu hạn.
+điểm dự đoán hữu hạn.
 
-Dispatch census hợp lệ.
+lần giao việc cho GPU census hợp lệ.
 
-Không dùng CPU để thay thế model math.
+Không dùng CPU để thay thế mô hình math.
 
 Tới đây mới có thể nói:
 
-> **Cơ chế không chỉ chạy đúng ở phép toán cục bộ; nó còn giữ được hành vi sinh token của model trong toàn bộ các cặp đã kiểm tra.**
+> **Cơ chế không chỉ chạy đúng ở phép toán cục bộ; nó còn giữ được hành vi sinh token của mô hình trong toàn bộ các cặp đã kiểm tra.**
 
-## Bây giờ mới được hỏi: decode có nhanh hơn không?
+## Bây giờ mới được hỏi: giai đoạn sinh token có nhanh hơn không?
 
-Đây là tầng tiếp theo của carry-through.
+Đây là tầng tiếp theo của khả năng giữ lợi ích khi đi lên toàn hệ.
 
-Nếu gate/up nhanh hơn nhưng decode không nhúc nhích, ta sẽ có:
+Nếu gate/up nhanh hơn nhưng giai đoạn sinh token không nhúc nhích, ta sẽ có:
 
 ```text
 component PASS
@@ -575,7 +551,7 @@ component PASS
 system carry-through FAIL
 ```
 
-Ngưỡng decode đã khóa khá rõ.
+Ngưỡng giai đoạn sinh token đã khóa khá rõ.
 
 Mỗi cell phải có:
 
@@ -584,9 +560,9 @@ candidate latency / baseline latency
 <= 0,90
 ```
 
-tức candidate phải giảm ít nhất 10% decode latency.
+tức phương án thử phải giảm ít nhất 10% giai đoạn sinh token độ trễ.
 
-Và speedup trung bình hình học trên bốn cell phải ít nhất:
+Và mức tăng tốc trung bình hình học trên bốn cell phải ít nhất:
 
 ```text
 1,25×
@@ -594,7 +570,7 @@ Và speedup trung bình hình học trên bốn cell phải ít nhất:
 
 Kết quả thực tế:
 
-| Cell | Decode speedup |
+| Cell | giai đoạn sinh token mức tăng tốc |
 |---|---:|
 | A/W-S | 2,33× |
 | A/W-C | 2,04× |
@@ -607,7 +583,7 @@ Trung bình hình học:
 ≈ 2,20×
 ```
 
-Không chỉ median.
+Không chỉ trung vị.
 
 Cả:
 
@@ -615,7 +591,7 @@ Cả:
 20 / 20
 ```
 
-cặp đo riêng lẻ đều có decode tốt hơn.
+cặp đo riêng lẻ đều có giai đoạn sinh token tốt hơn.
 
 Cặp yếu nhất vẫn khoảng:
 
@@ -641,7 +617,7 @@ Gate/up chiếm gần:
 59,67%
 ```
 
-và hiệu ứng thành phần cho ta lý do kỳ vọng movement ở cấp decode quanh vùng gần 2×.
+và hiệu ứng thành phần cho ta lý do kỳ vọng movement ở cấp giai đoạn sinh token quanh vùng gần 2×.
 
 Khi dùng số đo thành phần thật ở từng cell, dự đoán Amdahl nằm khoảng:
 
@@ -649,7 +625,7 @@ Khi dùng số đo thành phần thật ở từng cell, dự đoán Amdahl nằ
 1,89× → 2,10×
 ```
 
-Decode thực tế:
+giai đoạn sinh token thực tế:
 
 ```text
 2,04× → 2,39×
@@ -663,22 +639,22 @@ Amdahl ở đây chỉ là một mô hình thô dựa trên một phân vùng ch
 
 Hệ thống thật còn có:
 
-- tương tác giữa các kernel;
+- tương tác giữa các chương trình GPU;
 - thay đổi thời gian chờ;
-- hiệu ứng cache;
+- hiệu ứng bộ nhớ đệm;
 - các chi phí không được mô hình hóa hoàn toàn.
 
 Điều quan trọng hơn là:
 
-> **Tín hiệu component không biến mất khi bước vào decode thật.**
+> **Tín hiệu thành phần không biến mất khi bước vào giai đoạn sinh token thật.**
 
-Nó carry-through rất rõ.
+Nó khả năng giữ lợi ích khi đi lên toàn hệ rất rõ.
 
 ## Nhưng ta đã từng bị TTFT chặn một lần
 
 Chương 12 đã kể một bài học khó.
 
-Một successor trước đó làm decode và E2E tốt hơn, nhưng TTFT xấu đi quá mức đã khóa.
+Một successor trước đó làm giai đoạn sinh token và E2E tốt hơn, nhưng TTFT xấu đi quá mức đã khóa.
 
 Vì vậy lần này TTFT phải được giữ như một hàng rào độc lập.
 
@@ -691,7 +667,7 @@ candidate TTFT / baseline TTFT
 
 trong cả bốn cell.
 
-Kết quả median:
+Kết quả trung vị:
 
 ```text
 A/W-S  0,884
@@ -706,7 +682,7 @@ Cả bốn đều dưới:
 1,10
 ```
 
-PASS.
+ĐẠT (PASS).
 
 Có một số cặp riêng lẻ vượt 1,10.
 
@@ -716,9 +692,9 @@ Cặp tệ nhất khoảng:
 1,181
 ```
 
-Nhưng contract đã khóa từ trước là:
+Nhưng tiêu chuẩn đã khóa đã khóa từ trước là:
 
-> **đánh giá trên median của từng cell**, không phải bắt mọi cặp riêng lẻ đều dưới 1,10.
+> **đánh giá trên trung vị của từng cell**, không phải bắt mọi cặp riêng lẻ đều dưới 1,10.
 
 Vì vậy không được đổi luật sau khi thấy một sample xấu.
 
@@ -726,9 +702,9 @@ Vì vậy không được đổi luật sau khi thấy một sample xấu.
 
 ## Cuối cùng: người dùng nhìn thấy toàn bộ lượt chạy
 
-Decode nhanh hơn là tốt.
+giai đoạn sinh token nhanh hơn là tốt.
 
-Nhưng người dùng không trải nghiệm một con số decode cô lập.
+Nhưng người dùng không trải nghiệm một con số giai đoạn sinh token cô lập.
 
 Họ trải nghiệm toàn bộ lượt chạy.
 
@@ -736,14 +712,14 @@ Vì vậy E2E — **thời gian từ đầu đến cuối** — vẫn phải đi
 
 Kết quả:
 
-| Cell | E2E speedup |
+| Cell | E2E mức tăng tốc |
 |---|---:|
 | A/W-S | 2,31× |
 | A/W-C | 1,70× |
 | B/W-C | 1,74× |
 | B/W-S | 2,35× |
 
-Trung bình hình học của bốn median:
+Trung bình hình học của bốn trung vị:
 
 ```text
 ≈ 2,00×
@@ -779,13 +755,13 @@ E2E
 ~2,00×
 ```
 
-Đây mới là ý nghĩa của **carry-through**.
+Đây mới là ý nghĩa của **khả năng giữ lợi ích khi đi lên toàn hệ**.
 
-## Mode T không phải “đưa vào production”
+## Kiểm tra toàn hệ không có nghĩa “đưa vào sử dụng thật”
 
 Từ `Transfer` rất dễ bị hiểu thành:
 
-> “Đã PASS rồi thì triển khai sản phẩm.”
+> “Đã ĐẠT (PASS) rồi thì triển khai sản phẩm.”
 
 Không phải.
 
@@ -818,37 +794,37 @@ E2E
 
 Mỗi tầng có quyền giết hypothesis.
 
-Không có tầng nào được mặc định PASS chỉ vì tầng trước PASS.
+Không có tầng nào được mặc định ĐẠT (PASS) chỉ vì tầng trước ĐẠT (PASS).
 
-## Vai trò của AI ở Mode T thay đổi một lần nữa
+## Vai trò của AI ở bước kiểm tra toàn hệ thay đổi một lần nữa
 
 Ở Mode E, AI giúp mở rộng ý tưởng.
 
 Ở Mode M, AI giúp biến một ý tưởng thành mechanism cụ thể.
 
-Ở Mode C, AI giúp triển khai và kiểm tra dưới contract đã khóa.
+Ở Mode C, AI giúp triển khai và kiểm tra dưới tiêu chuẩn đã khóa đã khóa.
 
 Đến Mode T, một nguy cơ mới xuất hiện:
 
 > **AI rất dễ “giúp quá mức”.**
 
-Ví dụ thấy component đã PASS, AI có thể đề xuất:
+Ví dụ thấy thành phần đã ĐẠT (PASS), AI có thể đề xuất:
 
-- tối ưu thêm vài kernel khác trước khi tích hợp;
+- tối ưu thêm vài chương trình GPU khác trước khi tích hợp;
 - thay luôn FFN-down;
-- thêm fusion;
+- thêm gộp phép tính;
 - chỉnh scheduler;
-- làm sạch một vài bottleneck “tiện thể”.
+- làm sạch một vài nút thắt “tiện thể”.
 
-Những thay đổi đó có thể làm runtime nhanh hơn.
+Những thay đổi đó có thể làm hệ thực thi nhanh hơn.
 
 Nhưng chúng phá câu hỏi transfer.
 
-Nếu candidate thắng, ta không còn biết phần nào đã carry-through.
+Nếu phương án thử thắng, ta không còn biết phần nào đã khả năng giữ lợi ích khi đi lên toàn hệ.
 
 Vì vậy vai trò quản trị của con người trong Mode T là giữ nguyên câu hỏi:
 
-> **Mang đúng mechanism đã PASS sang đúng bối cảnh cần kiểm tra. Không thêm cứu trợ.**
+> **Mang đúng mechanism đã ĐẠT (PASS) sang đúng bối cảnh cần kiểm tra. Không thêm cứu trợ.**
 
 AI thực hiện phần nặng:
 
@@ -881,7 +857,7 @@ Câu trả lời cần rất chính xác.
 
 Ta có thể nói:
 
-> **Cơ chế Q4 gate/up subgroup32 Split-K đã chứng minh được carry-through trong ArcLLM trên exact model 7B và các workload đã kiểm tra.**
+> **Cơ chế Q4 gate/up subgroup32 Split-K đã chứng minh được khả năng giữ lợi ích khi đi lên toàn hệ trong ArcLLM trên exact mô hình 7B và các bài đo đã kiểm tra.**
 
 Ta có thể nói:
 
@@ -901,13 +877,13 @@ Nhưng ta **chưa được nói**:
 
 Đối chứng llama.cpp ở Q2/Q3 thuộc kiến trúc ArcLLM cũ.
 
-Candidate bây giờ đã thay đổi.
+phương án thử bây giờ đã thay đổi.
 
 Muốn trả lời câu hỏi bên ngoài:
 
-> **“Khoảng cách với runtime trưởng thành đã đóng được bao nhiêu?”**
+> **“Khoảng cách với hệ thực thi trưởng thành đã đóng được bao nhiêu?”**
 
-ta cần một phép so sánh mới, cùng điều kiện, với candidate mới.
+ta cần một phép so sánh mới, cùng điều kiện, với phương án thử mới.
 
 Mode T đã chứng minh:
 
@@ -927,9 +903,9 @@ real system value
 
 ### Nhớ 3 điều
 
-1. **Mode T kiểm tra sự sống sót của bằng chứng.** Một component PASS phải lần lượt sống sót qua trọng số thật, activation thật, semantics của model, decode và E2E trước khi được gọi là carry-through.
-2. **Transfer phải giữ phạm vi hẹp.** Trong phép thử này chỉ 56 gate/up Q4_K node của decode được thay. Nếu đồng thời sửa nhiều phần khác, ta sẽ mất khả năng biết cơ chế nào tạo ra kết quả.
-3. **I002 tạo ra một cải thiện ArcLLM nội bộ có ý nghĩa: khoảng `2,20×` decode và `2,00×` E2E, đồng thời giữ TTFT guard và token semantics.** Nhưng đây vẫn chưa phải bằng chứng ArcLLM thắng llama.cpp; đối chứng bên ngoài phải được đo lại với kiến trúc mới.
+1. **Mode T kiểm tra sự sống sót của bằng chứng.** Một thành phần ĐẠT (PASS) phải lần lượt sống sót qua trọng số thật, dữ liệu trung gian thật, semantics của mô hình, giai đoạn sinh token và E2E trước khi được gọi là khả năng giữ lợi ích khi đi lên toàn hệ.
+2. **Transfer phải giữ phạm vi hẹp.** Trong phép thử này chỉ 56 gate/up Q4_K node của giai đoạn sinh token được thay. Nếu đồng thời sửa nhiều phần khác, ta sẽ mất khả năng biết cơ chế nào tạo ra kết quả.
+3. **I002 tạo ra một cải thiện ArcLLM nội bộ có ý nghĩa: khoảng `2,20×` giai đoạn sinh token và `2,00×` E2E, đồng thời giữ TTFT guard và token semantics.** Nhưng đây vẫn chưa phải bằng chứng ArcLLM thắng llama.cpp; đối chứng bên ngoài phải được đo lại với kiến trúc mới.
 
 **Chương 15 — Một kiến trúc chỉ thắng khi toàn hệ được lợi**
 
@@ -956,4 +932,4 @@ Q4 đã sống sót qua cả bốn.
 
 Nhưng một câu hỏi cuối của Phần III vẫn còn:
 
-> **Một cải thiện nội bộ rất lớn có thực sự thay đổi vị trí của cả runtime trước thế giới bên ngoài — và khi bằng chứng trả lời, con người phải quyết định dừng hay tiếp tục như thế nào?**
+> **Một cải thiện nội bộ rất lớn có thực sự thay đổi vị trí của cả hệ thực thi trước thế giới bên ngoài — và khi bằng chứng trả lời, con người phải quyết định dừng hay tiếp tục như thế nào?**
