@@ -1,5 +1,34 @@
 # Chương 12 — Nhiều kiến trúc, nhưng chỉ thực tế mới trả lời được
 
+> **Mức đọc: Nghiên cứu**
+>
+> **Bản đồ xuyên suốt — đang mở: E/M/C/T / chọn cơ chế**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** E/M/C/T / chọn cơ chế.
+
+
 > **Câu hỏi của chương:** Khi AI có thể nghĩ ra rất nhiều cách làm một phép tính nhanh hơn, làm thế nào biết ý tưởng nào thực sự đáng đưa vào kiến trúc?
 
 Chương 11 kết thúc ở một trạng thái khá đặc biệt.
