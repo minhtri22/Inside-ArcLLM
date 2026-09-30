@@ -789,7 +789,7 @@ cách biểu diễn đó sẵn sàng cho phép tính ngay lúc này
 2. **Khi một cách biểu diễn có lợi ích và chi phí riêng, hệ thực thi phải hiểu nó như một đối tượng kiến trúc.** EXEC148 có độ trễ tốt hơn trong phạm vi đã đo, nhưng phải trả chi phí tạo một lần và khoảng `550 MB` vùng dữ liệu bổ sung trong thí nghiệm.
 3. **Lớp trừu tượng xuất hiện sau bằng chứng, không phải trước bằng chứng.** Thí nghiệm 2×2 buộc ArcLLM tách cách thực thi khỏi cách biểu diễn; từ đó mới nảy sinh các câu hỏi về ai tạo, nằm ở đâu, sống bao lâu và khi nào nên giữ hoặc bỏ.
 
-**Chương 18 — Dữ liệu có mặt chưa đủ: nó phải sẵn sàng đúng lúc**
+**Tiếp theo: [Chương 18 — Dữ liệu có mặt chưa đủ: nó phải sẵn sàng đúng lúc](18-du-lieu-o-trong-bo-nho-van-chua-du.md)**
 
 Ta từng nghĩ một câu hỏi lớn của hệ thực thi là:
 
