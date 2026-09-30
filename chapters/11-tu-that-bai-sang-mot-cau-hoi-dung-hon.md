@@ -135,7 +135,7 @@ Trong đường sinh từng token mới của ArcLLM có một con số rất d�
 469 dispatch / token
 ```
 
-`Dispatch` có thể hiểu là:
+**Một lần giao việc cho GPU (dispatch)** có thể hiểu là:
 
 > **một công việc tính toán được giao cho GPU thực hiện.**
 
@@ -264,7 +264,7 @@ Nhưng nó cho ta một vùng đủ lớn và đủ cụ thể để bắt đầ
 
 ## Xử lý đầu vào và sinh token đang được đối xử rất khác nhau
 
-Ở Chương 8, P7 đã tối ưu khá sâu đường **giai đoạn xử lý đầu vào — giai đoạn mô hình xử lý toàn bộ prompt đầu vào**.
+Ở Chương 8, P7 đã tối ưu khá sâu đường **giai đoạn xử lý đầu vào — giai đoạn mô hình xử lý toàn bộ **đoạn đầu vào****.
 
 giai đoạn xử lý đầu vào đã có những đường tính toán chuyên biệt như:
 
@@ -436,7 +436,7 @@ Hardware khác.
 
 chương trình GPU khác.
 
-Driver khác.
+Trình điều khiển khác.
 
 lượng tử hóa có thể khác.
 
@@ -859,7 +859,7 @@ Vì vậy SA0 có một bước riêng:
 
 `CAP` ở đây là viết tắt của **capability — khả năng phần cứng có thể cung cấp**.
 
-Trong các tài liệu GPU/API, từ **primitive — thao tác nền tảng** thường được dùng cho những khả năng cơ bản mà phần cứng hoặc API cung cấp để các phép tính lớn hơn xây lên trên đó. Ví dụ một loại thao tác theo nhóm lane, một kiểu dữ liệu số học hay một phép toán ma trận chuyên biệt đều có thể được xem là primitive ở mức này.
+Trong tài liệu GPU và giao diện lập trình, **thao tác nền tảng (primitive)** thường được dùng cho những khả năng cơ bản mà phần cứng hoặc API cung cấp để các phép tính lớn hơn xây lên trên đó. Ví dụ một loại thao tác theo nhóm lane, một kiểu dữ liệu số học hay một phép toán ma trận chuyên biệt đều có thể được xem là primitive ở mức này.
 
 SA0-CAP không chạy mô hình.
 
@@ -867,7 +867,7 @@ Không phép đo so sánh.
 
 Không tạo shader mới cho successor.
 
-Nó chỉ hỏi đúng GPU và đúng driver:
+Nó chỉ hỏi đúng GPU và đúng **trình điều khiển**:
 
 > **“Trên máy này, phần cứng thực sự hỗ trợ những thao tác nền tảng nào?”**
 
@@ -890,7 +890,7 @@ tối đa workgroup invocation
 → 1024
 ```
 
-Ngoài ra device còn công bố hỗ trợ:
+Ngoài ra **thiết bị** còn công bố hỗ trợ:
 
 ```text
 FP16
@@ -899,7 +899,7 @@ subgroup-size control
 cooperative matrix
 ```
 
-`Subgroup` có thể hiểu gần đúng là:
+**Nhóm con GPU (subgroup)** có thể hiểu gần đúng là:
 
 > **một nhóm nhỏ các lane GPU có thể phối hợp chặt chẽ khi thực hiện cùng một công việc.**
 
