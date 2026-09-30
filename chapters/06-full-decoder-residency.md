@@ -1,73 +1,49 @@
-# Chương 6 — Full decoder residency: giữ cả “tòa nhà” trên GPU
+# Chương 6 — Giữ toàn bộ các lớp xử lý sẵn trong bộ nhớ GPU
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Một lớp giải mã
+>         ↓
+> [ toàn bộ các lớp xử lý ]
+>         ↓
+> Bộ nhớ GPU
+>         ↓
+> đường sinh token
 > ```
->
-> ▶ **Đang mở ở chương này:** nhiều decoder layer.
 
 
-> **Câu hỏi của chương:** Một decoder layer đã chạy đúng. Nhưng nếu giữ toàn bộ 28 layer cùng trọng số của model trong đường thực thi GPU, kết quả cuối cùng có còn đúng không?
+> **Câu hỏi của chương:** Một lớp giải mã đã chạy đúng. Nhưng nếu giữ toàn bộ 28 lớp cùng trọng số của mô hình trong đường thực thi GPU, kết quả cuối cùng có còn đúng không?
 
 Ở Chương 5, ArcLLM đã đi được một bước khá xa.
 
-Không còn là một kernel riêng lẻ.
+Không còn là một chương trình GPU riêng lẻ.
 
 Không còn là một phép RMSNorm hay một phép nhân Q4_K đứng một mình.
 
-Một decoder layer thật của Qwen2 đã chạy từ đầu đến cuối bằng 15 Vulkan dispatch — **15 công việc tính toán GPU** — với các kết quả trung gian tiếp tục nằm ở phía GPU.
+Một lớp giải mã thật của Qwen2 đã chạy từ đầu đến cuối bằng 15 Vulkan lần giao việc cho GPU — **15 công việc tính toán GPU** — với các kết quả trung gian tiếp tục nằm ở phía GPU.
 
 P4 PASS.
 
-Nhưng model không chỉ có một layer.
+Nhưng mô hình không chỉ có một lớp.
 
-Model đang được ArcLLM sử dụng có **28 decoder layers**.
+mô hình đang được ArcLLM sử dụng có **28 các lớp giải mã**.
 
-Nếu coi một layer là một căn phòng, P4 mới chứng minh rằng một căn phòng có thể được xây đúng.
+Nếu coi một lớp là một căn phòng, P4 mới chứng minh rằng một căn phòng có thể được xây đúng.
 
 P5 hỏi:
 
 > **Ta có thể dựng cả tòa nhà, giữ toàn bộ những phần cần thiết trong bộ nhớ và cho tín hiệu đi xuyên từ tầng đầu tới tầng cuối mà không phải liên tục quay về CPU giữa chừng hay không?**
 
-Đây là bước chuyển từ **one-layer correctness — tính đúng của một layer** sang **full-decoder correctness — tính đúng của toàn bộ chuỗi decoder**.
+Đây là bước chuyển từ **one-lớp tính đúng — tính đúng của một lớp** sang **full-decoder tính đúng — tính đúng của toàn bộ chuỗi decoder**.
 
-## Trước hết: dữ liệu đi vào model bằng cách nào?
+## Trước hết: dữ liệu đi vào mô hình bằng cách nào?
 
 Ở các chương trước, chúng ta thường bắt đầu từ một dãy số đã có sẵn.
 
-Nhưng model thật không nhận trực tiếp chữ:
+Nhưng mô hình thật không nhận trực tiếp chữ:
 
 > “Xin chào”
 
@@ -79,11 +55,11 @@ Giả sử tokenizer biến một token nào đó thành:
 token ID = 1234
 ```
 
-Con số `1234` tự nó chưa mang đủ thông tin để đi qua 28 layer.
+Con số `1234` tự nó chưa mang đủ thông tin để đi qua 28 lớp.
 
-Model cần biến token ID ấy thành một dãy số dài hơn.
+mô hình cần biến token ID ấy thành một dãy số dài hơn.
 
-Công việc đó được gọi là **embedding — biến mã token thành một vector số mà model có thể xử lý**.
+Công việc đó được gọi là **phép nhúng — biến mã token thành một vector số mà mô hình có thể xử lý**.
 
 Có thể hình dung:
 
@@ -96,11 +72,11 @@ embedding
 [0,12, -0,08, 0,44, ...]
 ```
 
-Dãy số phía dưới mới bắt đầu đi vào các decoder layer.
+Dãy số phía dưới mới bắt đầu đi vào các lớp giải mã.
 
-P5 không dùng một bảng embedding giả.
+P5 không dùng một bảng phép nhúng giả.
 
-Nó sử dụng tensor thật:
+Nó sử dụng khối số thật:
 
 ```text
 token_embd.weight
@@ -110,9 +86,9 @@ token_embd.weight
 
 Nhắc lại, **Q6_K là một dạng lượng tử hóa — cách lưu trọng số gọn hơn bằng ít bit hơn so với F32**.
 
-GPU vì vậy phải bắt đầu ngay từ dữ liệu model thật.
+GPU vì vậy phải bắt đầu ngay từ dữ liệu mô hình thật.
 
-## Từ một token đi xuyên qua 28 layer
+## Từ một token đi xuyên qua 28 lớp
 
 P5 cố tình khóa **sequence length = 1**.
 
@@ -122,11 +98,11 @@ Tại sao không dùng một câu dài hơn?
 
 Không phải vì ArcLLM chỉ chạy được một token.
 
-P4 trước đó đã kiểm tra causal GQA attention — **attention có ràng buộc thứ tự token** — với sequence length bằng 4.
+P4 trước đó đã kiểm tra causal GQA cơ chế chú ý — **cơ chế chú ý có ràng buộc thứ tự token** — với sequence length bằng 4.
 
 P5 muốn cô lập một câu hỏi khác:
 
-> **Nếu bỏ độ phức tạp của chuỗi dài sang một bên, toàn bộ chiều sâu 28 layer có thể chạy đúng trong trạng thái resident hay không?**
+> **Nếu bỏ độ phức tạp của chuỗi dài sang một bên, toàn bộ chiều sâu 28 lớp có thể chạy đúng trong trạng thái resident hay không?**
 
 Đây là một ví dụ rất hay về cách thiết kế thí nghiệm.
 
@@ -146,9 +122,9 @@ bộ nhớ mới
 
 rồi kết quả sai, ta sẽ không biết lỗi nằm ở đâu.
 
-P5 vì vậy giữ sequence length ở 1 để tập trung vào **full-depth residency — khả năng giữ và chạy xuyên toàn bộ chiều sâu model**.
+P5 vì vậy giữ sequence length ở 1 để tập trung vào **full-depth trạng thái cư trú trong bộ nhớ — khả năng giữ và chạy xuyên toàn bộ chiều sâu mô hình**.
 
-## 338 tensor được giữ lại
+## 338 khối số được giữ lại
 
 Ở Chương 2, chúng ta đã đếm:
 
@@ -168,7 +144,7 @@ Nhưng P5 đi xa hơn.
 
 Không chỉ “có bốn vùng nhớ”.
 
-Runtime giờ phải biết tensor nào thuộc đâu và giữ được toàn bộ tập trọng số cần cho model thật.
+hệ thực thi giờ phải biết khối số nào thuộc đâu và giữ được toàn bộ tập trọng số cần cho mô hình thật.
 
 P5 giữ:
 
@@ -184,9 +160,9 @@ trong:
 
 Ta tách cụm này:
 
-- **weight arena**: vùng lưu trọng số lớn;
+- **trọng số arena**: vùng lưu trọng số lớn;
 - **packed**: trọng số vẫn giữ dạng đóng gói Q4_K/Q6_K;
-- **tensor-aware**: runtime vẫn biết ranh giới và vị trí của từng tensor bên trong các vùng đó.
+- **khối số-aware**: hệ thực thi vẫn biết ranh giới và vị trí của từng khối số bên trong các vùng đó.
 
 Có thể hình dung:
 
@@ -208,11 +184,11 @@ Arena 2
 
 Không phải chỉ ném 934,7 MiB byte vào GPU rồi hy vọng tìm lại được.
 
-Runtime phải biết:
+hệ thực thi phải biết:
 
-> “Tensor tôi cần cho layer 17 nằm ở đâu?”
+> “khối số tôi cần cho lớp 17 nằm ở đâu?”
 
-Đây là khác biệt giữa **có dữ liệu trong bộ nhớ** và **có một model có thể thực thi**.
+Đây là khác biệt giữa **có dữ liệu trong bộ nhớ** và **có một mô hình có thể thực thi**.
 
 ## “Resident” lần này có nghĩa mạnh hơn
 
@@ -220,9 +196,9 @@ Ta đã gặp từ **resident — cư trú, tức dữ liệu được giữ s�
 
 Ở P2, ý nghĩa còn khá cơ bản:
 
-> dữ liệu đã được đặt vào các buffer và chưa bị giải phóng.
+> dữ liệu đã được đặt vào các vùng nhớ và chưa bị giải phóng.
 
-Đến P5, residency có ý nghĩa thực tế hơn.
+Đến P5, trạng thái cư trú trong bộ nhớ có ý nghĩa thực tế hơn.
 
 Toàn bộ các trọng số cần cho chuỗi:
 
@@ -236,7 +212,7 @@ final norm
 LM head
 ```
 
-được giữ sẵn để đường thực thi có thể đi xuyên model mà không phải mỗi layer lại quay ra nạp trọng số từ đầu.
+được giữ sẵn để đường thực thi có thể đi xuyên mô hình mà không phải mỗi lớp lại quay ra nạp trọng số từ đầu.
 
 Ta có thể so hai cách tưởng tượng.
 
@@ -277,9 +253,9 @@ Tòa nhà đã có sẵn tất cả các phòng.
 
 Ta chỉ cho tín hiệu đi xuyên qua.
 
-## Sau 28 layer vẫn chưa xong
+## Sau 28 lớp vẫn chưa xong
 
-Khi tín hiệu đi qua layer cuối cùng, model chưa lập tức có token mới.
+Khi tín hiệu đi qua lớp cuối cùng, mô hình chưa lập tức có token mới.
 
 Còn hai bước quan trọng.
 
@@ -287,7 +263,7 @@ Còn hai bước quan trọng.
 
 Ta đã gặp RMSNorm ở Chương 4. Nhắc lại ngắn gọn: nó điều chỉnh độ lớn của tín hiệu về một thang phù hợp trước khi bước sang phần tiếp theo.
 
-Sau đó là **LM head — lớp đầu ra biến trạng thái cuối của model thành điểm số cho các token có thể được chọn tiếp theo**.
+Sau đó là **LM head — lớp đầu ra biến trạng thái cuối của mô hình thành điểm số cho các token có thể được chọn tiếp theo**.
 
 Có thể hình dung:
 
@@ -304,7 +280,7 @@ LM head
 ...
 ```
 
-Những điểm này được gọi là **logits — điểm số thô mà model gán cho từng token ứng viên**.
+Những điểm này được gọi là **điểm dự đoán — điểm số thô mà mô hình gán cho từng token ứng viên**.
 
 Ví dụ đồ chơi:
 
@@ -317,17 +293,17 @@ token C : 0,7
 Token B có logit cao nhất.
 
 Trong P5, ArcLLM chỉ cần kiểm tra xem CPU và GPU có đồng ý về **token đứng đầu — top1** hay không. Cách một hệ thống hoàn chỉnh lựa chọn token để sinh văn bản là một lớp khác và không phải câu hỏi của bước này.
-## “Tied” embedding và LM head
+## “Tied” phép nhúng và LM head
 
 P5 có một chi tiết thú vị:
 
-Embedding đầu vào và LM head đầu ra dùng chung tensor trọng số:
+phép nhúng đầu vào và LM head đầu ra dùng chung khối số trọng số:
 
 ```text
 token_embd.weight
 ```
 
-Cách này thường được gọi là **tied weights — hai vị trí trong model dùng chung cùng một bộ trọng số**.
+Cách này thường được gọi là **tied trọng số — hai vị trí trong mô hình dùng chung cùng một bộ trọng số**.
 
 Hãy hình dung một cuốn từ điển được dùng ở hai đầu:
 
@@ -347,15 +323,15 @@ cùng bảng trọng số
 logits
 ```
 
-P5 dùng chính tensor Q6_K đóng gói đó cho cả embedding và LM head theo cấu trúc model đã khóa.
+P5 dùng chính khối số Q6_K đóng gói đó cho cả phép nhúng và LM head theo cấu trúc mô hình đã khóa.
 
 Điều này cũng tạo thêm một bài kiểm tra gián tiếp tốt: cùng một khối dữ liệu phải được dùng đúng trong hai vai trò khác nhau của graph.
 
 ## LM head quá lớn để xử lý như một cục duy nhất
 
-LM head phải tạo điểm cho rất nhiều token trong vocabulary — **tập các token mà model biết**.
+LM head phải tạo điểm cho rất nhiều token trong vocabulary — **tập các token mà mô hình biết**.
 
-Nếu cố làm tất cả trong một dispatch khổng lồ, runtime có thể đụng phải những giới hạn thực thi không cần thiết.
+Nếu cố làm tất cả trong một lần giao việc cho GPU khổng lồ, hệ thực thi có thể đụng phải những giới hạn thực thi không cần thiết.
 
 P5 vì vậy chia các hàng của LM head thành những **chunk — phần nhỏ có kích thước được giới hạn**.
 
@@ -376,7 +352,7 @@ ghép thành logits cuối
 
 P5 tiếp tục giữ nguyên ranh giới đã được đặt ở P4: dữ liệu trung gian không được kéo về CPU giữa chuỗi chỉ để rồi lại gửi xuống GPU.
 
-## 441 dispatch trong một command buffer
+## 441 lần giao việc cho GPU trong một command vùng nhớ
 
 Toàn bộ đường thực thi P5 tạo ra:
 
@@ -386,11 +362,11 @@ Toàn bộ đường thực thi P5 tạo ra:
 
 Nhắc lại:
 
-**dispatch — một lần runtime giao một công việc tính toán cụ thể cho GPU**.
+**lần giao việc cho GPU — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU**.
 
 441 là con số rất khác 15 ở P4.
 
-Điều đó hợp lý vì bây giờ ta không chạy một layer nữa mà là toàn bộ:
+Điều đó hợp lý vì bây giờ ta không chạy một lớp nữa mà là toàn bộ:
 
 ```text
 embedding
@@ -412,9 +388,9 @@ Nhưng điều đáng chú ý hơn là:
 → 1 fence wait
 ```
 
-Tức toàn bộ chuỗi được ghi vào **một command buffer — một danh sách lệnh GPU**, rồi được gửi xuống queue một lần.
+Tức toàn bộ chuỗi được ghi vào **một command vùng nhớ — một danh sách lệnh GPU**, rồi được gửi xuống queue một lần.
 
-CPU không đứng giữa từng layer để điều phối bằng cách đọc kết quả lên rồi quyết định bước tiếp.
+CPU không đứng giữa từng lớp để điều phối bằng cách đọc kết quả lên rồi quyết định bước tiếp.
 
 Có thể hình dung:
 
@@ -437,9 +413,9 @@ fence báo xong
 CPU mới kiểm tra kết quả
 ```
 
-Đây là điều P5 gọi là **full decoder residency**.
+Đây là điều P5 gọi là **giữ toàn bộ khối giải mã sẵn trong bộ nhớ**.
 
-## Hai checkpoint correctness thay vì chỉ một
+## Hai checkpoint tính đúng thay vì chỉ một
 
 P5 không chỉ kiểm tra kết quả ở cuối LM head.
 
@@ -447,17 +423,17 @@ Có hai tầng được kiểm tra.
 
 Thứ nhất:
 
-**final normalized hidden — trạng thái cuối sau 28 layer và phép chuẩn hóa cuối**.
+**final normalized hidden — trạng thái cuối sau 28 lớp và phép chuẩn hóa cuối**.
 
 Thứ hai:
 
-**logits — các điểm đầu ra sau LM head**.
+**điểm dự đoán — các điểm đầu ra sau LM head**.
 
 Việc kiểm tra hai tầng giúp khoanh vùng tốt hơn.
 
-Nếu hidden state cuối đã sai, lỗi có thể nằm trong 28 layer.
+Nếu hidden state cuối đã sai, lỗi có thể nằm trong 28 lớp.
 
-Nếu hidden state đúng nhưng logits sai, ta có lý do nhìn gần hơn vào LM head.
+Nếu hidden state đúng nhưng điểm dự đoán sai, ta có lý do nhìn gần hơn vào LM head.
 
 P5 khóa trước các gate:
 
@@ -506,7 +482,7 @@ gate
 <= 0,005
 ```
 
-Đối với logits:
+Đối với điểm dự đoán:
 
 ```text
 max_abs
@@ -550,7 +526,7 @@ P5 không hỏi câu đó.
 
 Và câu trả lời là có.
 
-## Đây đã phải là “model biết nói” chưa?
+## Đây đã phải là “mô hình biết nói” chưa?
 
 Chưa.
 
@@ -574,37 +550,37 @@ logits
 top1
 ```
 
-Trông gần như model hoàn chỉnh rồi.
+Trông gần như mô hình hoàn chỉnh rồi.
 
-Nhưng để model **sinh liên tục nhiều token**, còn thiếu một phần lớn.
+Nhưng để mô hình **sinh liên tục nhiều token**, còn thiếu một phần lớn.
 
-Giả sử model vừa tạo token mới.
+Giả sử mô hình vừa tạo token mới.
 
 Ở bước sau, token đó phải được thêm vào chuỗi trước đó.
 
-Attention cần nhớ những thông tin đã tính từ các token cũ.
+cơ chế chú ý cần nhớ những thông tin đã tính từ các token cũ.
 
-Nếu mỗi token mới lại bắt model tính lại toàn bộ lịch sử từ đầu, chi phí sẽ rất lớn.
+Nếu mỗi token mới lại bắt mô hình tính lại toàn bộ lịch sử từ đầu, chi phí sẽ rất lớn.
 
-Đây là lúc chúng ta cần **KV cache — bộ nhớ lưu lại Key và Value của attention từ các token trước để không phải tính lại mọi thứ từ đầu**.
+Đây là lúc chúng ta cần **bộ nhớ đệm KV — bộ nhớ lưu lại Key và Value của cơ chế chú ý từ các token trước để không phải tính lại mọi thứ từ đầu**.
 
-P5 chưa có KV cache generation path.
+P5 chưa có bộ nhớ đệm KV generation path.
 
 Vì vậy P5 **không được phép** tuyên bố:
 
 > “ArcLLM đã có vòng lặp tạo sinh tự hồi quy hoàn chỉnh.”
 
-Muốn model thật sự sinh chuỗi token liên tục, ArcLLM còn cần **KV cache và vòng lặp tạo sinh tự hồi quy (autoregressive generation)**.
+Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần **bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation)**.
 
 Đó là câu hỏi của P6.
 
-## P5 cũng chưa phải benchmark
+## P5 cũng chưa phải phép đo so sánh
 
-Có 441 dispatch.
+Có 441 lần giao việc cho GPU.
 
 Có một submit.
 
-Có toàn bộ model resident.
+Có toàn bộ mô hình resident.
 
 Điều này nghe rất dễ dẫn tới câu hỏi:
 
@@ -612,9 +588,9 @@ Có toàn bộ model resident.
 
 P5 không trả lời.
 
-P5 được thiết kế cho **correctness — tính đúng**.
+P5 được thiết kế cho **tính đúng — tính đúng**.
 
-Không phải throughput — **tốc độ xử lý**.
+Không phải thông lượng — **tốc độ xử lý**.
 
 Không phải tokens/s — **số token sinh mỗi giây**.
 
@@ -624,7 +600,7 @@ Ta chưa được phép nhìn một kiến trúc chạy đúng rồi tự độn
 
 Đó là một ranh giới sẽ đặc biệt quan trọng ở những chương sau.
 
-Một runtime có thể:
+Một hệ thực thi có thể:
 
 ```text
 đúng
@@ -704,13 +680,13 @@ Vì vậy P5 PASS.
 
 Nhưng chỉ nên diễn giải thành:
 
-> **Toàn bộ decoder của model đã chạy trên Vulkan với toàn bộ trọng số cư trú, không có intermediate host round-trip, và cả trạng thái cuối lẫn logits đều vượt qua các cổng correctness đã khóa.**
+> **Toàn bộ decoder của mô hình đã chạy trên Vulkan với toàn bộ trọng số cư trú, không có intermediate host round-trip, và cả trạng thái cuối lẫn điểm dự đoán đều vượt qua các cổng tính đúng đã khóa.**
 
 P5 chưa chứng minh tốc độ.
 
 P5 chưa chứng minh generation nhiều token.
 
-P5 chưa có KV cache path hoàn chỉnh.
+P5 chưa có bộ nhớ đệm KV path hoàn chỉnh.
 
 Nhưng một ranh giới rất lớn vừa được vượt qua.
 
@@ -720,9 +696,9 @@ Nhưng một ranh giới rất lớn vừa được vượt qua.
 
 Bây giờ ta có thể bắt đầu cho nó hoạt động theo thời gian.
 
-## Câu hỏi tiếp theo: model nhớ token trước bằng cách nào?
+## Câu hỏi tiếp theo: mô hình nhớ token trước bằng cách nào?
 
-Nếu ta muốn model sinh:
+Nếu ta muốn mô hình sinh:
 
 ```text
 token 1
@@ -734,13 +710,13 @@ token 3
 token 4
 ```
 
-thì ở token 4, model cần thông tin từ những token trước đó.
+thì ở token 4, mô hình cần thông tin từ những token trước đó.
 
 Không thể mỗi bước đều phá toàn bộ tòa nhà rồi xây lại từ đầu.
 
 Ta cần một dạng bộ nhớ giữ những phần đã tính có thể tái sử dụng.
 
-Đó là **KV cache**.
+Đó là **bộ nhớ đệm KV**.
 
 Chương tiếp theo sẽ là lần đầu ArcLLM chuyển từ:
 
@@ -748,16 +724,16 @@ Chương tiếp theo sẽ là lần đầu ArcLLM chuyển từ:
 
 sang:
 
-> **“model có thể giữ trạng thái và tự sinh token tiếp theo, rồi tiếp tục lặp lại quá trình đó không?”**
+> **“mô hình có thể giữ trạng thái và tự sinh token tiếp theo, rồi tiếp tục lặp lại quá trình đó không?”**
 
 ### Nhớ 3 điều
 
-1. **P5 mở rộng từ một layer lên toàn bộ 28-layer decoder.** 338 tensor và khoảng 934,7 MiB payload đóng gói được giữ resident trong bốn vùng trọng số.
-2. **Correctness được kiểm tra ở hai điểm:** final normalized hidden và logits; CPU/GPU cũng đồng ý `top1 = 117612`.
-3. **Full decoder PASS chưa phải generation PASS và chưa phải performance PASS.** Muốn model thật sự sinh chuỗi token liên tục, ArcLLM còn cần KV cache và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
+1. **P5 mở rộng từ một lớp lên toàn bộ 28-lớp decoder.** 338 khối số và khoảng 934,7 MiB payload đóng gói được giữ resident trong bốn vùng trọng số.
+2. **tính đúng được kiểm tra ở hai điểm:** final normalized hidden và điểm dự đoán; CPU/GPU cũng đồng ý `top1 = 117612`.
+3. **Full decoder PASS chưa phải generation PASS và chưa phải performance PASS.** Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
 
-**Chương 7 — KV cache và token đầu tiên được sinh liên tục**
+**Chương 7 — bộ nhớ đệm KV và token đầu tiên được sinh liên tục**
 
-Ta đã cho một token đi xuyên cả model.
+Ta đã cho một token đi xuyên cả mô hình.
 
-Bước tiếp theo là làm cho model nhớ những gì vừa xảy ra — để token tiếp theo không phải bắt đầu lại từ đầu.
+Bước tiếp theo là làm cho mô hình nhớ những gì vừa xảy ra — để token tiếp theo không phải bắt đầu lại từ đầu.
