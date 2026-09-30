@@ -456,7 +456,7 @@ toàn hệ thống
 Rồi Q4 gate/up sống sót qua bước chuyển vào mô hình thật:
 
 ```text
-decode
+sinh token
 ≈ 2,20×
 
 E2E
@@ -477,7 +477,7 @@ Trong các trường hợp đã đo, khoảng cách với llama.cpp vẫn vào k
 độ trễ sinh token
 ≈ 10,38×
 
-E2E latency
+độ trễ toàn lượt
 ≈ 9,97×
 ```
 
