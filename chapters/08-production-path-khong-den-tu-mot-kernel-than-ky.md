@@ -1,5 +1,34 @@
 # Chương 8 — Production path không đến từ một kernel thần kỳ
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: benchmark / tối ưu**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** benchmark / tối ưu.
+
+
 > **Câu hỏi của chương:** Khi runtime đã tính đúng, làm thế nào biến nó thành một đường chạy thực tế hơn mà không tối ưu theo cảm tính?
 
 Ở cuối Chương 7, ArcLLM đã làm được một việc rất quan trọng.
