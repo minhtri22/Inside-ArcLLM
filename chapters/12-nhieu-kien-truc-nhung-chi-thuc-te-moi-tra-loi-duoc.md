@@ -719,3 +719,6 @@ Nhưng nếu nó không còn tính đúng, hiệu năng thậm chí không đư�
 1. **E/M/C/T là bốn ranh giới của cùng một quá trình nghiên cứu.** Chương 12 tập trung vào E — nghĩ rộng và M — khóa một cơ chế; Chương 13 và 14 lần lượt cho thấy C và T.
 2. **AI làm phương án trở nên rẻ, nhưng bằng chứng mới vẫn đắt.** Vì vậy không phải mọi ý tưởng AI sinh ra đều xứng đáng được chạy.
 3. **Local mức tăng tốc không phải system value.** Split-K Q4 đạt khoảng `3,14×` ở phép thử thành phần, nhưng Amdahl và một KHÔNG ĐẠT (FAIL) ở cấp hệ thống cho thấy kiến trúc chỉ có giá trị khi toàn hệ thực sự hưởng lợi.
+
+
+**Tiếp theo: [Chương 13 — Nhanh nhưng sai thì vẫn là sai](13-khi-correctness-noi-khong.md)**
