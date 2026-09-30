@@ -1024,7 +1024,7 @@ Mà vì chúng đã bị thử phá.
 2. **Một lớp trừu tượng chỉ đáng tin khi những họ khác nhau cùng đi qua được mà không cần luật riêng cho từng họ.** Mô hình giữ nguyên 114.688 quyết định của họ đầu tiên, đồng thời biểu diễn được có giới hạn P8 mandatory-feasibility case và cơ chế trực tiếp không có cách biểu diễn dữ liệu phụ.
 3. **“Tổng quát” không có nghĩa “phổ quát”.** v4 chỉ được xác nhận trong các lớp đã có bằng chứng. Một phản ví dụ tương lai có quyền mở lại kiến trúc.
 
-**Chương 20 — Ta đã hiểu cỗ máy đến đâu?**
+**Tiếp theo: [Chương 20 — Ta đã hiểu cỗ máy đến đâu?](20-ta-da-hieu-runtime-den-dau.md)**
 
 Tới đây các mảnh đã hội tụ:
 
