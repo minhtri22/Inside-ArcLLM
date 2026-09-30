@@ -61,7 +61,7 @@ Tên kỹ thuật của chúng sẽ xuất hiện ngay sau đây.
 Nhưng trước hết hãy giữ một hình dung đơn giản:
 
 ```text
-MODEL
+MÔ HÌNH
 
 không phải một phép tính khổng lồ
 
@@ -107,7 +107,7 @@ CPU / ArcLLM
       ↓
 Vulkan
       ↓
-GPU kernel
+chương trình GPU
       ↓
 kết quả
 ```
@@ -145,7 +145,7 @@ CPU reference
       ↓
 kết quả A
 
-GPU kernel
+chương trình GPU
       ↓
 kết quả B
 
@@ -253,7 +253,7 @@ GPU mới tính
 ```text
 Q4_K packed
      ↓
-GPU kernel đọc trực tiếp
+chương trình GPU đọc trực tiếp
      ↓
 phép nhân
      ↓
@@ -277,9 +277,9 @@ Không cần học đại số tuyến tính ở đây.
 Ta chỉ cần hình dung:
 
 ```text
-dữ liệu đang đi qua model
+dữ liệu đang đi qua mô hình
         ×
-trọng số model đã học
+trọng số mô hình đã học
         ↓
 dữ liệu mới
 ```
@@ -452,7 +452,7 @@ RoPE
 softmax
 → biến điểm số thành phân bố trọng số
 
-bounded GQA attention
+cơ chế chú ý GQA trong phạm vi giới hạn
 → attention GQA trong phạm vi kiểm tra nhỏ
 
 SwiGLU + residual
@@ -486,7 +486,7 @@ Một lần khác shader đã compile nhưng quá trình build dừng vì nhữn
 Trong cả hai trường hợp:
 
 ```text
-kernel chưa chạy
+chương trình GPU chưa chạy
       ↓
 không có output GPU
       ↓
@@ -513,7 +513,7 @@ Tới cuối P3, ArcLLM có thể nói:
 glslang 16.5.0
 → trình biên dịch shader đã được khóa và xác minh nguồn gốc
 
-7 Vulkan kernel gates
+7 cổng kiểm tra chương trình Vulkan
 → 7 cổng kiểm tra phép toán GPU
 → tất cả PASS so với CPU reference độc lập
 
@@ -524,7 +524,7 @@ Q4_K GPU path
 → dùng trực tiếp trọng số thật blk.0.attn_q.weight
 → vẫn ở dạng packed, không bung toàn bộ trước
 
-RoPE / softmax / bounded GQA attention
+RoPE / softmax / cơ chế chú ý GQA trong phạm vi giới hạn
 → các viên gạch attention đã qua gate riêng
 
 SwiGLU + residual
