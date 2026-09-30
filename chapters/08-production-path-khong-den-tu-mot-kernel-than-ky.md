@@ -964,7 +964,7 @@ Phần II bắt đầu từ đó.
 2. **Một phương án thử có nhanh hơn vẫn có thể KHÔNG ĐẠT.** P7-K tăng khoảng 6,8% nhưng không vượt ngưỡng `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn KHÔNG ĐẠT. Ngưỡng không được sửa sau khi đã thấy kết quả.
 3. **P7-L là phương án tốt nhất cho đường chạy nội bộ lúc đó, không phải bằng chứng ArcLLM thắng hệ thực thi khác.** Muốn đưa ra kết luận như vậy, cuốn sách phải chuyển sang phép đo đối chứng cùng điều kiện ở Chương 9.
 
-**Chương 9 — Muốn biết nhanh hay chậm, phải có một mốc để so**
+**Tiếp theo: [Chương 9 — Muốn biết nhanh hay chậm, phải có một mốc để so](09-benchmark-phai-co-doi-chung.md)**
 
 Từ đây, câu hỏi không còn là:
 
