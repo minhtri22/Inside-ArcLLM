@@ -187,7 +187,7 @@ The public book outline is now frozen at 20 main chapters across four parts:
 1. **Part I — Build the Machine (Ch. 1–8)**  
    Goal: build a real runtime from model data, Vulkan and primitive computation through decoder, KV cache and the evidence-selected production path.
 
-2. **Part II — Để evidence phán xét (Ch. 9–11)**  
+2. **Phần II — Để bằng chứng phán xét (Ch. 9–11)**  
    Goal: place the runtime under matched comparison, accept the Q3 negative verdict, close the current architecture, and define the conditions for opening a successor hypothesis. Part II ends at Chapter 11.
 
 3. **Part III — Kiến trúc chỉ có giá trị khi đi qua thực tế (Ch. 12–15)**  
@@ -454,3 +454,16 @@ Pedagogical QA:
 - PQA-01 through PQA-10: APPROVED_FIXED;
 - full-book zero-reader regression: PASS;
 - scientific verdict rewrite count: 0.
+
+
+## 2026-10-01 — Vietnamese-first glossary directionality
+
+Reader feedback identified a regression introduced by aggressive localization: some original technical terms had been translated away inside parentheses, producing forms such as `tín hiệu hoàn thành (tín hiệu hoàn thành)`.
+
+Editorial rule now locked:
+- explanatory prose uses **Vietnamese first**;
+- the canonical English technical term is preserved in parentheses at introduction or an important reminder;
+- examples: `tín hiệu hoàn thành (fence)`, `hàng đợi (queue)`, `chương trình GPU (kernel)`, `cơ chế chú ý (attention)`;
+- exact identifiers, standards and symbols remain unchanged.
+
+A full chapter scan corrected both duplicated Vietnamese parentheticals and English-first glossary definitions. Scientific evidence and verdicts were not changed.
