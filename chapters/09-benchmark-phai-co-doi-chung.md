@@ -1,49 +1,22 @@
-# Chương 9 — Benchmark phải có đối chứng
+# Chương 9 — Muốn biết nhanh hay chậm, phải có một mốc để so
 
 > **Mức đọc: Nghiên cứu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang ở bước nào của hành trình nghiên cứu?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> ArcLLM ─┐
+>          ├→ cùng mô hình + cùng máy + cùng bài đo
+> llama.cpp ─┘                    ↓
+>                          [ so sánh công bằng ]
 > ```
->
-> ▶ **Đang mở ở chương này:** benchmark / đối chứng / cách đo.
 
 
-> **Câu hỏi của chương:** Nếu ArcLLM chạy được và đã tự tối ưu qua nhiều bước, làm thế nào biết nó thực sự đang đứng ở đâu khi đặt cạnh một runtime trưởng thành?
+> **Câu hỏi của chương:** Nếu ArcLLM chạy được và đã tự tối ưu qua nhiều bước, làm thế nào biết nó thực sự đang đứng ở đâu khi đặt cạnh một hệ thực thi trưởng thành?
 
 Ở cuối Chương 8, ta đã có một điều mà lúc bắt đầu cuốn sách chưa hề có.
 
-Một production path.
+Một sử dụng thật path.
 
 Nó có thể:
 
@@ -63,7 +36,7 @@ tạo logits
 chọn token tiếp theo
 ```
 
-Trong P7, một số thay đổi còn tạo ra speedup rất lớn so với chính phiên bản ArcLLM trước đó.
+Trong P7, một số thay đổi còn tạo ra mức tăng tốc rất lớn so với chính phiên bản ArcLLM trước đó.
 
 P7-C:
 
@@ -91,11 +64,11 @@ Nhưng câu đó chưa có nghĩa khoa học rõ ràng.
 
 Nhanh hơn **cái gì**?
 
-Trong **workload nào**?
+Trong **bài đo nào**?
 
-Cùng model hay khác model?
+Cùng mô hình hay khác mô hình?
 
-Cùng quantization hay không?
+Cùng lượng tử hóa hay không?
 
 Cùng GPU không?
 
@@ -103,13 +76,13 @@ Một bên chạy lúc máy đang rảnh còn bên kia chạy khi máy nóng?
 
 Một bên sinh 32 token còn bên kia sinh 128 token?
 
-Một bên tính cả thời gian prefill còn bên kia chỉ tính decode?
+Một bên tính cả thời gian giai đoạn xử lý đầu vào còn bên kia chỉ tính giai đoạn sinh token?
 
 Nếu những câu hỏi ấy chưa được khóa, từ “nhanh hơn” gần như vô nghĩa.
 
-Đây là lý do benchmark cần **đối chứng — một baseline phù hợp để so sánh trong những điều kiện đủ giống nhau**.
+Đây là lý do phép đo so sánh cần **đối chứng — một mốc đối chứng phù hợp để so sánh trong những điều kiện đủ giống nhau**.
 
-## Benchmark không phải là chạy hai chương trình rồi nhìn con số
+## Phép đo so sánh không phải là chạy hai chương trình rồi nhìn con số
 
 Giả sử ta chạy ArcLLM và thấy:
 
@@ -127,7 +100,7 @@ Ta có được phép nói ArcLLM nhanh hơn không?
 
 Không.
 
-Người kia có thể dùng model khác.
+Người kia có thể dùng mô hình khác.
 
 GPU khác.
 
@@ -135,7 +108,7 @@ Quant khác.
 
 Prompt khác.
 
-Context khác.
+ngữ cảnh khác.
 
 Phiên bản llama.cpp khác.
 
@@ -147,19 +120,19 @@ So sánh như vậy giống như nói:
 
 nhưng quên hỏi rằng một chiếc chạy 10 km còn chiếc kia chạy 18 km.
 
-Một benchmark có ý nghĩa phải cố giữ những thứ không phải đối tượng nghiên cứu **giống nhau**.
+Một phép đo so sánh có ý nghĩa phải cố giữ những thứ không phải đối tượng nghiên cứu **giống nhau**.
 
 Trong ArcLLM, từ được dùng là:
 
-**matched benchmark — benchmark ghép cặp, trong đó hai hệ được đặt dưới một tập điều kiện chung đã khóa trước.**
+**phép đo đối chứng cùng điều kiện — phép đo so sánh ghép cặp, trong đó hai hệ được đặt dưới một tập điều kiện chung đã khóa trước.**
 
-## “Matched” không có nghĩa hai runtime phải giống nhau
+## “Cùng điều kiện” không có nghĩa hai hệ thực thi phải giống nhau
 
 Đây là một điểm dễ hiểu nhầm.
 
 ArcLLM và llama.cpp không có cùng kiến trúc bên trong.
 
-Nếu ép chúng có cùng kernel, cùng scheduler và cùng cách tổ chức memory thì ta không còn so hai runtime nữa.
+Nếu ép chúng có cùng chương trình GPU, cùng scheduler và cùng cách tổ chức bộ nhớ thì ta không còn so hai hệ thực thi nữa.
 
 Điều cần match là **bài toán chúng phải giải**.
 
@@ -184,31 +157,31 @@ Có thể hình dung:
 
 Phần ở trên phải được khóa.
 
-Phần bên trong runtime được phép khác.
+Phần bên trong hệ thực thi được phép khác.
 
 Chính sự khác biệt đó mới là thứ ta muốn quan sát.
 
-## Trước benchmark này, model cũng đã lớn hơn
+## Trước phép đo này, mô hình cũng đã lớn hơn
 
 Trước khi nói về Q2, cần nhắc lại một bước đã xảy ra trước đó trong hành trình nghiên cứu.
 
-P7 mà Chương 8 vừa kể tập trung vào đường production của model 1.5B.
+P7 mà Chương 8 vừa kể tập trung vào đường sử dụng thật của mô hình 1.5B.
 
-Nhưng benchmark matched sau đó không còn dùng model đó.
+Nhưng phép đo so sánh matched sau đó không còn dùng mô hình đó.
 
 Trước khi Q2 được phép mở, ArcLLM đã phải vượt qua một gate riêng:
 
-> **Q1 — model 7B thật có chạy end-to-end trên máy mục tiêu hay không?**
+> **Q1 — mô hình 7B thật có chạy end-to-end trên máy mục tiêu hay không?**
 
-Chi tiết về những trở ngại kiến trúc của bước 7B sẽ còn xuất hiện ở phần sau của sách, vì chúng tạo ra những bài học quan trọng về representation và abstraction.
+Chi tiết về những trở ngại kiến trúc của bước 7B sẽ còn xuất hiện ở phần sau của sách, vì chúng tạo ra những bài học quan trọng về cách biểu diễn dữ liệu và abstraction.
 
 Ở đây ta chỉ cần một fact đã được chứng minh trước Q2:
 
-> **Qwen2.5-Coder 7B Q4_K_M đã chạy end-to-end trên ArcLLM với model thật, 28 layer thật, GPU-resident KV và autoregressive decode thật.**
+> **Qwen2.5-Coder 7B Q4_K_M đã chạy end-to-end trên ArcLLM với mô hình thật, 28 lớp thật, GPU-resident KV và autoregressive giai đoạn sinh token thật.**
 
-Hai execution độc lập của Q1 cho cùng chuỗi token, cùng logits hash và cùng final-hidden hash.
+Hai thực thi độc lập của Q1 cho cùng chuỗi token, cùng điểm dự đoán hash và cùng final-hidden hash.
 
-Chỉ sau khi **feasibility — khả năng chạy thực sự** được thiết lập, benchmark performance mới được mở.
+Chỉ sau khi **feasibility — khả năng chạy thực sự** được thiết lập, phép đo so sánh hiệu năng mới được mở.
 
 Đây là một nguyên tắc đáng nhớ:
 
@@ -225,13 +198,13 @@ mới mở matched benchmark
 
 ## Đối chứng là llama.cpp
 
-Baseline được chọn là:
+mốc đối chứng được chọn là:
 
 **llama.cpp v0.4.1 với Vulkan.**
 
 Nhưng chỉ tên phiên bản thôi vẫn chưa đủ.
 
-Q2 khóa baseline xuống đúng Git release.
+Q2 khóa mốc đối chứng xuống đúng Git release.
 
 Trong quá trình kiểm tra trước phép đo, một chi tiết thú vị được phát hiện.
 
@@ -243,9 +216,9 @@ Quan trọng hơn:
 
 > việc này được phát hiện **trước khi có bất kỳ measurement Q2 nào**.
 
-Do đó baseline được sửa về đúng commit của tag `v0.4.1` trước khi chạy benchmark.
+Do đó mốc đối chứng được sửa về đúng commit của tag `v0.4.1` trước khi chạy phép đo so sánh.
 
-Không có outcome performance nào để nhìn rồi mới lựa baseline thuận lợi hơn.
+Không có outcome hiệu năng nào để nhìn rồi mới lựa mốc đối chứng thuận lợi hơn.
 
 Đây không phải một chi tiết Git vô thưởng vô phạt.
 
@@ -255,15 +228,15 @@ Nó minh họa một nguyên tắc:
 
 “llama.cpp khoảng phiên bản đó” không đủ tốt.
 
-Cuối cùng baseline được khóa ở đúng release `v0.4.1`, commit:
+Cuối cùng mốc đối chứng được khóa ở đúng release `v0.4.1`, commit:
 
 ```text
 b29c606e...
 ```
 
-## Cùng tên model cũng chưa đủ
+## Cùng tên mô hình vẫn chưa đủ
 
-Cả ArcLLM và llama.cpp phải đọc **đúng cùng một file model theo byte**.
+Cả ArcLLM và llama.cpp phải đọc **đúng cùng một file mô hình theo byte**.
 
 Target là Qwen2.5-Coder 7B Q4_K_M với kích thước:
 
@@ -273,7 +246,7 @@ Target là Qwen2.5-Coder 7B Q4_K_M với kích thước:
 
 Không phải:
 
-> “hai model đều là Qwen2.5-Coder 7B.”
+> “hai mô hình đều là Qwen2.5-Coder 7B.”
 
 Mà là:
 
@@ -281,19 +254,19 @@ Mà là:
 
 Tại sao phải khó tính như vậy?
 
-Hai file cùng tên model có thể khác metadata.
+Hai file cùng tên mô hình có thể khác metadata.
 
-Khác quantization build.
+Khác lượng tử hóa build.
 
 Khác tensor layout.
 
 Thậm chí khác một vài byte.
 
-Nếu ArcLLM chạy file A còn baseline chạy file B, ta đã thêm một biến mới vào experiment.
+Nếu ArcLLM chạy file A còn mốc đối chứng chạy file B, ta đã thêm một biến mới vào experiment.
 
 Q2 loại biến đó.
 
-## Tokenizer cũng bị đưa ra ngoài benchmark
+## Bộ tách văn bản cũng được đưa ra ngoài phép đo
 
 Cả hai hệ nhận trực tiếp cùng **raw token IDs — chính các mã token đã được khóa trước**.
 
@@ -303,7 +276,7 @@ Không chat template khác nhau.
 
 Không system prompt được thêm âm thầm.
 
-Benchmark bắt đầu từ:
+phép đo so sánh bắt đầu từ:
 
 ```text
 cùng token IDs
@@ -319,7 +292,7 @@ cùng một câu chữ
 
 Việc này làm experiment ít giống trải nghiệm chat hoàn chỉnh hơn.
 
-Nhưng nó giúp trả lời câu hỏi runtime chính xác hơn.
+Nhưng nó giúp trả lời câu hỏi hệ thực thi chính xác hơn.
 
 ## Những thứ nào được khóa giống nhau?
 
@@ -354,15 +327,15 @@ batch  = 256
 ubatch = 256
 ```
 
-và toàn bộ layer được yêu cầu GPU offload.
+và toàn bộ lớp được yêu cầu GPU offload.
 
-Preflight — **kiểm tra trước khi cho phép đo thật** — xác nhận baseline thực sự báo:
+Preflight — **kiểm tra trước khi cho phép đo thật** — xác nhận mốc đối chứng thực sự báo:
 
 ```text
 29 / 29 layers offloaded
 ```
 
-Như vậy benchmark không vô tình so:
+Như vậy phép đo so sánh không vô tình so:
 
 ```text
 ArcLLM dùng GPU
@@ -370,13 +343,13 @@ vs
 llama.cpp đang rơi một phần lớn về CPU
 ```
 
-## Hai workload, vì một workload không kể được cả câu chuyện
+## Hai bài đo, vì một bài đo không kể được cả câu chuyện
 
 Q2 khóa hai bài thử.
 
 Bài đầu:
 
-**W-S — short/decode-dominant**, tức prompt ngắn để phần sinh token chiếm tỷ trọng lớn hơn.
+**W-S — short/giai đoạn sinh token-dominant**, tức prompt ngắn để phần sinh token chiếm tỷ trọng lớn hơn.
 
 Prompt:
 
@@ -392,7 +365,7 @@ Output:
 
 Bài thứ hai:
 
-**W-C — context/prefill-sensitive**, tức prompt dài hơn để chi phí xử lý context ban đầu hiện rõ hơn.
+**W-C — ngữ cảnh/giai đoạn xử lý đầu vào-sensitive**, tức prompt dài hơn để chi phí xử lý ngữ cảnh ban đầu hiện rõ hơn.
 
 Prompt:
 
@@ -408,7 +381,7 @@ Output vẫn là:
 
 Tại sao không chỉ chọn một?
 
-Vì runtime có thể có hai đặc tính rất khác:
+Vì hệ thực thi có thể có hai đặc tính rất khác:
 
 ```text
 xử lý prompt nhanh
@@ -422,15 +395,15 @@ prefill chậm
 nhưng decode tốt
 ```
 
-Nếu chỉ đo một workload, ta có thể vô tình chọn đúng vùng thuận lợi cho một hệ.
+Nếu chỉ đo một bài đo, ta có thể vô tình chọn đúng vùng thuận lợi cho một hệ.
 
-Hai workload chưa bao phủ mọi thứ trên đời.
+Hai bài đo chưa bao phủ mọi thứ trên đời.
 
 Nhưng chúng tạo hai regime — **hai chế độ tải có đặc tính khác nhau** — đã được khóa trước outcome.
 
 ## Ba con số khác nhau kể ba câu chuyện khác nhau
 
-Q2 đo ba metric performance chính.
+Q2 đo ba chỉ số hiệu năng chính.
 
 Đầu tiên là:
 
@@ -453,17 +426,17 @@ TTFT = 120 ms
 
 TTFT quan trọng với cảm giác phản hồi ban đầu.
 
-Một model có thể sinh token sau đó rất nhanh, nhưng nếu mất năm giây mới bắt đầu trả lời, người dùng vẫn cảm thấy nó chậm.
+Một mô hình có thể sinh token sau đó rất nhanh, nhưng nếu mất năm giây mới bắt đầu trả lời, người dùng vẫn cảm thấy nó chậm.
 
-Metric thứ hai:
+chỉ số thứ hai:
 
-**decode throughput — tốc độ sinh các token sau khi prefill đã xong.**
+**giai đoạn sinh token thông lượng — tốc độ sinh các token sau khi giai đoạn xử lý đầu vào đã xong.**
 
 Trong Q2 có 32 token output.
 
 Token đầu tiên thuộc TTFT.
 
-Vì vậy decode throughput được tính trên:
+Vì vậy giai đoạn sinh token thông lượng được tính trên:
 
 ```text
 token #2 → token #32
@@ -489,9 +462,9 @@ decode throughput
 ≈ 12,5 token/giây
 ```
 
-Metric thứ ba:
+chỉ số thứ ba:
 
-**E2E latency — end-to-end latency, tổng thời gian từ khi bắt đầu prefill tới khi token cuối cùng của workload sẵn sàng.**
+**E2E độ trễ — end-to-end độ trễ, tổng thời gian từ khi bắt đầu giai đoạn xử lý đầu vào tới khi token cuối cùng của bài đo sẵn sàng.**
 
 Nếu bắt đầu tại:
 
@@ -513,7 +486,7 @@ E2E latency
 = 2,6 giây
 ```
 
-Ba metric trả lời ba câu khác nhau:
+Ba chỉ số trả lời ba câu khác nhau:
 
 ```text
 TTFT
@@ -528,13 +501,13 @@ E2E
 
 Vì thế nói:
 
-> “Runtime X nhanh hơn.”
+> “hệ thực thi X nhanh hơn.”
 
-mà không nói metric nào là thiếu thông tin.
+mà không nói chỉ số nào là thiếu thông tin.
 
 ## Một lần chạy không đủ
 
-Mỗi cell — **một tổ hợp system × workload** — có:
+Mỗi cell — **một tổ hợp system × bài đo** — có:
 
 ```text
 1 warmup
@@ -567,7 +540,7 @@ Máy tính không phải một chiếc đồng hồ lý tưởng.
 
 Driver có trạng thái.
 
-Cache có trạng thái.
+bộ nhớ đệm có trạng thái.
 
 Nhiệt độ thay đổi.
 
@@ -575,7 +548,7 @@ Hệ điều hành có thể làm việc nền.
 
 Một measurement đơn độc có thể là ngoại lệ.
 
-## Vì sao dùng median?
+## Vì sao dùng giá trị trung vị?
 
 Giả sử năm lần đo cho:
 
@@ -594,13 +567,13 @@ Nếu tính trung bình:
 = 29,2
 ```
 
-Con số `29,2` tạo cảm giác workload thường mất gần 30 đơn vị thời gian.
+Con số `29,2` tạo cảm giác bài đo thường mất gần 30 đơn vị thời gian.
 
 Nhưng bốn trong năm lần thực tế chỉ nằm từ 10 tới 13.
 
 Một lần `100` kéo mean — **trung bình cộng** — lên rất mạnh.
 
-Median — **trung vị** — làm khác.
+trung vị — **trung vị** — làm khác.
 
 Sắp xếp:
 
@@ -624,7 +597,7 @@ Vậy:
 median = 12
 ```
 
-Q2 vì vậy báo median cho các metric chính.
+Q2 vì vậy báo trung vị cho các chỉ số chính.
 
 Nó vẫn giữ minimum và maximum.
 
@@ -634,7 +607,7 @@ Chỉ là không để một outlier — **giá trị lệch rất xa phần cò
 
 ## MAD cho biết các lần đo phân tán ra sao
 
-Q2 còn dùng **MAD — Median Absolute Deviation, trung vị của độ lệch tuyệt đối so với median**.
+Q2 còn dùng **MAD — trung vị Absolute Deviation, trung vị của độ lệch tuyệt đối so với trung vị**.
 
 Với dãy vừa rồi:
 
@@ -642,7 +615,7 @@ Với dãy vừa rồi:
 10 11 12 13 100
 ```
 
-median:
+trung vị:
 
 ```text
 12
@@ -668,7 +641,7 @@ Sắp xếp các khoảng cách:
 88
 ```
 
-median của chúng là:
+trung vị của chúng là:
 
 ```text
 MAD = 1
@@ -676,7 +649,7 @@ MAD = 1
 
 Nó cho ta biết phần lớn measurement nằm khá chặt quanh trung tâm dù có một outlier rất lớn.
 
-Q2 cũng không báo **p95 — phân vị thứ 95, tức mức mà khoảng 95% lần đo nằm ở hoặc thấp hơn nó**.
+Q2 cũng không báo **phân vị 95 (p95) — phân vị thứ 95, tức mức mà khoảng 95% lần đo nằm ở hoặc thấp hơn nó**.
 
 Hình dung nếu có 100 lần đo đã sắp từ nhanh tới chậm:
 
@@ -693,11 +666,11 @@ chậm nhất
 
 Nếu `p95 = 250 ms`, ta có thể hiểu gần đúng rằng khoảng 95% các lần đo hoàn thành trong 250 ms hoặc nhanh hơn, còn khoảng 5% chậm hơn mức đó.
 
-Đây là một **tail metric — metric nhìn phần đuôi chậm của phân bố**.
+Đây là một **tail chỉ số — chỉ số nhìn phần đuôi chậm của phân bố**.
 
-Nhưng với chỉ năm lần đo trong mỗi cell, số mẫu quá ít để một tail metric như p95 có ý nghĩa ổn định.
+Nhưng với chỉ năm lần đo trong mỗi cell, số mẫu quá ít để một tail chỉ số như phân vị 95 (p95) có ý nghĩa ổn định.
 
-## Performance chưa phải toàn bộ resource envelope
+## Hiệu năng chưa phải toàn bộ giới hạn tài nguyên
 
 Q2 không chỉ đo thời gian.
 
@@ -709,17 +682,17 @@ Hai thuật ngữ dễ bị nhầm là:
 
 Working set có thể hiểu gần đúng là:
 
-> lượng memory của process đang thực sự resident trong physical memory tại thời điểm đó.
+> lượng bộ nhớ của process đang thực sự resident trong physical bộ nhớ tại thời điểm đó.
 
 Private bytes gần hơn với:
 
-> phần memory đã commit riêng cho process.
+> phần bộ nhớ đã commit riêng cho process.
 
 Hai con số không đồng nghĩa.
 
-Đặc biệt trên hệ thống UMA — **CPU và GPU chia sẻ một không gian bộ nhớ vật lý lớn** — việc nhìn một con số memory duy nhất rồi kết luận “runtime dùng từng này VRAM” rất dễ sai.
+Đặc biệt trên hệ thống UMA — **CPU và GPU chia sẻ một không gian bộ nhớ vật lý lớn** — việc nhìn một con số bộ nhớ duy nhất rồi kết luận “hệ thực thi dùng từng này VRAM” rất dễ sai.
 
-Vì vậy Q2 giữ nhiều metric resource thay vì cố ép chúng thành một số duy nhất.
+Vì vậy Q2 giữ nhiều chỉ số resource thay vì cố ép chúng thành một số duy nhất.
 
 GPU utilization cũng được thử thu thập.
 
@@ -735,13 +708,13 @@ Nó ghi:
 
 > **GPU-utilization peak unreliable.**
 
-và loại metric đó khỏi validity/advantage claim.
+và loại chỉ số đó khỏi validity/advantage claim.
 
 Một measurement không đáng tin không trở thành bằng chứng chỉ vì ta muốn có thêm cột trong bảng.
 
 ## Hai bên chạy xong cả 20 phép đo
 
-Khi execution hoàn tất:
+Khi thực thi hoàn tất:
 
 ```text
 20 / 20 measured attempts
@@ -754,11 +727,11 @@ Mỗi attempt tạo đúng:
 32 generated tokens
 ```
 
-Final logits đều finite.
+Final điểm dự đoán đều finite.
 
-ArcLLM giữ đúng dispatch census đã khóa.
+ArcLLM giữ đúng lần giao việc cho GPU census đã khóa.
 
-llama.cpp thực sự chạy đúng baseline Vulkan đã pin.
+llama.cpp thực sự chạy đúng mốc đối chứng Vulkan đã pin.
 
 RAM/CPU traces bắt buộc cũng đầy đủ.
 
@@ -766,7 +739,7 @@ Do đó Q2 nhận classification:
 
 > **Q2_MATCHED_CHARACTERIZATION_COMPLETE**
 
-Cần đọc chính xác tên verdict.
+Cần đọc chính xác tên kết luận.
 
 Nó không nói:
 
@@ -778,28 +751,28 @@ Cũng không nói:
 
 Nó chỉ nói:
 
-> **Bộ matched characterization đã được thực hiện hợp lệ và đủ dữ liệu để bước khoa học tiếp theo sử dụng.**
+> **Bộ matched mô tả đặc tính đã được thực hiện hợp lệ và đủ dữ liệu để bước khoa học tiếp theo sử dụng.**
 
 ## Và đây là bảng mà Q2 nhìn thấy
 
-Median đã đóng băng:
+trung vị đã đóng băng:
 
-| Workload | System | TTFT | Decode | E2E | Peak working set |
+| bài đo | System | TTFT | giai đoạn sinh token | E2E | Peak working set |
 |---|---|---:|---:|---:|---:|
 | W-S | ArcLLM | 918,265 ms | 0,3184 tok/s | 98.285,231 ms | ~10,02 GB |
 | W-S | llama.cpp | 100,318 ms | 12,7449 tok/s | 2.535,868 ms | ~5,47 GB |
 | W-C | llama.cpp | 1.423,482 ms | 13,0354 tok/s | 3.803,029 ms | ~5,48 GB |
 | W-C | ArcLLM | 14.706,425 ms | 0,3990 tok/s | 91.043,729 ms | ~10,01 GB |
 
-Chỉ nhìn bảng, mắt người lập tức muốn đưa ra verdict.
+Chỉ nhìn bảng, mắt người lập tức muốn đưa ra kết luận.
 
-Nhưng Q2 contract cấm việc đó.
+Nhưng Q2 tiêu chuẩn đã khóa cấm việc đó.
 
 Tại sao?
 
 Vì Q2 được thiết kế trước với vai trò:
 
-> **characterization — mô tả đầy đủ mặt phẳng performance/resource.**
+> **mô tả đặc tính — mô tả đầy đủ mặt phẳng hiệu năng/resource.**
 
 Không phải:
 
@@ -807,9 +780,9 @@ Không phải:
 
 Đó là hai công việc khoa học khác nhau.
 
-## Ratio cũng chỉ là mô tả
+## Tỷ lệ cũng chỉ là mô tả
 
-Ví dụ W-S có TTFT ratio:
+Ví dụ W-S có TTFT tỷ lệ:
 
 ```text
 ArcLLM / llama.cpp
@@ -818,15 +791,15 @@ ArcLLM / llama.cpp
 
 Điều đó chỉ có nghĩa:
 
-> median TTFT của ArcLLM trong cell này bằng khoảng 9,154 lần con số baseline.
+> trung vị TTFT của ArcLLM trong cell này bằng khoảng 9,154 lần con số mốc đối chứng.
 
-Decode throughput ratio:
+giai đoạn sinh token thông lượng tỷ lệ:
 
 ```text
 ≈ 0,02499
 ```
 
-Working-set ratio:
+Working-set tỷ lệ:
 
 ```text
 ≈ 1,832
@@ -844,13 +817,13 @@ Nếu bây giờ tùy ý chọn:
 
 > “Private bytes thấp hơn khoảng 3%, vậy ArcLLM có advantage.”
 
-thì ta đang cherry-pick — **chọn một metric thuận lợi sau khi đã nhìn outcome**.
+thì ta đang cherry-pick — **chọn một chỉ số thuận lợi sau khi đã nhìn outcome**.
 
-Nếu ngược lại nhìn throughput rồi tuyên bố ngay final verdict, ta cũng đang bỏ qua contract đã khóa rằng Q2 chỉ làm characterization.
+Nếu ngược lại nhìn thông lượng rồi tuyên bố ngay final kết luận, ta cũng đang bỏ qua tiêu chuẩn đã khóa đã khóa rằng Q2 chỉ làm mô tả đặc tính.
 
 Bước tiếp theo phải được thiết kế riêng.
 
-## Tại sao không cho Q2 tự chọn “winner”?
+## Tại sao không cho Q2 tự chọn “người thắng”?
 
 Đây là một nguyên tắc rất mạnh.
 
@@ -896,7 +869,7 @@ và:
 
 ## Một kết quả âm tính cũng cần được thiết kế nghiêm túc
 
-Bảng Q2 không cho thấy một candidate advantage rõ ràng trên các primary performance metric hay working-set memory.
+Bảng Q2 không cho thấy một phương án thử advantage rõ ràng trên các primary hiệu năng chỉ số hay working-set bộ nhớ.
 
 Private bytes thấp hơn một chút.
 
@@ -906,7 +879,7 @@ Nhưng Q2 không được phép biến các tín hiệu nhỏ đó thành claim 
 
 Vì vậy câu hỏi của Chương 10 sẽ mạnh hơn nhiều:
 
-> **Nếu ta khóa trước một ranh giới “practical advantage” rồi lấy fresh evidence, ArcLLM có thực sự vượt được ranh giới đó ở bất kỳ regime đã xác định nào không?**
+> **Nếu ta khóa trước một ranh giới “practical advantage” rồi lấy bằng chứng mới, ArcLLM có thực sự vượt được ranh giới đó ở bất kỳ regime đã xác định nào không?**
 
 Nếu câu trả lời là không, đó không phải là sự thất bại của phương pháp.
 
@@ -920,12 +893,12 @@ Nó tồn tại để tìm ra kiến trúc đó **thực sự làm được gì 
 
 ### Nhớ 3 điều
 
-1. **Matched benchmark không bắt hai runtime phải giống kiến trúc; nó bắt bài toán so sánh phải đủ giống.** Q2 khóa cùng model bytes, raw token IDs, hardware, quant, context, output length và các điều kiện measurement quan trọng.
-2. **TTFT, decode throughput và E2E là ba câu hỏi khác nhau.** Một chữ “nhanh” không thay thế được ba metric này; nhiều lần đo và median giúp tránh để một run bất thường định nghĩa toàn bộ kết quả.
-3. **Q2 hoàn thành characterization, không chọn winner.** 20/20 attempt thành công tạo ra một mặt phẳng evidence đủ hợp lệ; việc một practical advantage có tồn tại hay không phải được khóa thành câu hỏi riêng và kiểm tra bằng fresh evidence ở Q3.
+1. **phép đo đối chứng cùng điều kiện không bắt hai hệ thực thi phải giống kiến trúc; nó bắt bài toán so sánh phải đủ giống.** Q2 khóa cùng mô hình bytes, raw token IDs, hardware, quant, ngữ cảnh, output length và các điều kiện measurement quan trọng.
+2. **TTFT, giai đoạn sinh token thông lượng và E2E là ba câu hỏi khác nhau.** Một chữ “nhanh” không thay thế được ba chỉ số này; nhiều lần đo và trung vị giúp tránh để một run bất thường định nghĩa toàn bộ kết quả.
+3. **Q2 hoàn thành mô tả đặc tính, không chọn phương án thắng.** 20/20 attempt thành công tạo ra một mặt phẳng evidence đủ hợp lệ; việc một practical advantage có tồn tại hay không phải được khóa thành câu hỏi riêng và kiểm tra bằng bằng chứng mới ở Q3.
 
 **Chương 10 — Khi “tự build được” vẫn chưa đủ**
 
 Ở chương tiếp theo, ArcLLM sẽ làm điều khó nhất đối với một project đã đầu tư rất nhiều công sức:
 
-> **định nghĩa trước điều gì sẽ khiến chính kiến trúc của mình không vượt qua được bài kiểm tra — rồi để fresh evidence quyết định.**
+> **định nghĩa trước điều gì sẽ khiến chính kiến trúc của mình không vượt qua được bài kiểm tra — rồi để bằng chứng mới quyết định.**
