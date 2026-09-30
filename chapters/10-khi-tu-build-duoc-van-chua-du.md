@@ -843,7 +843,7 @@ vì sao cơ chế đó có thể thay đổi nút thắt
 2. **40/40 fresh attempts hoàn tất nhưng không có primary benefit nào ĐẠT (PASS).** Hai phiên đo độc lập đều không bác bỏ H-NPA; private bytes và CPU utilization chỉ là supporting observations.
 3. **kết luận là `FEASIBLE_NO_DEMONSTRATED_ADVANTAGE`, không phải “ArcLLM không chạy được”.** Feasibility đã được chứng minh; thứ không được chứng minh là practical regime advantage của kiến trúc hiện tại. Vì vậy current architecture line phải đóng thay vì tuning vô hạn.
 
-**Chương 11 — Từ một thất bại tới câu hỏi đúng hơn**
+**Tiếp theo: [Chương 11 — Từ một thất bại tới câu hỏi đúng hơn](11-tu-that-bai-sang-mot-cau-hoi-dung-hon.md)**
 
 Q3 không cho ArcLLM một chiến thắng hiệu năng.
 
