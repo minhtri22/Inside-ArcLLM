@@ -1,5 +1,34 @@
 # Chương 5 — Một decoder layer hoàn chỉnh
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: một decoder layer**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** một decoder layer.
+
+
 > **Câu hỏi của chương:** Nếu từng phép tính đã đúng khi đứng riêng, khi nối chúng thành một lớp thật của model thì cả chuỗi có còn đúng không?
 
 Ở Chương 4, ArcLLM đã thử từng viên gạch.
