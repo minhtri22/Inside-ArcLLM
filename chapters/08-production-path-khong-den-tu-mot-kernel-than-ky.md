@@ -109,7 +109,7 @@ Các trọng số — **trọng số** — tiếp tục ở dạng packed — **
 
 P6 cố ý rất nhỏ.
 
-Prompt chỉ có bốn token.
+Đầu vào chỉ có bốn token.
 
 ngữ cảnh được giới hạn để kiểm tra tính đúng của bộ nhớ đệm KV.
 
@@ -124,7 +124,7 @@ tg128
 
 Trong phạm vi P7:
 
-- **pp512 — prompt processing 512 token**, tức pha giai đoạn xử lý đầu vào xử lý 512 token đầu vào;
+- **pp512 — xử lý 512 token đầu vào**, tức bài đo phần văn bản ban đầu dài hơn;
 - **tg128 — token generation 128 token**, tức vòng giai đoạn sinh token sinh tiếp 128 token.
 
 Có thể hình dung:
@@ -150,7 +150,7 @@ Tổng ngữ cảnh đi tới 640 vị trí.
 
 Một cơ chế chạy được ở 4 hoặc 16 vị trí chưa chắc chạy được ở 512.
 
-P7-A vì vậy phải thay một số phần đã đủ cho proof nhưng chưa đủ cho bài đo lớn hơn.
+P7-A vì vậy phải thay một số phần đã đủ cho **bằng chứng ban đầu** nhưng chưa đủ cho bài đo lớn hơn.
 
 cơ chế chú ý giai đoạn xử lý đầu vào chuyển sang **online softmax — cách tính softmax theo luồng để không phụ thuộc vào một mảng cố định chỉ chứa được số lượng token nhỏ**.
 
@@ -482,7 +482,7 @@ Ta đang dùng chúng như một cách đọc và quản trị những nghiên c
 
 Ở Mode E có thể dùng evidence đã tiêu — **spent evidence**, profile cũ, decomposition, ablation nhỏ hoặc phép tính nhanh.
 
-Mục đích không phải tạo claim cuối.
+Mục đích không phải tạo **kết luận cuối cùng**.
 
 Mục đích là **loại nhanh những hướng không đáng tiêu thêm evidence mới**.
 
@@ -495,7 +495,7 @@ Các timestamp profile P7-B, P7-D, P7-H, P7-M là hình ảnh rất dễ hiểu 
 
 ### M — Kiểm tra cơ chế (Mechanism qualification)
 
-Sau khi Mode E chỉ ra một candidate, **Mode M — kiểm tra mechanism có đủ cơ sở để đáng chạy confirmatory hay không**.
+Sau khi bước E — Khám phá chỉ ra một **phương án thử**, bước M hỏi: **cơ chế này có đủ cơ sở để đáng mở phép xác nhận hay không?**
 
 Chỉ chọn **một mechanism**.
 
@@ -619,7 +619,7 @@ Kết quả:
 
 Đây là một ví dụ rất hay.
 
-1,0684× nghĩa là candidate **có nhanh hơn**.
+1,0684× nghĩa là phương án thử **có nhanh hơn**.
 
 Nhưng gate đã khóa là:
 
@@ -631,7 +631,7 @@ Vậy kết luận vẫn là:
 
 > **KHÔNG ĐẠT (FAIL).**
 
-Trong nghiên cứu, “có cải thiện” và “ĐẠT (PASS) contract” là hai câu khác nhau.
+Trong nghiên cứu, “có cải thiện” và “**vượt tiêu chuẩn đã khóa**” là hai câu khác nhau.
 
 Nếu một công việc mất 100 giây, mức tăng tốc 1,068× tương ứng còn khoảng:
 
@@ -694,13 +694,13 @@ Gate:
 
 ĐẠT (PASS).
 
-P7-L được freeze — **đóng băng làm production candidate**.
+P7-L được **đóng băng làm phương án cho đường chạy thực tế**.
 
 Nhưng ngay cả lúc đó, P7 vẫn chưa đóng.
 
 Bước tiếp theo vẫn là:
 
-> **profile lại winner.**
+> **đo lại phương án đang tốt nhất.**
 
 ## Phương án đang tốt nhất cũng phải bị soi lại
 
@@ -800,7 +800,7 @@ Bởi một research program không được đánh giá bằng số ý tưởng
 
 Sau P7-L:
 
-- gate/up đã có winner;
+- hai nhánh gate/up đã có phương án đang tốt nhất;
 - FFN-down đã được challenge thêm và K64 thất bại;
 - gộp phép tính rộng hơn với SwiGLU không vượt gate;
 - nhiều biến thể tiling/dequant đã thất bại;
@@ -813,7 +813,7 @@ P7 vì vậy đóng với:
 
 Đây là điểm hội tụ.
 
-Không phải vì code không thể tối ưu thêm.
+Không phải vì **mã** không thể tối ưu thêm.
 
 Mà vì evidence hiện tại không còn biện minh cho việc tiếp tục kéo dài P7.
 
@@ -854,11 +854,11 @@ decode
 
 Nó không có nghĩa:
 
-> “ArcLLM đã là sản phẩm production hoàn thiện.”
+> “ArcLLM đã là một sản phẩm hoàn thiện để sử dụng thật.”
 
 Nó có nghĩa hẹp hơn:
 
-> **Trong phạm vi mô hình và architecture hiện tại, đã có một composition được chọn từ evidence, tính đúng đã giữ, các candidate quan trọng đã được thử, winner đã được freeze và P7 có thể đóng.**
+> **Trong phạm vi mô hình và kiến trúc hiện tại, ta đã chọn được một cách ghép từ bằng chứng, giữ được tính đúng, thử các phương án quan trọng, đóng băng phương án đang tốt nhất và có thể kết thúc P7.**
 
 ## Và vẫn chưa được phép nói ArcLLM nhanh
 
@@ -880,7 +880,7 @@ P7 ghi nhận rằng absolute thông lượng — **tốc độ tuyệt đối**
 
 Vì vậy các quyết định tối ưu dựa chủ yếu vào:
 
-> **same-run interleaved A/B — chạy mốc đối chứng và candidate xen kẽ trong cùng phiên đo.**
+> **A/B xen kẽ trong cùng lượt chạy — mốc đối chứng và phương án thử được chạy luân phiên trong cùng phiên đo.**
 
 Lý do trực giác rất đơn giản.
 
@@ -961,8 +961,8 @@ Phần II bắt đầu từ đó.
 ### Nhớ 3 điều
 
 1. **hiệu năng optimization phải bắt đầu bằng measurement, không bằng danh sách ý tưởng.** P7 liên tục profile → chọn một nút thắt → thử một mechanism → đo lại.
-2. **Một candidate có nhanh hơn vẫn có thể KHÔNG ĐẠT (FAIL).** P7-K tăng khoảng 6,8% nhưng không vượt gate `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn KHÔNG ĐẠT (FAIL). Gate không được sửa sau outcome.
-3. **P7-L là production-path winner, không phải bằng chứng ArcLLM thắng hệ thực thi khác.** Muốn đưa ra claim đó, cuốn sách phải chuyển sang phép đo so sánh matched ở Chương 9.
+2. **Một phương án thử có nhanh hơn vẫn có thể KHÔNG ĐẠT.** P7-K tăng khoảng 6,8% nhưng không vượt ngưỡng `1,10×`; P7-N tăng khoảng 5,2% nhưng vẫn KHÔNG ĐẠT. Ngưỡng không được sửa sau khi đã thấy kết quả.
+3. **P7-L là phương án tốt nhất cho đường chạy nội bộ lúc đó, không phải bằng chứng ArcLLM thắng hệ thực thi khác.** Muốn đưa ra kết luận như vậy, cuốn sách phải chuyển sang phép đo đối chứng cùng điều kiện ở Chương 9.
 
 **Chương 9 — phép đo so sánh phải có đối chứng**
 
