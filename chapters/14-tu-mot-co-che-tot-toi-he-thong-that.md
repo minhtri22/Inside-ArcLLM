@@ -54,11 +54,11 @@ Trong nghiên cứu ArcLLM, ta còn dùng từ:
 Nó mô tả một vấn đề rất thật:
 
 ```text
-kernel nhanh hơn
+chương trình GPU nhanh hơn
 ↓
 phép tính thật có nhanh hơn?
 ↓
-decode có nhanh hơn?
+giai đoạn sinh token có nhanh hơn?
 ↓
 toàn bộ lượt sinh token có nhanh hơn?
 ```
@@ -67,7 +67,7 @@ Một mũi tên có thể đứt ở bất kỳ đâu.
 
 ## Phép thử nhỏ và mô hình thật không phải cùng một thế giới
 
-Ở phép thử Q4 trước đó, ta dùng các **bộ dữ liệu kiểm thử cố định (fixture)**.
+Ở phép thử Q4 trước đó, ta dùng các **bộ dữ liệu kiểm thử cố định (bài thử cố định)**.
 
 Chúng rất hữu ích.
 
@@ -112,7 +112,7 @@ hoặc thậm chí:
 
 ```text
 nhanh ở chính phép tính đó
-nhưng phần còn lại của runtime nuốt mất lợi ích
+nhưng phần còn lại của hệ thực thi nuốt mất lợi ích
 ```
 
 Vì vậy Mode T không hỏi lại câu hỏi của Mode C.
@@ -151,7 +151,7 @@ Ta đã có hai mảnh bằng chứng độc lập:
 
 ```text
 mảnh 1
-gate/up chiếm ~59,67% chi phí GPU decode
+hai nhánh gate/up chiếm ~59,67% chi phí GPU khi sinh token
 
 mảnh 2
 cơ chế Split-K đã tăng tốc đúng shape gate/up Q4_K
@@ -173,7 +173,7 @@ Không phải Q6.
 Chỉ:
 
 ```text
-28 layer
+28 lớp
 ×
 2 phép gate + up
 =
@@ -248,11 +248,11 @@ Nếu làm vậy, dù hệ thực thi nhanh hơn, ta sẽ không còn biết:
 Vì vậy thay đổi được khóa rất hẹp:
 
 ```text
-decode only
+chỉ sinh token
 
 Q4_K only
 
-28 layer
+28 lớp
 
 gate + up only
 
@@ -262,7 +262,7 @@ gate + up only
 Những phần sau giữ nguyên:
 
 ```text
-prefill
+xử lý đầu vào
 Q/K/V
 attention
 attention output
@@ -270,7 +270,7 @@ FFN-down
 SwiGLU
 RMSNorm
 LM head
-model
+mô hình
 quantization
 KV cache
 generation semantics
@@ -279,11 +279,11 @@ generation semantics
 Cơ chế cũng giữ nguyên:
 
 ```text
-subgroup = 32 lane
+nhóm con GPU = 32 làn tính toán
 
-4 subgroup / workgroup
+4 nhóm con / nhóm làm việc
 
-1 subgroup / output row
+1 nhóm con / hàng đầu ra
 
 K chia qua 32 lane
 ```
@@ -338,7 +338,7 @@ W-C
 Mỗi tổ hợp phiên đo/bài đo có:
 
 ```text
-3 layer
+3 lớp
 ×
 3 vị trí
 ×
@@ -484,9 +484,9 @@ Nhưng Mode T vẫn chưa kết thúc.
 Ta có thể tưởng tượng chuỗi:
 
 ```text
-fixture
+bài thử cố định
 ↓
-real weights + real activation
+trọng số thật + dữ liệu trung gian thật
 ```
 
 đã ĐẠT (PASS).
@@ -524,9 +524,9 @@ Sau đó trong 20 cặp measurement:
 cũng giữ:
 
 ```text
-candidate token IDs
+mã token của phương án thử
 =
-baseline token IDs
+mã token của mốc đối chứng
 ```
 
 điểm dự đoán hữu hạn.
@@ -546,7 +546,7 @@ Tới đây mới có thể nói:
 Nếu gate/up nhanh hơn nhưng giai đoạn sinh token không nhúc nhích, ta sẽ có:
 
 ```text
-component PASS
+thành phần ĐẠT
 ↓
 system carry-through FAIL
 ```
@@ -556,7 +556,7 @@ Ngưỡng giai đoạn sinh token đã khóa khá rõ.
 Mỗi cell phải có:
 
 ```text
-candidate latency / baseline latency
+độ trễ phương án thử / độ trễ mốc đối chứng
 <= 0,90
 ```
 
@@ -602,9 +602,9 @@ Cặp yếu nhất vẫn khoảng:
 Vậy mũi tên tiếp theo cũng đứng vững:
 
 ```text
-component speedup
+mức tăng tốc thành phần
 ↓
-decode speedup
+mức tăng tốc khi sinh token
 ```
 
 ## Amdahl dự đoán gần 2× — thực tế khoảng 2,20×
@@ -661,7 +661,7 @@ Vì vậy lần này TTFT phải được giữ như một hàng rào độc l�
 Ngưỡng:
 
 ```text
-candidate TTFT / baseline TTFT
+TTFT phương án thử / TTFT mốc đối chứng
 <= 1,10
 ```
 
@@ -736,13 +736,13 @@ cặp riêng lẻ đều cải thiện E2E.
 Chuỗi bằng chứng giờ đã dài hơn rất nhiều:
 
 ```text
-Q4 component fixture
+Q4 component bài thử cố định
 PASS
 ↓
-trọng số thật + activation thật
+trọng số thật + dữ liệu trung gian thật
 PASS
 ↓
-chuỗi token toàn model
+chuỗi token toàn mô hình
 PASS
 ↓
 decode
@@ -772,12 +772,12 @@ Mode T chỉ nói:
 Trong chương này, mức độ thực tế tăng từng bước:
 
 ```text
-fixture nhân tạo
+bài thử cố định nhân tạo
 
 ↓
 
-trọng số model thật
-activation thật
+trọng số mô hình thật
+dữ liệu trung gian thật
 
 ↓
 
@@ -785,7 +785,7 @@ toàn bộ token semantics
 
 ↓
 
-decode toàn model
+decode toàn mô hình
 
 ↓
 
@@ -831,7 +831,7 @@ AI thực hiện phần nặng:
 ```text
 kiểm tra 56 node mục tiêu
 xác minh binding
-chạy correctness
+chạy kiểm tra tính đúng
 so token
 thu timing
 kiểm tra đủ 20 cặp
@@ -862,7 +862,7 @@ Ta có thể nói:
 Ta có thể nói:
 
 ```text
-decode geomean
+trung bình hình học của giai đoạn sinh token
 ≈ 2,20×
 
 E2E geomean
