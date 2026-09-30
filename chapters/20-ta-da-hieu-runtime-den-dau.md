@@ -1099,3 +1099,6 @@ Nhưng chính vì bây giờ ta có thể nhìn vào bên trong nó, một câu 
 > **Nếu không chỉ nhìn đầu vào và đầu ra, ta có thể quan sát chính hệ thống đang biến đổi bên trong như thế nào?**
 
 Phần Bonus sau cuốn sách sẽ bắt đầu từ câu hỏi đó.
+
+
+**Tiếp theo: [Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy](bonus-tu-xay-co-may-toi-lang-nghe-co-may.md)**
