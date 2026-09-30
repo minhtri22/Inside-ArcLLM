@@ -551,7 +551,7 @@ P3 ĐẠT (PASS) chỉ mở quyền đi sang câu hỏi mới:
 2. **Cách tính tham chiếu trên CPU (CPU reference) đóng vai trò “đáp án” để kiểm tra GPU, và ngưỡng sai số phải được khóa trước khi nhìn kết quả.**
 3. **P3 ĐẠT (PASS) ở các phép tính nền tảng (primitives), chưa phải ĐẠT của lớp giải mã hay toàn mô hình.**
 
-**Chương 5 — Ghép các phép tính thành một lớp giải mã**
+**Tiếp theo: [Chương 5 — Ghép các phép tính thành một lớp giải mã](05-mot-decoder-layer-hoan-chinh.md)**
 
 Ở P3, ta đã đặt từng viên gạch lên bàn và thử riêng từng viên.
 
