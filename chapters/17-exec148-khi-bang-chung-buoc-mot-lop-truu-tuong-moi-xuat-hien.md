@@ -1,5 +1,34 @@
 # Chương 17 — EXEC148: khi bằng chứng buộc một lớp trừu tượng mới xuất hiện
 
+> **Mức đọc: Nâng cao**
+>
+> **Bản đồ xuyên suốt — đang mở: representation như đối tượng runtime**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** representation như đối tượng runtime.
+
+
 > **Câu hỏi của chương:** Khi cùng một tensor có thể được biểu diễn theo nhiều cách để phục vụ những đường thực thi khác nhau, runtime cần hiểu điều gì ngoài việc “tensor này đang nằm trong bộ nhớ”?
 
 Chương 16 kết thúc ở một nơi mà ban đầu ArcLLM không định đi tới.
