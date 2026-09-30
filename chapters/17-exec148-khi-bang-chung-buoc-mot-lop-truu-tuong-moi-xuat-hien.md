@@ -234,9 +234,9 @@ A + B
 
 làm kiến trúc mặc định.
 
-Sự tương tác giữa hai cơ chế là đối kháng và B nhanh hơn AB trong cả hai workload.
+Sự tương tác giữa hai cơ chế là đối kháng và B nhanh hơn AB trong cả hai **bài đo**.
 
-Thay vào đó, bằng chứng tạo ra hai **khối chức năng nền tảng (primitive)** độc lập.
+Thay vào đó, bằng chứng tạo ra hai **khối chức năng nền tảng** độc lập.
 
 Thứ nhất:
 
@@ -444,7 +444,7 @@ Hai thứ không nhất thiết giống nhau.
 
 Trong cách triển khai đang được đo, CPU tạo EXEC148.
 
-Nhưng CPU ghi trực tiếp vào một Vulkan buffer mà cả CPU lẫn GPU đều có thể truy cập trên máy này.
+Nhưng CPU ghi trực tiếp vào một **vùng nhớ Vulkan** mà cả CPU lẫn GPU đều có thể truy cập trên máy này.
 
 Máy đang dùng:
 
@@ -630,9 +630,9 @@ xác minh đúng mô hình và đúng phiên bản
 thực thi
 ```
 
-Một file dữ liệu phụ đi kèm file chính thường được gọi là:
+Một **tệp dữ liệu phụ** đi kèm tệp chính thường được gọi là:
 
-> **tệp phụ — file phụ đi kèm**.
+> **tệp phụ (sidecar)**.
 
 Như vậy chi phí biến đổi không còn nằm trên:
 
@@ -644,7 +644,7 @@ Nhưng ta lại phải trả bằng:
 - thời gian nạp;
 - việc quản lý phiên bản tương thích;
 - khả năng lưu lại để tái sử dụng;
-- và việc bảo đảm file phụ đúng với mô hình đang chạy.
+- và việc bảo đảm **tệp phụ** đúng với mô hình đang chạy.
 
 Điểm đáng chú ý không phải phương án này chắc chắn tốt.
 
