@@ -872,6 +872,43 @@ Mỗi chương phải trả lời được:
 
 Chỉ khi cả 7 câu đều đạt mới coi chương là **PEDAGOGICAL-QA-CLEAN**.
 
+### PQA-11 — APPROVED_FIXED — HIGH — Thuật ngữ gốc bị dịch mất trong ngoặc
+
+Phản hồi độc giả phát hiện một lỗi sau vòng Việt hóa: một số khái niệm được viết kiểu:
+
+`tín hiệu hoàn thành (tín hiệu hoàn thành)`
+
+hoặc English-first kiểu:
+
+`Driver — trình điều khiển`.
+
+Cả hai đều không đạt mục tiêu của sách. Người đọc cần hiểu tiếng Việt ngay trong câu **và** cần thấy đúng thuật ngữ chuyên môn để nhận ra nó khi đọc tài liệu khác.
+
+**Luật khóa:**
+
+```text
+Tiếng Việt (English)
+```
+
+Ví dụ:
+
+- `tín hiệu hoàn thành (fence)`;
+- `hàng đợi (queue)`;
+- `vùng nhớ tạm (scratch)`;
+- `chương trình GPU (kernel)`;
+- `cơ chế chú ý (attention)`;
+- `cách biểu diễn dữ liệu (representation)`;
+- `trạng thái cư trú trong bộ nhớ (residency)`.
+
+Đã quét lại Chương 0–20 + Bonus theo cả hai chiều:
+- không để từ chuyên ngành tiếng Anh đứng trước rồi mới dịch;
+- không dịch mất từ gốc bên trong ngoặc;
+- tên riêng, mã kỹ thuật và định danh thật vẫn được giữ nguyên.
+
+**Trạng thái: APPROVED_FIXED.**
+
+---
+
 ## Kết quả sau vòng viết lại 2026-10-01
 
 Toàn bộ phạm vi công khai đã được viết lại/QA:
