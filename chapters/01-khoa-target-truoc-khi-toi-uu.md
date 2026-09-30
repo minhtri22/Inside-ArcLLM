@@ -2,375 +2,416 @@
 
 > **Mức đọc: Đi sâu**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở phần nào của cỗ máy?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Câu hỏi của người dùng
+>         ↓
+>      Mô hình
+>         ↓
+>    Hệ thực thi
+>         ↓
+>   CPU / GPU / bộ nhớ
 > ```
 >
-> ▶ **Đang mở ở chương này:** toàn bộ cỗ máy ở mức khái quát.
+> Chương này chỉ cần làm rõ bốn tầng trên. Những phép tính bên trong mô hình sẽ được mở ở các chương sau.
 
-Nếu sơ đồ trên còn hoàn toàn mới, hãy đọc [Phần 0 — Bản đồ trước khi vào rừng](00-ban-do-truoc-khi-vao-rung.md) trước. Khi chúng ta mở một ứng dụng AI, gõ một câu hỏi rồi vài giây sau nhận được câu trả lời, mọi thứ trông rất đơn giản.
+Bạn gõ:
 
-Nhưng bên dưới ô chat ấy là nhiều lớp khác nhau.
+```text
+Hà Nội là thủ đô của nước nào?
+```
 
-Ứng dụng có thể lo giao diện, lưu lịch sử trò chuyện, tìm tài liệu, gọi công cụ hoặc kết nối Internet. Một **model** lại làm công việc khác: nó chứa những cấu trúc và hàng tỷ con số đã học được trong quá trình huấn luyện, rồi dùng chúng để dự đoán phần tiếp theo của văn bản.
+Ứng dụng AI trả lời:
 
-Giữa model và phần cứng còn có một lớp rất quan trọng: **runtime**.
+```text
+Việt Nam.
+```
 
-Có thể hình dung đơn giản như thế này:
+Nếu chỉ dùng AI, ta không cần biết điều gì xảy ra ở giữa.
+
+Nhưng nếu muốn tự xây cỗ máy, ta phải phân biệt những phần có vai trò rất khác nhau.
+
+## Một ví dụ đời thường trước khi nói kỹ thuật
+
+Hãy tưởng tượng một công trường.
+
+Có:
+
+1. **bản thiết kế**, chứa thông tin về thứ cần được tạo ra;
+2. **đội tổ chức thi công**, đọc bản thiết kế, chia việc và quyết định thứ tự;
+3. **máy móc và người thực hiện**, thật sự làm các công việc cụ thể.
+
+Trong một hệ AI, phép so sánh gần đúng là:
+
+```text
+bản thiết kế đã chứa những gì học được
+→ mô hình
+
+đội tổ chức thi công
+→ hệ thực thi
+
+máy móc làm việc
+→ CPU / GPU / bộ nhớ
+```
+
+Đây chỉ là ví dụ để nắm vai trò. Mô hình AI không phải một bản vẽ xây nhà, và GPU không phải máy xúc. Nhưng phép so sánh giúp ta tránh nhầm ba thứ thành một.
+
+## Mô hình không phải ứng dụng chat
+
+Ứng dụng mà bạn nhìn thấy có thể làm rất nhiều việc:
+
+- hiển thị ô chat;
+- lưu lịch sử;
+- tải tệp;
+- tìm kiếm Internet;
+- gọi công cụ khác;
+- quản lý tài khoản.
+
+**Mô hình (model)** nằm ở một lớp khác.
+
+Nó chứa cấu trúc và rất nhiều con số đã được điều chỉnh trong quá trình huấn luyện. Khi nhận đầu vào mới, những con số đó được dùng trong các phép tính để tạo ra token tiếp theo.
+
+Ta có thể vẽ:
 
 ```text
 Người dùng
     ↓
-Ứng dụng AI  ↔  Ứng dụng khác / Tools
+Ứng dụng AI
     ↓
-Model
+Mô hình
+```
+
+Nếu tắt giao diện chat nhưng vẫn có cách đưa dữ liệu vào mô hình, mô hình vẫn có thể chạy.
+
+Ngược lại, chỉ có giao diện đẹp mà không có mô hình phía sau thì ứng dụng không thể tự sinh câu trả lời.
+
+## Nhưng mô hình nằm trên ổ đĩa vẫn chưa tự chạy được
+
+Giả sử bạn tải về một tệp mô hình.
+
+Tệp đó nằm trên ổ SSD.
+
+Nó không thể tự nói:
+
+> “Hãy lấy khối số này, đưa vào GPU, thực hiện phép nhân, giữ kết quả ở bộ nhớ này, rồi chuyển sang bước tiếp theo.”
+
+Một tệp chỉ là dữ liệu.
+
+Cần một chương trình hiểu cách đọc nó và tổ chức việc thực hiện.
+
+Chương trình đó được gọi là **hệ thực thi (runtime)**.
+
+Ta thêm một tầng:
+
+```text
+Người dùng
     ↓
-Runtime
+Ứng dụng AI
+    ↓
+Mô hình
+    ↓
+Hệ thực thi
+```
+
+Hệ thực thi làm những việc như:
+
+- mở tệp mô hình;
+- tìm đúng dữ liệu cần dùng;
+- chuẩn bị bộ nhớ;
+- gửi phép tính xuống CPU hoặc GPU;
+- giữ lại những kết quả cần cho bước tiếp theo;
+- lặp lại quá trình cho tới khi sinh được token mới.
+
+Vì vậy:
+
+> **Mô hình là thứ đã học. Hệ thực thi là thứ làm cho mô hình chạy.**
+
+Đây là ranh giới quan trọng nhất của Chương 1.
+
+## CPU và GPU nằm ở đâu?
+
+Hệ thực thi không tự làm mọi phép tính bằng ý nghĩ.
+
+Cuối cùng công việc phải chạy trên phần cứng.
+
+**CPU — bộ xử lý trung tâm** là bộ xử lý đa dụng của máy tính.
+
+**GPU — bộ xử lý đồ họa** có khả năng thực hiện rất nhiều phép tính số tương tự nhau song song, nên đặc biệt hữu ích với nhiều phép tính trong mô hình ngôn ngữ.
+
+Bộ nhớ giữ dữ liệu đang được sử dụng.
+
+Bây giờ bức tranh đầy đủ của chương là:
+
+```text
+Người dùng
+    ↓
+Ứng dụng AI
+    ↓
+Mô hình
+    ↓
+Hệ thực thi
     ↓
 CPU / GPU / bộ nhớ
 ```
 
-Sơ đồ này cố tình được đơn giản hóa. Trong một hệ thống thật, dữ liệu có thể đi qua lại giữa các lớp nhiều lần. Ứng dụng có thể yêu cầu một công cụ tìm kiếm thông tin, đưa kết quả trở lại model, rồi tiếp tục sinh câu trả lời. Nhưng ở thời điểm này, chúng ta chỉ cần nhớ một điều: **ArcLLM nằm ở phần dưới của sơ đồ, gần model và phần cứng hơn là gần giao diện người dùng.**
+ArcLLM nằm chủ yếu ở tầng **hệ thực thi**.
 
-Runtime có thể hiểu là **hệ thực thi model**.
+## Một token là gì?
 
-Nếu model là một bản thiết kế khổng lồ thì runtime là bộ máy đọc bản thiết kế đó và biến nó thành công việc thật trên máy tính.
+Ta sẽ dùng từ này rất nhiều nên cần hiểu đủ sớm.
 
-Một file model nằm yên trên ổ đĩa không thể tự yêu cầu GPU thực hiện phép nhân, không tự biết phải giữ dữ liệu nào trong bộ nhớ, cũng không tự biết kết quả của phép tính này phải được chuyển sang phép tính tiếp theo ra sao.
+Hãy bắt đầu bằng cách hiểu đơn giản:
 
-Runtime làm những việc ấy.
+> **Token là một mảnh văn bản nhỏ mà mô hình xử lý.**
 
-Nó đọc model, chuẩn bị dữ liệu, tổ chức bộ nhớ, quyết định phần việc nào được thực hiện ở đâu, gửi công việc xuống phần cứng rồi thu kết quả về để tiếp tục bước kế tiếp.
-
-Và quá trình đó lặp đi lặp lại cho tới khi model tạo được câu trả lời.
-
-## Token không nhất thiết là một chữ
-
-Ở đây chúng ta cần làm rõ một từ sẽ xuất hiện rất nhiều trong cuốn sách này: **token**.
-
-Có một cách giải thích thường gặp là “token là một mảnh văn bản”. Cách nói ấy dễ nhớ, nhưng nếu hiểu quá sát thì lại không chính xác.
-
-Token không cố định là một ký tự.
-
-Nó cũng không nhất thiết là một từ.
-
-Một token là **một đơn vị mà model dùng để xử lý văn bản**. Trước khi văn bản được đưa vào model, một thành phần gọi là **tokenizer — bộ tách và mã hóa văn bản —** sẽ chuyển văn bản thành các token, rồi mỗi token được biểu diễn bằng một con số.
-
-Tùy model và tokenizer, một token có thể tương ứng với một ký tự, một chuỗi nhiều ký tự, một phần của một từ, cả một từ, dấu câu hoặc thậm chí một phần liên quan đến khoảng trắng.
-
-Ví dụ, hãy tưởng tượng ta có chữ:
+Nếu có câu:
 
 ```text
-ChatGPT!
+Tôi thích cà phê.
 ```
 
-Một tokenizer có thể chia nó thành:
+người mới có thể tạm hình dung:
 
 ```text
+Tôi | thích | cà | phê | .
+```
+
+Nhưng đây chỉ là hình dung.
+
+Trong hệ thống thật, token **không nhất thiết là một từ**.
+
+Một token có thể là cả từ, một phần của từ, dấu câu hoặc một chuỗi ký tự khác.
+
+Một **bộ tách và mã hóa văn bản (tokenizer)** quyết định cách chia và đổi mỗi token thành một mã số.
+
+Ví dụ minh họa:
+
+```text
+"ChatGPT!"
+    ↓
+bộ tách và mã hóa
+    ↓
 Chat | GPT | !
+    ↓
+314 | 9821 | 17
 ```
 
-Nhưng một tokenizer khác hoàn toàn có thể chia theo cách khác.
+Các số trên chỉ là ví dụ.
 
-Vì vậy khi trong sách tôi nói “model sinh thêm một token”, hãy hiểu đơn giản là:
+Điều cần nhớ:
 
-> Model vừa tạo thêm **một đơn vị văn bản theo cách mã hóa riêng của nó**, chứ không nhất thiết vừa tạo thêm một chữ hay một từ hoàn chỉnh.
+> **Mô hình không trực tiếp cầm câu chữ như con người. Nó nhận những mã số đại diện cho các token.**
 
-Chúng ta chưa cần biết tokenizer hoạt động sâu bên trong như thế nào. Chỉ cần hiểu điều này là đủ để đi tiếp.
+## ArcLLM là gì?
 
-## Và đây là nơi ArcLLM xuất hiện
+ArcLLM là dự án nghiên cứu lớp hệ thực thi vừa nói.
 
-ArcLLM nghiên cứu chính lớp **runtime** vừa nói ở trên.
+Dự án bắt đầu trên một máy tính dùng bộ xử lý Intel Core Ultra 7 258V và GPU tích hợp Intel Arc 140V.
 
-Tên của nó cũng bắt nguồn từ một câu chuyện rất đời thường.
-
-Dự án không bắt đầu trong một trung tâm dữ liệu với hàng trăm GPU. Nó bắt đầu trên chiếc máy tính mà người phát triển đang có.
-
-Máy đó sử dụng Intel Core Ultra 7 258V và GPU tích hợp **Intel Arc 140V**.
-
-Đó cũng chính là nguồn gốc của cái tên:
+Tên dự án ghép từ:
 
 ```text
 Intel Arc
-    +
++
 LLM
-    ↓
+↓
 ArcLLM
 ```
 
-`Arc` đến từ dòng GPU Intel Arc trên chiếc máy phát triển ban đầu.
+**LLM** là viết tắt của *Large Language Model*, tức **mô hình ngôn ngữ lớn**.
 
-`LLM` là viết tắt của **Large Language Model — mô hình ngôn ngữ lớn**.
+Tên ArcLLM ghi lại chiếc máy nơi dự án bắt đầu. Nó không có nghĩa hệ thực thi này về nguyên tắc chỉ được phép chạy trên Intel Arc.
 
-Cái tên vì thế giống một dấu mốc ghi lại nơi dự án được sinh ra hơn là một giới hạn kỹ thuật.
+## Tại sao lại tự xây khi đã có llama.cpp và Ollama?
 
-ArcLLM không có nghĩa là “một runtime chỉ được phép chạy trên Intel Arc”. Và ArcLLM cũng không được định nghĩa là runtime dành riêng cho một model duy nhất.
+Nếu mục tiêu chỉ là:
 
-Trong nghiên cứu, chúng ta sẽ thường **khóa một model cụ thể** cho một thí nghiệm. Việc đó rất quan trọng: nếu vừa đổi runtime vừa đổi model thì khi kết quả thay đổi, chúng ta sẽ không biết nguyên nhân đến từ đâu.
+> “Tôi muốn tải một mô hình về và trò chuyện ngay.”
 
-Nhưng khóa model trong một thí nghiệm không đồng nghĩa với việc hard-code toàn bộ kiến trúc vào model đó.
+thì tự xây ArcLLM là cách vòng vèo.
 
-Mục tiêu rộng hơn của ArcLLM là xây dựng và hiểu một **hệ thực thi model**, trong đó những phần phụ thuộc vào model, loại trọng số hay phần cứng có thể được tách ra rõ ràng.
+llama.cpp đã là một hệ thực thi trưởng thành. Ollama giúp người dùng tải, quản lý và chạy mô hình thuận tiện hơn.
 
-Điều đó sẽ trở nên quan trọng hơn rất nhiều ở các chương sau.
+ArcLLM không ra đời vì những phần mềm đó “không tốt”.
 
-Còn hiện tại, chỉ cần giữ một ranh giới thật rõ:
+Nó ra đời vì câu hỏi khác:
 
-> **ArcLLM là runtime. Nó chưa phải là một hệ AI hoàn chỉnh.**
+> **Nếu tự xây từ những phần thấp nhất, ta có hiểu được vì sao một hệ thực thi phải có hình dạng như hiện nay không?**
 
-ArcLLM không phải giao diện chat.
+Một hệ thống trưởng thành đã chứa rất nhiều quyết định tích lũy qua nhiều năm.
 
-Nó không phải một agent tự đi làm nhiều bước.
+Nếu dùng nó làm lõi ngay từ đầu, ta có thể đo và sửa, nhưng nhiều câu hỏi đã được trả lời hộ.
 
-Nó chưa phải hệ thống gọi công cụ.
+ArcLLM chọn con đường chậm hơn:
 
-Nó không phải RAG — tức hệ thống đi tìm tài liệu bên ngoài rồi đưa tài liệu đó cho model.
+```text
+cần đọc tệp mô hình
+→ tự xây phần đọc
 
-Những lớp ấy có thể nằm phía trên runtime.
+cần dùng GPU
+→ tự xây đường giao việc cho GPU
 
-Nếu sau này một ứng dụng muốn dùng ArcLLM làm động cơ bên dưới thì đó là một bài toán khác.
+cần một phép tính
+→ tự xây phép tính đó
 
-Cuốn sách này tập trung vào câu hỏi thấp hơn:
+một cách làm thất bại
+→ giữ lại thất bại
 
-> **Từ một file model nằm trên ổ đĩa, làm thế nào để những phép tính bên trong nó thực sự chạy trên CPU, GPU và bộ nhớ của một chiếc máy tính?**
+bằng chứng buộc kiến trúc đổi
+→ mới đổi kiến trúc
+```
 
-## Nhưng llama.cpp và Ollama đã tồn tại rồi
-
-Đến đây có một câu hỏi rất tự nhiên.
-
-Nếu đã có `llama.cpp`, đã có Ollama, và chỉ cần vài câu lệnh là có thể chạy model trên máy cá nhân, tại sao lại mất công xây ArcLLM?
-
-Câu trả lời ngắn nhất là:
-
-> **Nếu mục đích chỉ là sử dụng model, chúng ta không cần ArcLLM.**
-
-`llama.cpp` đã là một runtime rất trưởng thành. Mục tiêu công khai của dự án là thực hiện suy luận LLM bằng C/C++ với thiết lập tối thiểu và hiệu năng cao trên nhiều loại phần cứng. Qua thời gian, nó đã có rất nhiều **backend — lớp thực thi nối runtime với một loại phần cứng hoặc cơ chế cụ thể —**, hỗ trợ CPU, nhiều dòng GPU và nhiều kiểu **quantization — lượng tử hóa, cách biểu diễn trọng số gọn hơn bằng ít bit hơn —** khác nhau.
-
-Ollama lại giải quyết một nhu cầu ở lớp cao hơn: giúp người dùng tải, quản lý và chạy model thuận tiện hơn mà không cần tự xử lý tất cả chi tiết phía dưới.
-
-Nếu mục tiêu là:
-
-> “Tôi muốn tải một model về máy và chat với nó ngay.”
-
-thì dùng một hệ thống trưởng thành như vậy hợp lý hơn rất nhiều so với tự viết runtime từ đầu.
-
-ArcLLM không ra đời vì những công cụ ấy làm chưa tốt.
-
-Ngược lại, chúng chính là một phần nguồn cảm hứng.
-
-Một trong những điều rất thú vị từ Georgi Gerganov, `ggml` và sau đó là `llama.cpp` là việc họ cho thấy một hệ thống chạy model lớn không nhất thiết phải là một khối phần mềm bí ẩn chỉ tồn tại trong các framework khổng lồ.
-
-Có thể đi xuống rất thấp.
-
-Có thể nhìn thấy dữ liệu.
-
-Có thể tự viết những phép tính.
-
-Có thể tận dụng phần cứng phổ thông.
-
-Và từ những thành phần tương đối nhỏ, từng bước hình thành một runtime thực sự hữu ích.
-
-Tinh thần ấy là một trong những cảm hứng dẫn tới ArcLLM:
+Tinh thần là:
 
 > **Muốn hiểu chiếc máy, hãy thử tự xây chiếc máy.**
 
-Nhưng ArcLLM chọn không dùng llama.cpp làm lõi nghiên cứu.
+## llama.cpp vẫn rất quan trọng
 
-Lý do không phải vì muốn “viết lại cho hay hơn”.
+Tự xây không có nghĩa tự so với chính mình mãi mãi.
 
-Nếu ngay từ đầu chúng ta lấy một runtime trưởng thành làm lõi, rất nhiều quyết định quan trọng đã được đưa ra hộ chúng ta: cách tổ chức tensor, cách chọn **kernel — chương trình tính toán nhỏ chạy trên GPU —**, cách quản lý bộ nhớ, cách chia backend, cách điều phối công việc và hàng loạt tối ưu đã tích lũy qua nhiều năm.
+Hãy tưởng tượng ta tự chế một chiếc xe.
 
-Ta có thể đo chúng.
+Hôm qua nó chạy 10 km/h.
 
-Ta có thể sửa một phần.
+Hôm nay sửa xong chạy 20 km/h.
 
-Nhưng sẽ khó hơn nhiều để trả lời một câu hỏi căn bản:
+Ta có thể nói:
 
-> **Tại sao kiến trúc lại phải có hình dạng như vậy?**
+> “Nhanh gấp đôi hôm qua.”
 
-ArcLLM đi theo hướng ngược lại.
+Nhưng nếu một chiếc xe bình thường chạy 100 km/h, ta vẫn còn cách rất xa thực tế.
 
-Bắt đầu với càng ít giả định càng tốt.
+ArcLLM cũng vậy.
 
-Khi cần đọc model, ta xây phần đọc model.
+Một cải tiến 2 lần hay 3 lần so với phiên bản trước có thể cho biết thay đổi vừa làm có tác dụng.
 
-Khi cần đưa dữ liệu vào GPU, ta xây phần bộ nhớ GPU.
+Nhưng nó **không tự động chứng minh ArcLLM nhanh hơn một hệ thực thi trưởng thành**.
 
-Khi cần một phép tính, ta xây phép tính đó.
+Vì vậy llama.cpp được dùng như **mốc đối chứng bên ngoài**.
 
-Khi một cách tổ chức thất bại, ta giữ lại thất bại ấy.
+Muốn so công bằng, hai bên phải dùng cùng mô hình, cùng máy, cùng đầu vào và cùng cách đo.
 
-Và chỉ khi bằng chứng cho thấy cần một abstraction mới — một lớp khái niệm mới — chúng ta mới thêm nó.
+Chuyện này sẽ trở thành trọng tâm của Chương 9.
 
-Chính vì vậy nhiều thứ mà ở runtime trưởng thành có thể chỉ xuất hiện như một API hoặc một cấu trúc dữ liệu, trong cuốn sách này sẽ có cả câu chuyện phía sau:
+## Nhưng trước khi chạy nhanh, phải chắc rằng ta đang chạy đúng thứ
 
-Tại sao nó xuất hiện?
+Đây là bước đầu tiên thật sự của dự án.
 
-Vấn đề nào buộc nó phải tồn tại?
+Giả sử hôm nay ta dùng tệp mô hình A.
 
-Ta đã thử cách gì trước đó?
+Ngày mai vô tình đổi sang tệp B.
 
-Cách nào thất bại?
+Kết quả nhanh hơn 10%.
 
-Và bằng chứng nào khiến kiến trúc thay đổi?
+Ta không còn biết:
 
-## Vậy llama.cpp được dùng để làm gì?
+> Hệ thực thi tốt hơn?
 
-Không dùng llama.cpp làm lõi không có nghĩa là bỏ qua nó.
+hay:
 
-Ngược lại, llama.cpp giữ một vai trò rất quan trọng trong ArcLLM:
+> Tệp mô hình đã khác?
 
-> **Nó là một đối chứng bên ngoài.**
+Vì vậy ArcLLM bắt đầu bằng một nguyên tắc rất đơn giản:
 
-Hãy tưởng tượng ta tự chế một động cơ.
+> **Khóa đúng đối tượng trước khi tối ưu.**
 
-Hôm qua động cơ chạy được 10 km/h. Hôm nay sửa xong chạy 20 km/h.
+Dự án chọn một mô hình cụ thể: Qwen2.5-Coder-1.5B.
 
-Ta có thể vui vì nó nhanh gấp đôi.
+Nhưng tên tệp vẫn chưa đủ. Hai tệp có thể cùng tên mà nội dung khác nhau.
 
-Nhưng nếu những động cơ trưởng thành ngoài kia đã chạy 200 km/h thì “nhanh gấp đôi hôm qua” chưa nói được nhiều.
+Vì vậy tệp được kiểm tra bằng **SHA-256**, một cách tạo “dấu vân tay số” từ nội dung dữ liệu.
 
-Nghiên cứu runtime cũng vậy.
+Nếu nội dung đổi, dấu vân tay gần như chắc chắn cũng đổi.
 
-ArcLLM có thể cải thiện 2 lần, 3 lần hay nhiều hơn so với chính phiên bản trước của nó. Những kết quả đó vẫn có giá trị vì chúng cho biết một thay đổi kiến trúc đã tạo ra tác động gì.
+Nhờ đó ta biết các lần thử đang dùng đúng cùng một tệp.
 
-Nhưng chúng **không tự động chứng minh ArcLLM nhanh hơn một runtime trưởng thành**.
+## Máy có đủ khả năng để bắt đầu không?
 
-Muốn biết điều đó, cần đặt hai bên vào một phép so sánh công bằng: cùng model, cùng phần cứng, cùng đầu vào và cùng cách đo.
+Khóa đúng tệp vẫn chưa đủ.
 
-Đó là lý do llama.cpp xuất hiện nhiều lần trong câu chuyện ArcLLM.
+Nếu mô hình cần nhiều bộ nhớ hơn chiếc máy có thể cung cấp, mọi kế hoạch phía sau đều vô nghĩa.
 
-Không phải như một đối thủ cần phải “đánh bại”.
+Kiểm tra đầu tiên của ArcLLM cho thấy tệp mô hình có **338 khối số (tensor)**.
 
-Mà như một **thước đo thực tế**.
+Ở đây hãy tạm hiểu khối số là những dãy hoặc bảng số mà mô hình dùng trong phép tính. Chương 2 sẽ mở chúng ra kỹ hơn.
 
-Một runtime nghiên cứu nếu chỉ tự so với chính mình rất dễ sống trong một thế giới riêng.
-
-Đối chứng bên ngoài buộc chúng ta phải hỏi:
-
-> Những gì vừa khám phá thực sự có giá trị đến đâu khi đặt cạnh một hệ thống đã trưởng thành?
-
-Và như chúng ta sẽ thấy sau này, có lúc câu trả lời rất không dễ chịu.
-
-Nhưng chính những lần như vậy lại mở ra những nhánh nghiên cứu quan trọng nhất.
-
-## Bắt đầu từ đâu?
-
-Bây giờ chúng ta đã biết ArcLLM nằm ở đâu.
-
-Nó không phải toàn bộ ứng dụng AI.
-
-Nó nằm ở lớp gần model và phần cứng.
-
-Nó được sinh ra trên một chiếc máy có GPU Intel Arc 140V, lấy cảm hứng từ tinh thần xây runtime từ những thành phần thấp như ggml và llama.cpp, nhưng chọn tự xây đường thực thi của mình để mỗi quyết định kiến trúc đều có thể được quan sát và kiểm chứng.
-
-Vậy bắt đầu xây một runtime như vậy từ đâu?
-
-Có lẽ phản xạ đầu tiên là viết ngay một kernel thật nhanh. Nhắc lại, **kernel** ở đây là chương trình tính toán nhỏ được gửi xuống GPU để thực hiện một loại phép tính cụ thể; Chương 4 sẽ mở khái niệm này kỹ hơn.
-
-ArcLLM không bắt đầu ở đó.
-
-Trước khi tối ưu bất kỳ thứ gì, ta phải chắc rằng mình đang nhìn đúng thứ.
-
-Giả sử hôm nay ta chạy một file model, ngày mai vô tình thay bằng file khác. Nếu kết quả nhanh hơn 10%, đó là nhờ runtime tốt hơn hay chỉ vì model đã thay đổi?
-
-Hoặc hôm nay GPU có đủ bộ nhớ, ngày mai máy đang chạy nhiều chương trình khác và bộ nhớ trống giảm mạnh. Nếu lần chạy thứ hai thất bại, liệu kiến trúc có sai, hay chỉ đơn giản là chiếc máy đang bận?
-
-Đó là lý do bước đầu tiên của ArcLLM có tên rất giản dị: **P0 — bootstrap runtime và khóa mục tiêu**.
-
-Trong giai đoạn này, dự án chọn một model cụ thể để làm đối tượng nghiên cứu: Qwen2.5-Coder-1.5B.
-
-Nhưng chỉ ghi tên model vẫn chưa đủ.
-
-Hai file có thể có cùng tên mà nội dung khác nhau.
-
-Vì vậy file được khóa bằng **SHA-256 — một hàm băm dùng để tạo “dấu vân tay số” cho dữ liệu —**. Chỉ cần nội dung bên trong thay đổi thì dấu vân tay cũng thay đổi.
-
-P0 cũng kiểm tra xem máy có nhìn thấy GPU hay không, model có đọc được hay không và lượng bộ nhớ cần thiết có nằm trong khả năng phần cứng hay không.
-
-Lần kiểm tra đầu tiên cho thấy file model chứa 338 tensor. Có thể tạm hiểu **tensor** là những bảng số mà model sử dụng trong các phép tính. Chúng ta sẽ mở chúng ra kỹ hơn ở chương sau.
-
-Với **context — phạm vi token mà runtime chuẩn bị để model có thể xử lý trong một lượt —** là 4.096 token, bộ lập kế hoạch ước lượng runtime cần khoảng 2,120 GiB bộ nhớ, trong khi ngưỡng khả năng đã được xác nhận là 3,75 GiB. **GiB — gibibyte —** là một đơn vị dung lượng bộ nhớ; ở đây ta chỉ cần dùng nó để so sánh “cần bao nhiêu” với “máy có thể đáp ứng bao nhiêu”.
-
-Không cần công thức phức tạp:
+Với phạm vi làm việc 4.096 token, bộ lập kế hoạch ước lượng cần khoảng:
 
 ```text
-Cần khoảng:      2,120 GiB
-Có thể đáp ứng:  3,75 GiB
+2,120 GiB bộ nhớ
+```
 
+trong khi mức dung lượng có thể đáp ứng đã được xác nhận là:
+
+```text
+3,75 GiB
+```
+
+**GiB (gibibyte)** là một đơn vị dung lượng. Ở đây ta chưa cần học cách đổi đơn vị; chỉ cần so:
+
+```text
 2,120 < 3,75
 ```
 
-Về mặt năng lực, nó vừa.
+Về dung lượng thiết kế, nó vừa.
 
-Có một lần chạy bị chặn vì lượng RAM trống thực tế lúc đó thấp hơn mức dự phòng 8 GiB. Nhưng đó lại là một bài học quan trọng.
+## “Máy đang bận” khác “thiết kế không vừa”
 
-**“Máy đang thiếu bộ nhớ lúc này” không giống với “kiến trúc cần nhiều bộ nhớ hơn máy có thể cung cấp”.**
+Có một lần chạy bị chặn vì lúc đó lượng RAM còn trống thấp hơn mức dự phòng 8 GiB.
 
-Một bên là trạng thái tạm thời.
+Thoạt nhìn, có thể kết luận:
 
-Một bên là giới hạn của thiết kế.
+> “Máy không đủ bộ nhớ.”
 
-Nếu không phân biệt hai chuyện đó, ta có thể giết một hướng nghiên cứu chỉ vì hôm ấy máy đang chạy quá nhiều chương trình.
+Nhưng đó chưa phải kết luận đúng.
 
-Sau khi ranh giới này được làm rõ, P0 đạt PASS.
+Có hai chuyện khác nhau:
 
-Và như vậy ArcLLM có viên gạch đầu tiên.
+```text
+Máy đang thiếu bộ nhớ lúc này
+```
 
-Chưa có model hoàn chỉnh đang trò chuyện.
+và:
 
-Chưa có kernel tối ưu.
+```text
+Thiết kế luôn cần nhiều bộ nhớ hơn máy có thể cung cấp
+```
 
-Chưa có những khái niệm phức tạp mà chúng ta sẽ gặp hàng chục chương sau.
+Trường hợp đầu có thể chỉ vì đang mở nhiều chương trình.
 
-Chỉ có một điều chắc chắn hơn trước:
+Trường hợp sau mới là giới hạn của thiết kế.
 
-> **Ta biết mình đang chạy model nào, file nào, trên phần cứng nào, và chiếc máy có đủ khả năng để bắt đầu hay không.**
+ArcLLM phải phân biệt hai chuyện đó trước khi quyết định có dừng hướng nghiên cứu hay không.
 
-Đó là một khởi đầu có vẻ nhỏ.
+Sau khi ranh giới này được làm rõ, bước đầu tiên được đánh giá **ĐẠT (PASS)**.
 
-Nhưng mọi phép đo về sau đều phụ thuộc vào nó.
+Chưa có một mô hình hoàn chỉnh đang trò chuyện.
+
+Chưa có phép tính GPU tối ưu.
+
+Chưa có những lớp xử lý mà ta sẽ gặp sau này.
+
+Nhưng ta đã biết chắc hơn ba điều:
+
+```text
+đang dùng đúng mô hình nào
+↓
+đúng tệp nào
+↓
+trên chiếc máy nào
+```
+
+Mọi phép đo về sau phụ thuộc vào nền móng này.
 
 ### Nhớ 3 điều
 
-1. **ArcLLM là lớp runtime thực thi model, không phải toàn bộ hệ AI hay ứng dụng chat.**
-2. **Tự xây runtime không phải vì llama.cpp hay Ollama không tốt, mà vì ta muốn nhìn thấy và kiểm chứng từng quyết định kiến trúc; llama.cpp vẫn là một đối chứng quan trọng.**
-3. **Trước khi tối ưu, phải khóa đúng model, đúng file và đúng điều kiện phần cứng — nếu không, một con số đẹp hơn chưa chắc nói lên điều gì.**
+1. **Mô hình là phần chứa những gì đã học; hệ thực thi là phần làm cho mô hình chạy; CPU/GPU là phần cứng thực hiện phép tính.**
+2. **ArcLLM tự xây hệ thực thi để hiểu từng quyết định bên trong, không phải vì các công cụ như llama.cpp hay Ollama không tốt.**
+3. **Trước khi tối ưu, phải khóa đúng mô hình, đúng tệp và đúng điều kiện phần cứng. Nếu không, một con số đẹp hơn chưa chắc nói lên điều gì.**
 
-**Chương 2 — Bên trong file model có gì?**
+**Tiếp theo: [Chương 2 — Bên trong tệp mô hình có gì?](02-gguf-tensor-store.md)**
 
-Chúng ta vừa biết P0 nhìn thấy 338 tensor trong một file GGUF.
+Ta vừa biết tệp nghiên cứu chứa 338 khối số.
 
-Nhưng tensor là gì? Vì sao model lại chứa nhiều tensor như vậy? Và nếu model có hàng tỷ con số, runtime có thực sự phải bung tất cả chúng ra thành những con số lớn rồi mới tính được hay không?
-
-Đó là nơi cuộc hành trình thực sự bắt đầu.
+Chương sau sẽ mở tệp đó ra và trả lời: một “khối số” thực sự được lưu như thế nào, vì sao có loại chiếm nhiều chỗ hơn loại khác, và vì sao cách lưu các con số quyết định trực tiếp liệu mô hình có vừa trong bộ nhớ hay không.
