@@ -586,9 +586,9 @@ Mà để quyết định:
 
 Có một ranh giới bằng chứng cần khóa ngay trước các con số tiếp theo:
 
-> **Các số NPU dưới đây là phép chiếu phân tích từ evidence exact-target hiện có của ArcLLM kết hợp với đo thời gian của NPU provider. Chúng không phải một fresh full-mô hình benchmark có NPU, và ở thời điểm này chưa có NPU lớp thực thi phần cứng được tích hợp vào canonical hệ thực thi.**
+> **Các con số NPU dưới đây là phép chiếu phân tích từ bằng chứng trên đúng đối tượng mục tiêu của ArcLLM, kết hợp với phép đo thời gian của bộ cung cấp NPU. Đây không phải phép đo mới của toàn mô hình có NPU, và ở thời điểm này chưa có lớp thực thi NPU được tích hợp vào hệ thực thi chuẩn.**
 
-Cụ thể, phần current-canonical được ước tính bằng cách lấy evidence hậu-I002 rồi áp tỷ lệ B/0 đã đo của Q4-down vào phần Q4_K FFN-down trước khi chuẩn hóa lại các family share. Vì vậy những con số này dùng để quyết định **có đáng mở một có giới hạn transfer study hay không**, không phải để tuyên bố production speedup.
+Cụ thể, ước lượng hiện tại lấy **bằng chứng sau I002**, áp tỷ lệ B/0 đã đo của Q4-down vào phần Q4_K FFN-down rồi chuẩn hóa lại tỷ trọng các nhóm phép tính. Vì vậy các con số này chỉ dùng để quyết định **có đáng mở một phép thử chuyển giao trong phạm vi giới hạn hay không**, không phải để tuyên bố mức tăng tốc khi sử dụng thật.
 
 ## Cơ chế từng thành công lớn có thể trở thành nơi không đáng chuyển tiếp
 
@@ -749,7 +749,7 @@ Phép thử ngoài bộ dữ liệu kiểm thử cố định cho thấy giao di
 
 Nó không chứng minh:
 
-> **chất lượng ngôn ngữ trên mọi prompt tùy ý đã được xác nhận.**
+> **chất lượng ngôn ngữ trên mọi đầu vào tùy ý đã được xác nhận.**
 
 Hai chuyện khác nhau.
 
@@ -1050,7 +1050,7 @@ Và cánh cửa đó chỉ xuất hiện bởi cỗ máy đã được xây đ�
 
 ## Inside ArcLLM kết thúc tại đây
 
-Ta bắt đầu với một file mô hình và một câu hỏi:
+Ta bắt đầu với một **tệp mô hình** và một câu hỏi:
 
 > **“Bên dưới một câu trả lời AI có gì?”**
 
