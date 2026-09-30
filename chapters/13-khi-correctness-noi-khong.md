@@ -104,11 +104,11 @@ Cả Q4_K và Q6_K đều là những cách lưu trọng số đã được lư�
 
 **lượng tử hóa — lượng tử hóa** có thể hiểu là:
 
-> thay vì lưu mọi trọng số bằng một số thực lớn như F32, ta biểu diễn chúng bằng ít bit hơn cùng một số thông tin scale cần thiết để tái tạo giá trị gần đúng khi tính toán.
+> thay vì lưu mọi trọng số bằng một số thực lớn như F32, ta biểu diễn chúng bằng ít bit hơn cùng một số **hệ số tỉ lệ** cần thiết để tái tạo giá trị gần đúng khi tính toán.
 
 Q4_K dùng ít bit hơn cho giá trị lượng tử hóa.
 
-Q6_K dùng nhiều bit hơn và có cách đóng gói metadata khác.
+Q6_K dùng nhiều bit hơn và có cách đóng gói **thông tin mô tả** khác.
 
 Điểm quan trọng của experiment không phải học thuộc cấu trúc byte.
 
@@ -557,7 +557,7 @@ không được suy ra:
 performance FAIL
 ```
 
-Hai claim hoàn toàn khác nhau.
+Đó là **hai kết luận hoàn toàn khác nhau**.
 
 Q6 có thể về lý thuyết rất nhanh nhưng sai.
 
@@ -594,7 +594,7 @@ mọi GPU
 
 sẽ cùng ĐẠT (PASS).
 
-Q6 đã bác bỏ một claim rộng hơn:
+Q6 đã bác bỏ một **kết luận rộng hơn**:
 
 > **cùng cơ chế Split-K và hình học thực thi có thể chuyển từ Q4_K sang Q6_K, với bộ đọc packed-Q6 tương ứng, mà vẫn giữ tính đúng tiêu chuẩn đã khóa.**
 
