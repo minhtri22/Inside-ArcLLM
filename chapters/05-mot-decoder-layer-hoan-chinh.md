@@ -59,11 +59,11 @@ Có thể hình dung:
 ```text
 dữ liệu đi vào
      ↓
-Layer 0
+Lớp 0
      ↓
-Layer 1
+Lớp 1
      ↓
-Layer 2
+Lớp 2
      ↓
 ...
 ```
@@ -147,11 +147,11 @@ Nếu A ghi dữ liệu sai chỗ, hoặc B đọc nhầm vùng nhớ — **vùn
 Ta có thể hình dung:
 
 ```text
-Kernel A
+Chương trình GPU A
    ↓
-buffer X
+vùng nhớ X
 
-Kernel B đáng lẽ đọc X
+Chương trình GPU B đáng lẽ đọc vùng X
 nhưng lại đọc Y
    ↓
 sai
@@ -182,15 +182,15 @@ Nhắc lại, **lần giao việc cho GPU — một lần hệ thực thi giao m
 Có thể hình dung mỗi lần giao việc cho GPU là một công đoạn trong dây chuyền:
 
 ```text
-dispatch 1
+lần giao việc 1
     ↓
-dispatch 2
+lần giao việc 2
     ↓
-dispatch 3
+lần giao việc 3
     ↓
 ...
     ↓
-dispatch 15
+lần giao việc 15
 ```
 
 Con số 15 không có nghĩa một lớp giải mã nói chung luôn phải có đúng 15 lần giao việc cho GPU.
@@ -200,7 +200,7 @@ Nó chỉ mô tả implementation P4 đã được kiểm tra.
 Điều quan trọng hơn là cả 15 công việc này được ghi vào **một bộ lệnh — một danh sách lệnh GPU đã chuẩn bị trước**, rồi gửi xuống bằng:
 
 ```text
-1 command buffer
+1 bộ lệnh
 → 1 lần submit
 → 1 lần fence wait
 ```
@@ -266,7 +266,7 @@ phép C
  ↓
 ...
  ↓
-kết quả cuối layer
+kết quả cuối lớp
 ```
 
 thay vì:
@@ -493,7 +493,7 @@ Một người chơi đúng riêng không bảo đảm cả nhóm vào đúng nh
 Ở P4, ta đồng thời kiểm tra:
 
 ```text
-kernel đúng
+chương trình GPU đúng
 +
 trọng số thật đúng
 +
@@ -503,7 +503,7 @@ Q6_K đúng
 +
 thứ tự phép toán đúng
 +
-buffer nối đúng
+vùng nhớ nối đúng
 +
 residual đúng
 +
@@ -552,7 +552,7 @@ shader compile
 native build
 → chưa chạy
 
-Vulkan layer execution
+thực thi lớp bằng Vulkan
 → chưa chạy
 ```
 
@@ -585,17 +585,17 @@ Cách quản trị sâu hơn — gồm các chế độ dùng để loại nhanh
 Tóm tắt P4:
 
 ```text
-1 decoder layer thật
+1 lớp giải mã thật
 → blk.0 của Qwen2
 
 15 Vulkan dispatches
 → 15 công việc tính toán GPU
 
-1 command buffer
+1 bộ lệnh
 → một danh sách lệnh GPU
 
 1 submit
-→ gửi cả chuỗi xuống compute queue một lần
+→ gửi cả chuỗi xuống hàng đợi tính toán một lần
 
 1 fence wait
 → chờ GPU hoàn tất cả chuỗi
@@ -646,25 +646,25 @@ Nếu mô hình có nhiều lớp nối tiếp nhau, liệu ta có thể giữ t
 Không còn:
 
 ```text
-một primitive
+một phép tính nền tảng
 ```
 
 cũng không còn:
 
 ```text
-một layer
+một lớp
 ```
 
 mà là:
 
 ```text
-embedding
+phép nhúng
    ↓
-layer
+lớp
    ↓
-layer
+lớp
    ↓
-layer
+lớp
    ↓
 ...
    ↓
