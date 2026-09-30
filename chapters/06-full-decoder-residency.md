@@ -59,7 +59,7 @@ Con số `1234` tự nó chưa mang đủ thông tin để đi qua 28 lớp.
 
 Mô hình cần biến token ID ấy thành một dãy số dài hơn.
 
-Công việc đó được gọi là **phép nhúng — biến mã token thành một vector số mà mô hình có thể xử lý**.
+Công việc đó được gọi là **phép nhúng (embedding)** — biến mã token thành một vectơ số mà mô hình có thể xử lý.
 
 Có thể hình dung:
 
@@ -84,7 +84,7 @@ token_embd.weight
 
 được lưu ở dạng Q6_K đóng gói trong GGUF.
 
-Nhắc lại, **Q6_K là một dạng lượng tử hóa — cách lưu trọng số gọn hơn bằng ít bit hơn so với F32**.
+Nhắc lại, **Q6_K là một dạng lượng tử hóa (quantization)** — cách lưu trọng số gọn hơn bằng ít bit hơn so với F32.
 
 GPU vì vậy phải bắt đầu ngay từ dữ liệu mô hình thật.
 
@@ -122,7 +122,7 @@ bộ nhớ mới
 
 rồi kết quả sai, ta sẽ không biết lỗi nằm ở đâu.
 
-P5 vì vậy giữ sequence length ở 1 để tập trung vào **full-depth trạng thái cư trú trong bộ nhớ — khả năng giữ và chạy xuyên toàn bộ chiều sâu mô hình**.
+P5 vì vậy giữ sequence length ở 1 để tập trung vào **cư trú toàn chiều sâu (full-depth residency)** — khả năng giữ và chạy xuyên toàn bộ chiều sâu mô hình.
 
 ## 338 khối số được giữ lại
 
@@ -192,7 +192,7 @@ Hệ thực thi phải biết:
 
 ## “Giữ sẵn trong bộ nhớ” (resident) lần này có nghĩa mạnh hơn
 
-Ta đã gặp từ **resident — cư trú, tức dữ liệu được giữ sẵn trong vùng nhớ cần dùng**.
+Ta đã gặp từ **cư trú trong bộ nhớ (resident)** — dữ liệu được giữ sẵn trong vùng nhớ cần dùng.
 
 Ở P2, ý nghĩa còn khá cơ bản:
 
@@ -259,11 +259,11 @@ Khi tín hiệu đi qua lớp cuối cùng, mô hình chưa lập tức có toke
 
 Còn hai bước quan trọng.
 
-Đầu tiên là **final RMSNorm — phép chuẩn hóa cuối cùng**.
+Đầu tiên là **phép chuẩn hóa RMS cuối (final RMSNorm)**.
 
 Ta đã gặp RMSNorm ở Chương 4. Nhắc lại ngắn gọn: nó điều chỉnh độ lớn của tín hiệu về một thang phù hợp trước khi bước sang phần tiếp theo.
 
-Sau đó là **lớp tạo điểm đầu ra (LM head) — lớp đầu ra biến trạng thái cuối của mô hình thành điểm số cho các token có thể được chọn tiếp theo**.
+Sau đó là **lớp tạo điểm đầu ra (LM head)** — lớp đầu ra biến trạng thái cuối của mô hình thành điểm số cho các token có thể được chọn tiếp theo.
 
 Có thể hình dung:
 
@@ -280,7 +280,7 @@ LM head
 ...
 ```
 
-Những điểm này được gọi là **điểm dự đoán — điểm số thô mà mô hình gán cho từng token ứng viên**.
+Những điểm này được gọi là **điểm dự đoán (logits)** — điểm số thô mà mô hình gán cho từng token ứng viên.
 
 Ví dụ đồ chơi:
 
@@ -303,7 +303,7 @@ phép nhúng đầu vào và lớp tạo điểm đầu ra (LM head) đầu ra d
 token_embd.weight
 ```
 
-Cách này thường được gọi là **tied trọng số — hai vị trí trong mô hình dùng chung cùng một bộ trọng số**.
+Cách này thường được gọi là **dùng chung trọng số (tied weights)** — hai vị trí trong mô hình dùng chung cùng một bộ trọng số.
 
 Hãy hình dung một cuốn từ điển được dùng ở hai đầu:
 
@@ -333,7 +333,7 @@ lớp tạo điểm đầu ra (LM head) phải tạo điểm cho rất nhiều t
 
 Nếu cố làm tất cả trong một lần giao việc cho GPU khổng lồ, hệ thực thi có thể đụng phải những giới hạn thực thi không cần thiết.
 
-P5 vì vậy chia các hàng của lớp tạo điểm đầu ra (LM head) thành những **chunk — phần nhỏ có kích thước được giới hạn**.
+P5 vì vậy chia các hàng của lớp tạo điểm đầu ra (LM head) thành những **mảnh xử lý (chunk)** — phần nhỏ có kích thước được giới hạn.
 
 Có thể hình dung:
 
@@ -348,7 +348,7 @@ chunk 3
 ghép thành điểm dự đoán cuối
 ```
 
-Điều quan trọng là việc chia chunk này vẫn diễn ra mà không có **vòng đi-về trung gian qua CPU — vòng lặp tính toán trung gian quay ngược về CPU**.
+Điều quan trọng là việc chia chunk này vẫn diễn ra mà không có **vòng đi-về trung gian qua CPU (intermediate host round-trip)**.
 
 P5 tiếp tục giữ nguyên ranh giới đã được đặt ở P4: dữ liệu trung gian không được kéo về CPU giữa chuỗi chỉ để rồi lại gửi xuống GPU.
 
@@ -362,7 +362,7 @@ Toàn bộ đường thực thi P5 tạo ra:
 
 Nhắc lại:
 
-**lần giao việc cho GPU — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU**.
+**lần giao việc cho GPU (dispatch)** — một lần hệ thực thi giao một công việc tính toán cụ thể cho GPU.
 
 441 là con số rất khác 15 ở P4.
 
@@ -388,7 +388,7 @@ Nhưng điều đáng chú ý hơn là:
 → 1 fence wait
 ```
 
-Tức toàn bộ chuỗi được ghi vào **một bộ lệnh — một danh sách lệnh GPU**, rồi được gửi xuống hàng đợi một lần.
+Tức toàn bộ chuỗi được ghi vào **một bộ lệnh (command buffer)** — một danh sách lệnh GPU, rồi được gửi xuống hàng đợi một lần.
 
 CPU không đứng giữa từng lớp để điều phối bằng cách đọc kết quả lên rồi quyết định bước tiếp.
 
@@ -423,7 +423,7 @@ Có hai tầng được kiểm tra.
 
 Thứ nhất:
 
-**final normalized hidden — trạng thái cuối sau 28 lớp và phép chuẩn hóa cuối**.
+**trạng thái ẩn cuối đã chuẩn hóa (final normalized hidden)**.
 
 Thứ hai:
 
@@ -455,10 +455,10 @@ RMSE    <= 0,01
 
 Nhắc lại:
 
-- **max_abs — sai số tuyệt đối lớn nhất**: phần tử tệ nhất lệch bao nhiêu;
-- **RMSE — căn trung bình bình phương sai số**: cả dãy nhìn chung lệch bao nhiêu.
+- **sai số tuyệt đối lớn nhất (max_abs)**: phần tử tệ nhất lệch bao nhiêu;
+- **căn trung bình bình phương sai số (RMSE)**: cả dãy nhìn chung lệch bao nhiêu.
 
-Ngoài ra, tất cả giá trị phải **finite — hữu hạn**, tức không được xuất hiện những giá trị vô nghĩa như vô cực hoặc `NaN`.
+Ngoài ra, tất cả giá trị phải **hữu hạn (finite)**, tức không được xuất hiện những giá trị vô nghĩa như vô cực hoặc `NaN`.
 
 ## Kết quả thật nhỏ hơn ngưỡng kiểm tra rất nhiều
 
@@ -562,7 +562,7 @@ cơ chế chú ý cần nhớ những thông tin đã tính từ các token cũ.
 
 Nếu mỗi token mới lại bắt mô hình tính lại toàn bộ lịch sử từ đầu, chi phí sẽ rất lớn.
 
-Đây là lúc chúng ta cần **bộ nhớ đệm KV — bộ nhớ lưu lại Key và Value của cơ chế chú ý từ các token trước để không phải tính lại mọi thứ từ đầu**.
+Đây là lúc chúng ta cần **bộ nhớ đệm khóa–giá trị (KV cache)** — bộ nhớ lưu lại Key và Value của cơ chế chú ý từ các token trước để không phải tính lại mọi thứ từ đầu.
 
 P5 chưa có bộ nhớ đệm KV generation path.
 
@@ -588,7 +588,7 @@ Có toàn bộ mô hình resident.
 
 P5 không trả lời.
 
-P5 được thiết kế cho **tính đúng — tính đúng**.
+P5 được thiết kế để kiểm tra **tính đúng (correctness)**.
 
 Không phải thông lượng — **tốc độ xử lý**.
 
@@ -732,7 +732,7 @@ sang:
 2. **tính đúng được kiểm tra ở hai điểm:** final normalized hidden và điểm dự đoán; CPU/GPU cũng đồng ý `top1 = 117612`.
 3. **Full decoder ĐẠT (PASS) chưa phải generation ĐẠT (PASS) và chưa phải hiệu năng ĐẠT (PASS).** Muốn mô hình thật sự sinh chuỗi token liên tục, ArcLLM còn cần bộ nhớ đệm KV và vòng lặp tạo sinh tự hồi quy (autoregressive generation).
 
-**Chương 7 — bộ nhớ đệm KV và token đầu tiên được sinh liên tục**
+**Chương 7 — Bộ nhớ giúp mô hình không phải tính lại từ đầu (KV cache)**
 
 Ta đã cho một token đi xuyên cả mô hình.
 
