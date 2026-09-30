@@ -67,7 +67,7 @@ Q3 được mở để ngăn chính điều đó.
 
 Q2 đã hoàn thành vai trò của nó:
 
-> **matched mô tả đặc tính — mô tả ArcLLM và mốc đối chứng trên cùng một mặt phẳng đo.**
+> **mô tả đặc tính cùng điều kiện (matched characterization)** — mô tả ArcLLM và mốc đối chứng trên cùng một mặt phẳng đo.
 
 Q3 có vai trò khác.
 
@@ -75,7 +75,7 @@ Nó đặt một giả thuyết có thể bị bác bỏ.
 
 Giả thuyết được gọi là:
 
-**H-NPA — giả thuyết “chưa chứng minh được lợi thế thực tế trong phạm vi đã khóa”.**
+**giả thuyết chưa chứng minh được lợi thế thực tế trong phạm vi đã khóa (bounded no-practical-advantage hypothesis, H-NPA).**
 
 Đọc bằng tiếng Việt:
 
@@ -105,7 +105,7 @@ Q3 đặt luật:
 
 Tách câu này ra.
 
-**Primary benefit dimension — chiều lợi ích chính** là một trong bốn chỉ số được phép tạo advantage:
+**chiều lợi ích chính (primary benefit dimension)** là một trong bốn chỉ số được phép tạo advantage:
 
 ```text
 TTFT
@@ -215,7 +215,7 @@ Chúng không được tuyên bố là ngưỡng phổ quát cho mọi hệ th�
 
 Đây là nơi Q3 thêm một lớp bảo vệ rất quan trọng:
 
-**blocking-harm guard — hàng rào ngăn một lợi ích nhỏ được gọi là advantage khi nó phải trả giá quá lớn ở những chỉ số chính khác.**
+**hàng rào ngăn tác hại (blocking-harm guard)** — không cho phép một lợi ích nhỏ được gọi là lợi thế khi phải trả giá quá lớn ở những chỉ số chính khác.
 
 Giả sử một hệ thực thi giảm bộ nhớ 20%.
 
@@ -291,7 +291,7 @@ CPU utilization
 GPU counters
 ```
 
-chỉ là **supporting các chỉ số — chỉ số hỗ trợ**.
+chỉ là **các chỉ số hỗ trợ (supporting metrics)**.
 
 Chúng vẫn được ghi.
 
@@ -351,7 +351,7 @@ Nếu lại dùng chính Q2 để xác nhận kết luận, ta sẽ vừa dùng 
 
 Q3 vì vậy yêu cầu:
 
-**fresh reproduction — bằng chứng mới được tạo sau khi hypothesis và threshold đã khóa.**
+**tái lập bằng bằng chứng mới (fresh reproduction)** — bằng chứng mới được tạo sau khi giả thuyết và ngưỡng đã khóa.
 
 Có hai phiên đo độc lập:
 
@@ -412,7 +412,7 @@ ArcLLM W-C
 llama.cpp W-C
 ```
 
-Đây gọi là **counterbalancing — đổi thứ tự giữa các phiên để giảm nguy cơ thứ tự chạy tự tạo ra lợi thế hệ thống**.
+Đây gọi là **đảo thứ tự cân bằng (counterbalancing)** — đổi thứ tự giữa các phiên để giảm nguy cơ thứ tự chạy tự tạo ra lợi thế hệ thống.
 
 Hình dung nếu GPU nóng dần theo thời gian.
 
@@ -652,7 +652,7 @@ Không điều kiện nào như vậy xuất hiện.
 
 Vì thế:
 
-> **H-NPA không bị falsify — không bị bằng chứng bác bỏ.**
+> **H-NPA không bị bác bỏ (not falsified)** — bằng chứng mới chưa đủ để bác bỏ giả thuyết.
 
 Q3 đi tới kết luận đã khóa từ trước:
 
@@ -718,9 +718,9 @@ Thật dễ để tất cả ĐẠT (PASS) trước đó tạo ra một loại a
 
 Science không cho phép suy luận đó.
 
-**Feasibility — chạy được** không đồng nghĩa với:
+**khả năng chạy được (feasibility)** không đồng nghĩa với:
 
-**advantage — tốt hơn ở một regime có ý nghĩa.**
+**lợi thế (advantage)** — tốt hơn trong một miền điều kiện có ý nghĩa.
 
 Một chiếc máy có thể được xây thành công.
 
@@ -843,7 +843,7 @@ vì sao cơ chế đó có thể thay đổi nút thắt
 2. **40/40 fresh attempts hoàn tất nhưng không có primary benefit nào ĐẠT (PASS).** Hai phiên đo độc lập đều không bác bỏ H-NPA; private bytes và CPU utilization chỉ là supporting observations.
 3. **kết luận là `FEASIBLE_NO_DEMONSTRATED_ADVANTAGE`, không phải “ArcLLM không chạy được”.** Feasibility đã được chứng minh; thứ không được chứng minh là practical regime advantage của kiến trúc hiện tại. Vì vậy current architecture line phải đóng thay vì tuning vô hạn.
 
-**Chương 11 — Từ thất bại sang một câu hỏi đúng hơn**
+**Chương 11 — Từ một thất bại tới câu hỏi đúng hơn**
 
 Q3 không cho ArcLLM một chiến thắng hiệu năng.
 
