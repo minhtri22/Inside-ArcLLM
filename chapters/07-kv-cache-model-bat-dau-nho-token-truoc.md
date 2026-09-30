@@ -182,7 +182,7 @@ P6 là lần đầu ArcLLM kiểm tra con đường này xuyên qua toàn bộ 2
 
 ## Hai giai đoạn: xử lý đầu vào (giai đoạn xử lý đầu vào) và sinh token (giai đoạn sinh token)
 
-Khi một người gửi cho mô hình một prompt, ví dụ:
+Khi một người gửi cho mô hình một **đoạn đầu vào**, ví dụ:
 
 > “Hôm nay trời…”
 
@@ -265,7 +265,7 @@ Nhắc lại:
 
 Các giá trị này không phải thông số tối ưu cho mọi mô hình.
 
-Chúng chỉ là contract của phép thử P6.
+Chúng chỉ là **điều kiện đã khóa của phép thử P6**.
 
 ## Giai đoạn xử lý đầu vào bắt đầu ghi “trí nhớ”
 
@@ -485,7 +485,7 @@ trạng thái được giữ lại bên trong
 
 P6 chạy thật.
 
-Sau bốn token prompt:
+Sau bốn token đầu vào:
 
 ```text
 [1, 17, 42, 256]
@@ -714,9 +714,9 @@ Câu hỏi tiếp theo thay đổi:
 
 ### Nhớ 3 điều
 
-1. **giai đoạn xử lý đầu vào — xử lý prompt ban đầu — tạo K/V; giai đoạn sinh token — xử lý token mới — tái sử dụng K/V đã có.** Đó là lý do bộ nhớ đệm KV tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
+1. **Giai đoạn xử lý đầu vào tạo K/V từ phần văn bản ban đầu; giai đoạn sinh token tái sử dụng K/V đã có khi xử lý token mới.** Đó là lý do bộ nhớ đệm KV tránh phải tính lại toàn bộ lịch sử ở mỗi bước.
 2. **bộ nhớ đệm KV của P6 nằm ở GPU xuyên qua generation.** Không có vòng đi-về trung gian qua CPU đối với K/V.
-3. **P6 ĐẠT (PASS) là generation-tính đúng ĐẠT (PASS), chưa phải hiệu năng hay production ĐẠT (PASS).** Hai token chọn token có điểm cao nhất `[6228, 17]`, điểm dự đoán và chính bộ nhớ đệm K/V đều vượt qua các gate đã khóa.
+3. **P6 ĐẠT về tính đúng của quá trình sinh token, chưa phải kết luận về hiệu năng hay một sản phẩm hoàn thiện.** Hai token được chọn `[6228, 17]`, điểm dự đoán và chính bộ nhớ đệm K/V đều vượt qua các ngưỡng đã khóa.
 
 **Chương 8 — đường chạy thực tế không đến từ một chương trình GPU thần kỳ**
 
