@@ -11,11 +11,12 @@ Cuốn sách dùng hành trình xây dựng ArcLLM như một câu chuyện th�
 1. **Hiểu nền tảng AI từ bên trong** — từ model, token, tensor, runtime, CPU/GPU và bộ nhớ tới cách một hệ thống suy luận thực sự được xây dựng, kiểm tra và tối ưu.
 2. **Học cách làm việc cùng AI mà vẫn giữ quyền phán đoán của con người** — đặt câu hỏi, khóa phạm vi, yêu cầu bằng chứng, phân biệt PASS/FAIL, biết khi nào nên tiếp tục và khi nào phải dừng.
 
-Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu, Chương 1–20 và Bonus**: toàn bộ phần chính của cuốn sách đã hoàn chỉnh.
+Sách được xuất bản tuần tự theo từng chương. Hiện đã có **Lời nói đầu, Phần 0, Chương 1–20 và Bonus**: toàn bộ phần chính của cuốn sách đã hoàn chỉnh.
 
 ## Bắt đầu đọc
 
 - [Lời nói đầu — Thư gửi người đọc](chapters/00-loi-noi-dau.md)
+- [Phần 0 — Bản đồ trước khi vào rừng](chapters/00-ban-do-truoc-khi-vao-rung.md)
 - [Chương 1 — Bên dưới một câu trả lời AI có gì?](chapters/01-khoa-target-truoc-khi-toi-uu.md)
 - [Chương 2 — GGUF không còn là một file, nó trở thành tensor store](chapters/02-gguf-tensor-store.md)
 - [Chương 3 — Xây phần lõi Vulkan](chapters/03-vulkan-runtime-core.md)
@@ -40,9 +41,34 @@ Sách được xuất bản tuần tự theo từng chương. Hiện đã có **
 
 ## Lộ trình của cuốn sách
 
+Mỗi phần có một **mức đọc** để người mới biết mình đang đi sâu tới đâu:
+
+```text
+Nền tảng
+   ↓
+Đi sâu
+   ↓
+Nghiên cứu
+   ↓
+Nâng cao
+```
+
+Đây không phải điểm số hay điều kiện bắt buộc. Nếu một phần nâng cao chưa cần cho mục tiêu hiện tại, người đọc có thể đi tiếp mà không coi đó là thất bại.
+
+### Phần 0 — Bản đồ trước khi vào rừng
+
+**Mức đọc: Nền tảng**
+
+**Mục tiêu:** dựng những khái niệm tối thiểu trước khi mở runtime: AI → Machine Learning → Neural Network → Language Model → LLM → Transformer → decoder-only Transformer; đồng thời giải thích model, parameter/weight, dense, training/inference, token, tensor, CPU/GPU, bộ nhớ và runtime trong cùng một bức tranh.
+
+- [**Phần 0 — Bản đồ trước khi vào rừng**](chapters/00-ban-do-truoc-khi-vao-rung.md)  
+  Dành cho người bắt đầu từ số 0. Phần này đưa ra sơ đồ xuyên suốt của cuốn sách và đường đi của dữ liệu từ văn bản → token → tensor → decoder layers → logits → token tiếp theo, đồng thời cho thấy runtime và CPU/GPU nằm ở đâu.
+
 ### Phần I — Build the Machine
 
-**Mục tiêu:** đi từ con số 0 tới một runtime thực sự chạy được.
+**Mức đọc: Đi sâu**
+
+**Mục tiêu:** từ nền tảng đã dựng ở Phần 0, mở từng lớp của cỗ máy cho tới một runtime thực sự chạy được.
 
 - [**Chương 1 — Bên dưới một câu trả lời AI có gì?**](chapters/01-khoa-target-truoc-khi-toi-uu.md)  
   Bắt đầu từ câu hỏi đơn giản nhất: một câu trả lời AI được tạo ra qua những lớp nào, và vì sao phải khóa đúng mục tiêu trước khi tối ưu bất kỳ thứ gì.
@@ -65,6 +91,8 @@ Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận ho�
 
 ### Phần II — Để bằng chứng phán xét
 
+**Mức đọc: Nghiên cứu**
+
 **Mục tiêu:** đặt runtime trước một phép đối chứng cùng điều kiện và chấp nhận kết quả, kể cả khi kết quả đó không có lợi cho kiến trúc mình đã xây.
 
 - [**Chương 9 — Benchmark phải có đối chứng**](chapters/09-benchmark-phai-co-doi-chung.md)  
@@ -75,6 +103,8 @@ Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận ho�
   Phân rã khoảng cách hiệu năng để tìm cơ chế có thể kiểm tra, thay vì nhảy ngay sang một kiến trúc mới chỉ vì kiến trúc cũ đã thất bại.
 
 ### Phần III — Kiến trúc chỉ có giá trị khi đi qua thực tế
+
+**Mức đọc: Nghiên cứu**
 
 **Mục tiêu:** cho thấy một ý tưởng kỹ thuật chỉ có giá trị khi nó sống sót qua tính đúng, thực nghiệm, quá trình đưa vào hệ thống lớn hơn và tác động ở cấp toàn hệ.
 
@@ -90,6 +120,10 @@ Kết thúc Phần I, ArcLLM đã chạy được một đường suy luận ho�
 Trong Phần III, các mode làm việc E/M/C/T được giới thiệu ngay tại những tình huống thực tế đã tạo ra nhu cầu cho chúng, thay vì tách thành một chương quản trị riêng.
 
 ### Phần IV — Từ runtime cụ thể tới một mô hình tổng quát hơn
+
+**Mức đọc: Nâng cao**
+
+> Nếu mục tiêu của bạn chỉ là hiểu LLM runtime hoạt động ra sao, bạn đã có đủ nền sau Phần I–III để đọc Chương 20. Phần IV dành cho người muốn theo tiếp cách bằng chứng buộc runtime hình thành các khái niệm representation, residency, acquisition và lifecycle.
 
 **Mục tiêu:** rút ra những ranh giới và khái niệm tổng quát chỉ sau khi thực nghiệm cho thấy runtime thực sự cần chúng.
 
@@ -109,7 +143,7 @@ Trong Phần III, các mode làm việc E/M/C/T được giới thiệu ngay t�
 Cuốn sách giữ một số nguyên tắc xuyên suốt:
 
 - **Không yêu cầu biết code.** Code là phương tiện để thực thi nghiên cứu, không phải điều kiện để hiểu câu chuyện.
-- **Thuật ngữ kỹ thuật phải được giải thích tại chỗ.** Tiếng Anh được giữ như từ khóa để người đọc có thể tra cứu, nhưng nội dung tiếng Việt phải đủ để hiểu.
+- **Thuật ngữ kỹ thuật phải được giải thích tại chỗ.** Lần đầu một từ quan trọng xuất hiện, sách ưu tiên dạng **English — tiếng Việt — một câu nghĩa đơn giản**. Tiếng Anh được giữ như từ khóa để người đọc có thể tra cứu, nhưng nội dung tiếng Việt phải đủ để hiểu.
 - **Mọi con số quan trọng phải có ngữ cảnh.** Công thức và tham số được đi kèm ví dụ đơn giản khi cần.
 - **PASS và FAIL đều có giá trị.** Một nhánh thất bại có thể giúp đóng một con đường, xác định giới hạn hoặc đặt ra câu hỏi tốt hơn.
 - **Không biến lỗi kỹ thuật thành kết luận khoa học.**
@@ -121,7 +155,7 @@ Cuốn sách giữ một số nguyên tắc xuyên suốt:
 
 Sau 20 chương chính, sách có thêm:
 
-- [**Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy**](chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md): mở từ Token-XRay sang SIX và các hướng quan sát hệ thống, với ranh giới rõ giữa điều đã được chứng minh, điều mới được quan sát và những câu hỏi còn mở.
+- [**Bonus — Từ xây cỗ máy tới lắng nghe cỗ máy**](chapters/bonus-tu-xay-co-may-toi-lang-nghe-co-may.md) — **Mức đọc: Nâng cao**: mở từ Token-XRay sang SIX và các hướng quan sát hệ thống, với ranh giới rõ giữa điều đã được chứng minh, điều mới được quan sát và những câu hỏi còn mở.
 - **Epilogue:** khép lại bằng những hướng có thể tiếp tục nghiên cứu trong tương lai, không giả định trước rằng sẽ có một tập sách thứ hai.
 - **Phụ lục A — Một người + AI:** một workflow thực hành cho người không cần biết code nhưng muốn dùng AI để biến câu hỏi thành phép thử có thể kiểm tra và truy vết.
 
