@@ -1,5 +1,34 @@
 # Chương 3 — Xây phần lõi Vulkan
 
+> **Mức đọc: Đi sâu**
+>
+> **Bản đồ xuyên suốt — đang mở: runtime / GPU / bộ nhớ**
+>
+> ```text
+> văn bản → token → tensor
+>                     ↓
+>          model / parameters
+>                     ↓
+>                  runtime
+>                     ↓
+>            CPU / GPU / bộ nhớ
+>                     ↓
+>      RMSNorm / attention / FFN
+>                     ↓
+>              decoder layer
+>                     ↓
+>             nhiều decoder layer
+>                     ↓
+>          KV cache / sinh token
+>                     ↓
+>        benchmark / tối ưu
+>                     ↓
+> representation / lifecycle / kiến trúc runtime
+> ```
+>
+> ▶ **Đang mở ở chương này:** runtime / GPU / bộ nhớ.
+
+
 > **Câu hỏi của chương:** Ta đã biết dữ liệu của model nằm ở đâu. Làm thế nào để GPU thật sự có một nơi nhận dữ liệu, nhận lệnh và báo lại rằng công việc đã hoàn thành?
 
 Ở cuối Chương 2, ArcLLM đã biến file GGUF từ một “cục dữ liệu” thành một kho tensor có bản đồ rõ ràng. Runtime biết tensor nào nằm ở đâu, dài bao nhiêu byte và đang được lưu theo kiểu nào. Q4_K vẫn có thể được giữ nguyên dạng đóng gói thay vì bung toàn bộ thành F32.
