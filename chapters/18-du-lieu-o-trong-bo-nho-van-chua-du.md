@@ -1,45 +1,21 @@
-# Chương 18 — Dữ liệu ở trong bộ nhớ vẫn chưa đủ: lấy từ đâu và sống bao lâu
+# Chương 18 — Dữ liệu có mặt chưa đủ: nó phải sẵn sàng đúng lúc
 
 > **Mức đọc: Nâng cao**
 >
-> **Bản đồ xuyên suốt**
+> **Bạn đang mở câu hỏi nào?**
 >
 > ```text
-> HỌ HÀNG KHÁI NIỆM                    ĐƯỜNG ĐI CỦA TOKEN / RUNTIME
-> 
-> AI                                   Văn bản
-> ↓                                    ↓
-> Machine Learning                     Tokenizer
-> ↓                                    ↓
-> Neural Network                       Token / token ID
-> ↓                                    ↓
-> Language Model                       Embedding → tensor
-> ↓                                           +
-> LLM                                  parameters / weights từ model
-> ↓                                           ↓
-> Transformer                          Runtime
-> ↓                                           ↓
-> Decoder-only Transformer             CPU / GPU / bộ nhớ
-> ↓                                           ↓
-> Nhiều decoder layer                  RMSNorm / Attention / FFN
-> ↓ chứa                                      ↓
-> Parameters / Weights                 một decoder layer
->                                             ↓
->                                      nhiều decoder layer
->                                             ↓
->                                      logits → token tiếp theo
->                                             ↓
->                                      KV cache / lặp lại
->                                             ↓
->                                      benchmark / tối ưu
->                                             ↓
->                                      representation / lifecycle
+> Một cách biểu diễn dữ liệu
+>        ↓
+> có tồn tại không?
+> ở đâu?
+> lấy bằng cách nào?
+> dùng được ngay chưa?
+> giữ bao lâu?
 > ```
->
-> ▶ **Đang mở ở chương này:** residency / acquisition / readiness / lifecycle.
 
 
-> **Câu hỏi của chương:** Nếu runtime biết một tensor hoặc một cách biểu diễn dữ liệu đang tồn tại trong bộ nhớ, thông tin đó đã đủ để quyết định có thể dùng nó ngay cho phép tính hay chưa?
+> **Câu hỏi của chương:** Nếu hệ thực thi biết một khối số hoặc một cách biểu diễn dữ liệu đang tồn tại trong bộ nhớ, thông tin đó đã đủ để quyết định có thể dùng nó ngay cho phép tính hay chưa?
 
 Ở Chương 6, một bước tiến rất lớn của ArcLLM là giữ trọng số mô hình trong vùng bộ nhớ mà GPU có thể truy cập.
 
@@ -49,7 +25,7 @@ Khi ấy, câu hỏi chủ yếu là:
 
 Chương 17 làm câu hỏi này phức tạp hơn.
 
-Cùng một tensor logic giờ có thể có:
+Cùng một khối số logic giờ có thể có:
 
 ```text
 Q4_K gốc
@@ -73,7 +49,7 @@ tensor đang ở trong bộ nhớ
 
 không còn đủ.
 
-Runtime phải biết thêm:
+Hệ thực thi phải biết thêm:
 
 ```text
 cách biểu diễn nào đang tồn tại?
@@ -93,11 +69,11 @@ khi nào phải bỏ?
 
 Đây là lúc ba khái niệm bắt đầu tách ra rõ ràng:
 
-> **trạng thái cư trú trong bộ nhớ (residency)** — một cách biểu diễn đang có mặt trong vùng bộ nhớ cần thiết hay chưa.
+> **trạng thái cư trú trong bộ nhớ (trạng thái cư trú)** — một cách biểu diễn đang có mặt trong vùng bộ nhớ cần thiết hay chưa.
 
-> **quá trình thu nhận hoặc tạo biểu diễn (acquisition)** — làm cho cách biểu diễn cần thiết xuất hiện.
+> **quá trình thu nhận hoặc tạo biểu diễn (quá trình thu nhận)** — làm cho cách biểu diễn cần thiết xuất hiện.
 
-> **vòng đời (lifecycle)** — khi nào giữ, khi nào loại bỏ và khi nào phải tạo lại cách biểu diễn đó.
+> **vòng đời (vòng đời)** — khi nào giữ, khi nào loại bỏ và khi nào phải tạo lại cách biểu diễn đó.
 
 Nhưng bằng chứng sau đó còn cho thấy ngay cả ba khái niệm này vẫn chưa đủ nếu ta trộn chúng với câu hỏi:
 
@@ -107,7 +83,7 @@ Nhưng bằng chứng sau đó còn cho thấy ngay cả ba khái niệm này v�
 
 Hãy lấy EXEC148.
 
-Giả sử runtime biết:
+Giả sử hệ thực thi biết:
 
 ```text
 EXEC148 đã tồn tại trong bộ nhớ
@@ -149,7 +125,7 @@ Nhưng trước hết, hãy xem việc tạo biểu diễn thực sự có nhi�
 
 ## Có biểu diễn phụ là tùy chọn trong một trường hợp
 
-Với Q4-down ở Chương 16 và 17, runtime có hai con đường hợp lệ.
+Với Q4-down ở Chương 16 và 17, hệ thực thi có hai con đường hợp lệ.
 
 Con đường A:
 
@@ -187,7 +163,7 @@ Nhưng B phải trả khoảng:
 
 vùng dữ liệu bổ sung trong thí nghiệm.
 
-Vì vậy nếu EXEC148 chưa tồn tại, runtime không nhất thiết phải tạo nó.
+Vì vậy nếu EXEC148 chưa tồn tại, hệ thực thi không nhất thiết phải tạo nó.
 
 Nó có thể hỏi:
 
@@ -199,7 +175,7 @@ Nếu câu trả lời là có, tạo B rồi dùng B.
 
 Đây là loại thứ nhất:
 
-> **tạo biểu diễn dựa trên khả năng bù chi phí nhờ tái sử dụng (reuse-amortized acquisition).**
+> **tạo biểu diễn dựa trên khả năng bù chi phí nhờ tái sử dụng (reuse-amortized quá trình thu nhận).**
 
 Nói đơn giản:
 
@@ -227,7 +203,7 @@ Vì vậy EXEC148 ở trường hợp này là:
 
 > **một cách biểu diễn hữu ích nhưng không bắt buộc.**
 
-Nếu không có nó, runtime vẫn còn A.
+Nếu không có nó, hệ thực thi vẫn còn A.
 
 ## Nhưng có biểu diễn phụ lại là bắt buộc trong trường hợp khác
 
@@ -235,7 +211,7 @@ Sau đó ArcLLM gặp một họ bài toán khác trong nhánh P8.
 
 Điểm quan trọng là obstruction ở đây **không phải tổng dung lượng bộ nhớ không đủ**.
 
-Với exact model 7B, P8-A tính được:
+Với exact mô hình 7B, P8-A tính được:
 
 ```text
 tổng residency dự kiến
@@ -248,13 +224,13 @@ headroom
 = 11.026.792.444 byte
 ```
 
-Tức **capacity tổng thể PASS**.
+Tức **capacity tổng thể ĐẠT (PASS)**.
 
-FAIL nằm ở một contract hẹp hơn đã được kế thừa từ kiến trúc trước:
+KHÔNG ĐẠT (FAIL) nằm ở một contract hẹp hơn đã được kế thừa từ kiến trúc trước:
 
-> **mỗi physical arena / tensor piece không được vượt 256 MiB.**
+> **mỗi physical arena / khối số piece không được vượt 256 MiB.**
 
-Hai tensor vocab đơn lẻ vi phạm contract đó:
+Hai khối số vocab đơn lẻ vi phạm contract đó:
 
 ```text
 token_embd.weight
@@ -262,9 +238,9 @@ token_embd.weight
 output.weight
 ```
 
-P8-A2 không nới arena cap, không đổi quantization, context hay KV precision để cứu kết quả.
+P8-A2 không nới arena cap, không đổi lượng tử hóa, context hay KV precision để cứu kết quả.
 
-Nó thay cách **biểu diễn vật lý** của đúng hai logical tensor lớn đó:
+Nó thay cách **biểu diễn vật lý** của đúng hai logical khối số lớn đó:
 
 ```text
 một logical tensor lớn
@@ -280,13 +256,13 @@ mỗi segment <= 256 MiB
 
 Tổng dữ liệu logic không đổi.
 
-Tổng công thức bộ nhớ không được cứu bằng cách làm nhỏ model.
+Tổng công thức bộ nhớ không được cứu bằng cách làm nhỏ mô hình.
 
-Chỉ cách cùng tensor logic được ánh xạ thành các physical piece thay đổi để contract arena vẫn được giữ.
+Chỉ cách cùng khối số logic được ánh xạ thành các physical piece thay đổi để contract arena vẫn được giữ.
 
-Trong nghiên cứu Phase2 về semantics của runtime, chính trường hợp P8 có giới hạn này được dùng như một:
+Trong nghiên cứu Phase2 về semantics của hệ thực thi, chính trường hợp P8 có giới hạn này được dùng như một:
 
-> **bounded mandatory-feasibility oracle — một trường hợp đối chứng có phạm vi giới hạn, trong đó representation cần thiết là điều kiện để đường thực thi đó khả thi.**
+> **có giới hạn mandatory-feasibility phép kiểm tra — một trường hợp đối chứng có phạm vi giới hạn, trong đó cách biểu diễn dữ liệu cần thiết là điều kiện để đường thực thi đó khả thi.**
 
 Không có một đường dự phòng đã được xác nhận tương đương như A trong trường hợp EXEC148.
 
@@ -308,13 +284,13 @@ Trong trường hợp này, câu hỏi:
 
 là câu hỏi sai.
 
-Bởi việc tạo representation không phải một tối ưu tùy chọn để hoàn vốn.
+Bởi việc tạo cách biểu diễn dữ liệu không phải một tối ưu tùy chọn để hoàn vốn.
 
-Nó là điều kiện để đường thực thi bounded đó trở nên khả thi.
+Nó là điều kiện để đường thực thi có giới hạn đó trở nên khả thi.
 
 Đây là loại thứ hai:
 
-> **tạo biểu diễn bắt buộc để phép tính trở nên khả thi (mandatory-for-feasibility acquisition).**
+> **tạo biểu diễn bắt buộc để phép tính trở nên khả thi (mandatory-for-feasibility quá trình thu nhận).**
 
 Ta có thể so hai trường hợp:
 
@@ -345,9 +321,9 @@ hoặc NOT_READY
 
 Hai loại này hoàn toàn khác nhau.
 
-Cũng phải giữ đúng biên giới claim:
+Cũng phải giữ đúng biên giới kết luận:
 
-> **Phase2 dùng P8 như một bounded oracle cho semantics acquisition; điều đó không tự nó biến P8 thành một claim full-inference mới.**
+> **Phase2 dùng P8 như một có giới hạn phép kiểm tra cho semantics quá trình thu nhận; điều đó không tự nó biến P8 thành một kết luận full-suy luận mới.**
 
 ## Không được ép mọi cách tạo biểu diễn vào một công thức
 
@@ -365,7 +341,7 @@ Dù tương lai chỉ có:
 1 token
 ```
 
-hay thậm chí chưa biết sẽ có bao nhiêu token, runtime vẫn phải thử tạo nó nếu muốn đi con đường đó.
+hay thậm chí chưa biết sẽ có bao nhiêu token, hệ thực thi vẫn phải thử tạo nó nếu muốn đi con đường đó.
 
 Không thể viết:
 
@@ -420,7 +396,7 @@ Nói bằng tiếng Việt:
 
 > **Chưa sẵn sàng để chạy.**
 
-Điều quan trọng là runtime không được tự chế một đường dự phòng không có trong bằng chứng.
+Điều quan trọng là hệ thực thi không được tự chế một đường dự phòng không có trong bằng chứng.
 
 Ví dụ:
 
@@ -443,7 +419,7 @@ Kết quả đúng có thể đơn giản là:
 
 Đây là một bước trưởng thành quan trọng.
 
-Runtime không chỉ cần biết:
+Hệ thực thi không chỉ cần biết:
 
 > “Đường nào nhanh nhất?”
 
@@ -453,7 +429,7 @@ Nó còn phải có khả năng trả lời:
 
 ## Còn một trạng thái khác: nằm ngoài bằng chứng
 
-Có một lý do khác khiến runtime không được đưa yêu cầu vào một đường thực thi.
+Có một lý do khác khiến hệ thực thi không được đưa yêu cầu vào một đường thực thi.
 
 Giả sử khối chức năng đó chỉ được xác nhận với:
 
@@ -495,7 +471,7 @@ OUTSIDE_VALIDATED_CAPABILITY
 → yêu cầu nằm ngoài phạm vi đã được chứng minh
 ```
 
-Đây là cách runtime bắt đầu mang ranh giới của bằng chứng khoa học vào chính quyết định thực thi.
+Đây là cách hệ thực thi bắt đầu mang ranh giới của bằng chứng khoa học vào chính quyết định thực thi.
 
 ## Tới đây tưởng đã đủ — nhưng cơ chế trực tiếp ở Chương 14 phá tiếp mô hình
 
@@ -526,7 +502,7 @@ Không có vùng dữ liệu phụ.
 
 Không cần bước tạo biểu diễn.
 
-Không có vòng đời của một representation mới.
+Không có vòng đời của một cách biểu diễn dữ liệu mới.
 
 Nếu đường Split-K32 tồn tại và dùng được:
 
@@ -538,13 +514,13 @@ Nếu nó không khả dụng:
 
 Đây là một trường hợp rất đơn giản.
 
-Nhưng chính sự đơn giản đó làm mô hình cũ FAIL.
+Nhưng chính sự đơn giản đó làm mô hình cũ KHÔNG ĐẠT (FAIL).
 
 ## Sai lầm: dùng trạng thái cư trú để trả lời “có chạy được không?”
 
 Mô hình lúc đó vẫn còn một giả định ngầm:
 
-> Muốn đường thực thi ưu tiên được chọn thì representation của nó phải đang cư trú trong bộ nhớ.
+> Muốn đường thực thi ưu tiên được chọn thì cách biểu diễn dữ liệu của nó phải đang cư trú trong bộ nhớ.
 
 Điều này hợp lý với EXEC148.
 
@@ -576,7 +552,7 @@ Giả vờ:
 resident = true
 ```
 
-dù chẳng có representation phụ nào đang tồn tại.
+dù chẳng có cách biểu diễn dữ liệu phụ nào đang tồn tại.
 
 Như vậy từ `resident` đã bị đổi nghĩa.
 
@@ -594,11 +570,11 @@ Nhưng như vậy mất luôn đường đối chứng dự phòng thật.
 
 Cả ba đều sai.
 
-Không phải code sai.
+Không phải mã sai.
 
 Mà lớp trừu tượng sai.
 
-## Một FAIL rất có giá trị
+## Một kết quả KHÔNG ĐẠT rất có giá trị
 
 Kết quả của phép thử độc lập này là:
 
@@ -610,19 +586,19 @@ Không phải khái niệm tạo biểu diễn sai.
 
 Mà là:
 
-> **Runtime đang dùng trạng thái “representation có trong bộ nhớ” để trả lời một câu hỏi rộng hơn khả năng của nó: “đường thực thi có thể chạy ngay không?”**
+> **hệ thực thi đang dùng trạng thái “cách biểu diễn dữ liệu có trong bộ nhớ” để trả lời một câu hỏi rộng hơn khả năng của nó: “đường thực thi có thể chạy ngay không?”**
 
 Đây là hai câu hỏi khác nhau.
 
 Bằng chứng buộc ArcLLM phải tách chúng.
 
-## Một trạng thái mới: sẵn sàng thực thi
+## Một trạng thái mới: sẵn sàng để thực thi
 
 Khái niệm được thêm vào rất nhỏ:
 
-> **trạng thái sẵn sàng thực thi (execution readiness)** — đường thực thi có thể xử lý yêu cầu hiện tại ngay bây giờ hay không.
+> **trạng thái sẵn sàng thực thi (cách thực thi readiness)** — đường thực thi có thể xử lý yêu cầu hiện tại ngay bây giờ hay không.
 
-Nó là một trạng thái độc lập với việc có hay không có representation phụ trong bộ nhớ.
+Nó là một trạng thái độc lập với việc có hay không có cách biểu diễn dữ liệu phụ trong bộ nhớ.
 
 Từ đây có bốn câu hỏi tách biệt:
 
@@ -638,17 +614,17 @@ Từ đây có bốn câu hỏi tách biệt:
 
 Ta cũng cần phân biệt:
 
-> **khả dụng về nguyên tắc (execution available)** — đường thực thi tồn tại và về nguyên tắc có thể dùng.
+> **khả dụng về nguyên tắc (cách thực thi available)** — đường thực thi tồn tại và về nguyên tắc có thể dùng.
 
 với:
 
-> **sẵn sàng thực thi (execution ready)** — đường đó có thể xử lý yêu cầu hiện tại ngay lúc này.
+> **sẵn sàng thực thi (cách thực thi ready)** — đường đó có thể xử lý yêu cầu hiện tại ngay lúc này.
 
-Một đường có thể tồn tại trong runtime nhưng tạm thời chưa sẵn sàng cho yêu cầu hiện tại.
+Một đường có thể tồn tại trong hệ thực thi nhưng tạm thời chưa sẵn sàng cho yêu cầu hiện tại.
 
 ## Ba ví dụ làm mọi thứ rõ hơn
 
-### Ví dụ 1 — cơ chế trực tiếp, không cần representation phụ
+### Ví dụ 1 — cơ chế trực tiếp, không cần cách biểu diễn phụ
 
 ```text
 đường Split-K32
@@ -694,7 +670,7 @@ có thể tạo B
 → hợp lệ
 ```
 
-Runtime phải cân nhắc chính sách:
+Hệ thực thi phải cân nhắc chính sách:
 
 ```text
 tái sử dụng thấp
@@ -749,14 +725,14 @@ Sau nhiều lần bị phản ví dụ làm hỏng mô hình, một nguyên tắ
 
 `Resident` từ đây chỉ có nghĩa:
 
-> **Một representation được tạo riêng có đang tồn tại trong vùng bộ nhớ cần thiết hay không.**
+> **Một cách biểu diễn dữ liệu được tạo riêng có đang tồn tại trong vùng bộ nhớ cần thiết hay không.**
 
 Không dùng trạng thái này để nói:
 
 - đường thực thi tồn tại;
 - đường thực thi chạy được;
 - khối chức năng nằm trong phạm vi hợp lệ;
-- bước tạo representation có thể thực hiện;
+- bước tạo cách biểu diễn dữ liệu có thể thực hiện;
 - hay yêu cầu nằm trong phạm vi bằng chứng.
 
 Từ đây ta có thể nhìn từng chiều riêng:
@@ -781,7 +757,7 @@ VÒNG ĐỜI
 sau đó giữ hay bỏ khi nào?
 ```
 
-Chương 19 sẽ gom sáu chiều này thành một bề mặt runtime tổng quát hơn.
+Chương 19 sẽ gom sáu chiều này thành một bề mặt hệ thực thi tổng quát hơn.
 
 Nhưng trước đó còn một phần quan trọng:
 
@@ -791,7 +767,7 @@ Nhưng trước đó còn một phần quan trọng:
 
 Giả sử EXEC148 đã được tạo.
 
-Runtime xác minh nó đúng với mô hình.
+Hệ thực thi xác minh nó đúng với mô hình.
 
 Đường B dùng được.
 
@@ -815,7 +791,7 @@ Nhưng giữ lại tốn gần:
 
 trong thí nghiệm hiện tại.
 
-Nếu **áp lực bộ nhớ (memory pressure)** tăng, giữ representation này có thể làm phần khác của hệ thống khó hoạt động.
+Nếu **áp lực bộ nhớ (bộ nhớ pressure)** tăng, giữ cách biểu diễn dữ liệu này có thể làm phần khác của hệ thống khó hoạt động.
 
 Vì vậy vòng đời phải là một quyết định riêng.
 
@@ -846,11 +822,11 @@ nếu còn hợp lệ và bộ nhớ cho phép
 
 Điều quan trọng là:
 
-> **Cách representation được tạo không quyết định duy nhất nó phải sống bao lâu.**
+> **Cách cách biểu diễn dữ liệu được tạo không quyết định duy nhất nó phải sống bao lâu.**
 
-CPU có thể tạo nhưng representation được giữ qua nhiều phiên.
+CPU có thể tạo nhưng cách biểu diễn dữ liệu được giữ qua nhiều phiên.
 
-GPU có thể tạo nhưng representation chỉ sống trong một yêu cầu.
+GPU có thể tạo nhưng cách biểu diễn dữ liệu chỉ sống trong một yêu cầu.
 
 Hai chiều đó độc lập.
 
@@ -879,15 +855,15 @@ Hoặc:
 → có thể loại representation tùy chọn
 ```
 
-Thao tác loại representation khỏi bộ nhớ thường được gọi là:
+Thao tác loại cách biểu diễn dữ liệu khỏi bộ nhớ thường được gọi là:
 
 > **evict — loại khỏi bộ nhớ**.
 
-Nếu sau này cần lại, runtime có thể phải tạo hoặc nạp lại.
+Nếu sau này cần lại, hệ thực thi có thể phải tạo hoặc nạp lại.
 
 Nhưng cũng phải cẩn thận:
 
-> **Một đường thực thi tạm thời chưa sẵn sàng không mặc nhiên có nghĩa representation phải bị xóa.**
+> **Một đường thực thi tạm thời chưa sẵn sàng không mặc nhiên có nghĩa cách biểu diễn dữ liệu phải bị xóa.**
 
 Giả sử EXEC148 vẫn hoàn toàn hợp lệ trong bộ nhớ, nhưng GPU tạm thời chưa thể dùng đường B.
 
@@ -913,7 +889,7 @@ Giả sử tạo EXEC148 mất:
 
 Phiên đầu dùng đủ lâu để B có lợi.
 
-Nếu cuối phiên ta xóa ngay representation, phiên kế tiếp lại trả:
+Nếu cuối phiên ta xóa ngay cách biểu diễn dữ liệu, phiên kế tiếp lại trả:
 
 ```text
 232 ms
@@ -929,7 +905,7 @@ Nếu có 5 phiên liên tiếp:
 
 chỉ riêng chi phí tạo lại.
 
-Nếu representation vẫn hợp lệ và bộ nhớ không căng, giữ nó qua các phiên có thể tránh phần chi phí này.
+Nếu cách biểu diễn dữ liệu vẫn hợp lệ và bộ nhớ không căng, giữ nó qua các phiên có thể tránh phần chi phí này.
 
 Nhưng nếu 550 MB đó làm hệ thống thiếu bộ nhớ, lựa chọn lại có thể đảo chiều.
 
@@ -943,7 +919,7 @@ dùng
 xóa
 ```
 
-Runtime cần một **chính sách vòng đời**.
+Hệ thực thi cần một **chính sách vòng đời**.
 
 ## Lớp kết nối phần cứng thật có tuân theo các ranh giới này không?
 
@@ -955,7 +931,7 @@ Sau khi các khái niệm được tách, ArcLLM còn phải hỏi:
 
 `Backend` trong ngữ cảnh này có thể hiểu là:
 
-> **lớp kết nối các quyết định chung của runtime với cơ chế thực thi cụ thể trên phần cứng.**
+> **lớp kết nối các quyết định chung của hệ thực thi với cơ chế thực thi cụ thể trên phần cứng.**
 
 Khi gắn mô hình vào đường Q4 thật, các trường hợp sau đã được kiểm tra:
 
@@ -995,7 +971,7 @@ B bị loại khỏi bộ nhớ
 
 Nó nằm ở việc:
 
-> **Lớp kết nối phần cứng thật có thể tuân thủ đúng sự phân biệt giữa chọn đường thực thi, tạo representation, trạng thái sẵn sàng, trạng thái cư trú và vòng đời mà không cần lén thêm luật riêng cho Q4.**
+> **Lớp kết nối phần cứng thật có thể tuân thủ đúng sự phân biệt giữa chọn đường thực thi, tạo cách biểu diễn dữ liệu, trạng thái sẵn sàng, trạng thái cư trú và vòng đời mà không cần lén thêm luật riêng cho Q4.**
 
 Đó là dấu hiệu lớp trừu tượng bắt đầu có giá trị kiến trúc thật.
 
@@ -1024,9 +1000,9 @@ execution_ready
 
 là đủ để xử lý ba họ đã được xác nhận:
 
-1. representation tùy chọn có đường dự phòng;
-2. representation bắt buộc để khả thi;
-3. cơ chế thực thi trực tiếp không cần representation phụ.
+1. cách biểu diễn dữ liệu tùy chọn có đường dự phòng;
+2. cách biểu diễn dữ liệu bắt buộc để khả thi;
+3. cơ chế thực thi trực tiếp không cần cách biểu diễn dữ liệu phụ.
 
 Không có bằng chứng để biện minh cho một mô hình trạng thái lớn hơn.
 
@@ -1087,7 +1063,7 @@ Chỉ khi nó bị phá, ta mới thêm đúng khái niệm còn thiếu.
 
 ## Dữ liệu không còn chỉ là “các byte ở một địa chỉ”
 
-Tới đây, cách runtime nhìn một tensor đã thay đổi rất xa so với đầu cuốn sách.
+Tới đây, cách hệ thực thi nhìn một khối số đã thay đổi rất xa so với đầu cuốn sách.
 
 Ban đầu:
 
@@ -1131,9 +1107,9 @@ nhưng còn phải sẵn sàng cho yêu cầu hiện tại
 
 Nhưng đó không phải sự phức tạp do ta thích một hệ thống lớn.
 
-Nó là sự phức tạp mà bằng chứng buộc runtime phải nhìn thấy.
+Nó là sự phức tạp mà bằng chứng buộc hệ thực thi phải nhìn thấy.
 
-## Và đây là ranh giới dẫn sang runtime v4
+## Và đây là ranh giới dẫn sang hệ thực thi v4
 
 Sau nhiều vòng phản ví dụ, sáu chiều bắt đầu ổn định:
 
@@ -1153,7 +1129,7 @@ vòng đời
 
 Đây chưa phải tuyên bố:
 
-> “Sáu thứ này là mô hình phổ quát cho mọi runtime AI.”
+> “Sáu thứ này là mô hình phổ quát cho mọi hệ thực thi AI.”
 
 Bằng chứng không cho phép nói vậy.
 
@@ -1165,11 +1141,11 @@ Bằng chứng không cho phép nói vậy.
 
 ### Nhớ 3 điều
 
-1. **Có dữ liệu trong bộ nhớ không đồng nghĩa phép tính sẵn sàng chạy.** Trạng thái cư trú chỉ nên nói representation có tồn tại trong bộ nhớ hay không; trạng thái sẵn sàng thực thi phải được tách riêng.
-2. **Không phải mọi cách tạo representation đều giống nhau.** EXEC148 là representation tùy chọn có thể chỉ đáng tạo khi tái sử dụng đủ lâu; một representation cần để phép tính khả thi thì phải được tạo bất kể mức tái sử dụng thấp hay chưa biết.
-3. **Vòng đời là một quyết định độc lập.** Representation đã tạo có thể được giữ để tái sử dụng, bị loại khi hết hiệu lực hoặc khi chính sách bộ nhớ yêu cầu; việc đường thực thi tạm thời chưa sẵn sàng không tự động có nghĩa phải xóa dữ liệu.
+1. **Có dữ liệu trong bộ nhớ không đồng nghĩa phép tính sẵn sàng chạy.** Trạng thái cư trú chỉ nên nói cách biểu diễn dữ liệu có tồn tại trong bộ nhớ hay không; trạng thái sẵn sàng thực thi phải được tách riêng.
+2. **Không phải mọi cách tạo cách biểu diễn dữ liệu đều giống nhau.** EXEC148 là cách biểu diễn dữ liệu tùy chọn có thể chỉ đáng tạo khi tái sử dụng đủ lâu; một cách biểu diễn dữ liệu cần để phép tính khả thi thì phải được tạo bất kể mức tái sử dụng thấp hay chưa biết.
+3. **Vòng đời là một quyết định độc lập.** cách biểu diễn dữ liệu đã tạo có thể được giữ để tái sử dụng, bị loại khi hết hiệu lực hoặc khi chính sách bộ nhớ yêu cầu; việc đường thực thi tạm thời chưa sẵn sàng không tự động có nghĩa phải xóa dữ liệu.
 
-**Chương 19 — Từ ArcLLM cụ thể tới một mô hình runtime tổng quát hơn**
+**Chương 19 — Từ ArcLLM cụ thể tới một mô hình hệ thực thi tổng quát hơn**
 
 Ta đã có sáu câu hỏi riêng:
 
@@ -1187,4 +1163,4 @@ nếu thiếu thì lấy hoặc tạo bằng cách nào?
 sau đó giữ nó tới bao giờ?
 ```
 
-Chương tiếp theo sẽ xem liệu sáu câu hỏi đó có thể trở thành một bề mặt runtime chung mà nhiều loại cơ chế khác nhau cùng đi qua hay không — mà không làm mất những ranh giới do chính các PASS và FAIL trước đó tạo ra.
+Chương tiếp theo sẽ xem liệu sáu câu hỏi đó có thể trở thành một bề mặt hệ thực thi chung mà nhiều loại cơ chế khác nhau cùng đi qua hay không — mà không làm mất những ranh giới do chính các ĐẠT (PASS) và KHÔNG ĐẠT (FAIL) trước đó tạo ra.
