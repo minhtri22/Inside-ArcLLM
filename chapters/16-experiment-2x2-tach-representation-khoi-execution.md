@@ -684,13 +684,13 @@ Vì vậy ta có một trade-off:
 
 ```text
 A
-latency cao hơn B
+độ trễ cao hơn B
 nhưng
 không tốn ~550 MB image mới
 không tốn materialization ban đầu
 
 B
-latency thấp hơn
+độ trễ thấp hơn
 nhưng
 có chi phí upfront + RAM
 ```
