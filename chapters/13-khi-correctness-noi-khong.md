@@ -810,7 +810,7 @@ Chỉ những thứ sống sót mới được quyền đi tiếp.
 2. **Q6 KHÔNG ĐẠT (FAIL) về tính đúng, không KHÔNG ĐẠT (FAIL) về hiệu năng.** hiệu năng không được chạy, số measurement pair bằng 0 và mô hình thật không được load; vì vậy không được nói Q6 nhanh hay chậm.
 3. **Một ĐẠT (PASS) không tự động tổng quát sang miền khác.** Q4 chứng minh cơ chế có giá trị trong phạm vi Q4_K đã thử. Q6 cho thấy cùng cơ chế giữ nguyên không vượt được tính đúng tiêu chuẩn đã khóa ở một định dạng lượng tử hóa khác.
 
-**Chương 14 — Từ một phép tính tốt tới cả hệ thống thật**
+**Tiếp theo: [Chương 14 — Từ một phép tính tốt tới cả hệ thống thật](14-tu-mot-co-che-tot-toi-he-thong-that.md)**
 
 Q6 dừng trước khi được chuyển tiếp.
 
