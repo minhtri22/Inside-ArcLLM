@@ -1,4 +1,4 @@
-# Phần 0 — Bản đồ trânh lạc lối
+# Phần 0 — Bản đồ trước khi đi vào rừng
 
 > **Mức đọc: Nền tảng**
 >
