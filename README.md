@@ -121,7 +121,7 @@ Phần này dành cho người muốn đi tiếp từ “làm cho chạy nhanh�
 - **Không tuyên bố hiệu năng vượt quá bằng chứng đã đo.**
 - **Không kể lại lịch sử như thể tác giả đã biết đáp án từ đầu.**
 
-## Source code: https://github.com/minhtri22/Inside-ArcLLM
+## Source code: https://github.com/minhtri22/ArcLLM
 
 ## Phần bổ sung
 
