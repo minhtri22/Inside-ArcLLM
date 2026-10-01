@@ -16,7 +16,7 @@ Cuốn sách hiện có **Lời nói đầu, Phần 0, Chương 1–20 và Bonus
 ## Bắt đầu đọc
 
 - [Lời nói đầu — Thư gửi người đọc](chapters/00-loi-noi-dau.md)
-- [Phần 0 — Bản đồ trước khi vào rừng](chapters/00-ban-do-truoc-khi-vao-rung.md)
+- [Phần 0 — Bản đồ trấnh lạc lối](chapters/00-ban-do-truoc-khi-vao-rung.md)
 - [Chương 1 — Bên dưới một câu trả lời AI có gì?](chapters/01-khoa-target-truoc-khi-toi-uu.md)
 - [Chương 2 — Bên trong tệp mô hình có gì? (GGUF)](chapters/02-gguf-tensor-store.md)
 - [Chương 3 — Làm thế nào để giao việc cho GPU? (Vulkan)](chapters/03-vulkan-runtime-core.md)
