@@ -133,6 +133,6 @@ Bonus mở ra một câu hỏi rộng hơn: khi đã biết cách nhìn vào m�
 
 Các con số và kết luận kỹ thuật trong sách được biên tập từ những phép thử thật của ArcLLM.
 
-Kho mã này chỉ chứa nội dung sách đã xuất bản. Mã nguồn hệ thực thi, dữ liệu thí nghiệm thô và tài liệu nghiên cứu chi tiết nằm ngoài kho sách.
+Kho mã này chỉ chứa nội dung sách đã xuất bản. Mã nguồn hệ thực thi, dữ liệu thí nghiệm thô và tài liệu nghiên cứu chi tiết nằm ngoài kho sách. https://github.com/minhtri22/ArcLLM/blob/main/lineage.md
 
 Mục tiêu của *Inside ArcLLM* không chỉ là kể rằng một hệ thực thi đã được xây như thế nào. Quan trọng hơn là giữ lại **vì sao một hướng được chọn, vì sao một hướng bị loại, và bằng chứng nào đã buộc câu hỏi tiếp theo phải thay đổi**.
