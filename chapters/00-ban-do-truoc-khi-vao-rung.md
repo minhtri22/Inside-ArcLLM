@@ -1,4 +1,4 @@
-# Phần 0 — Bản đồ traán lạc lối
+# Phần 0 — Bản đồ trânh lạc lối
 
 > **Mức đọc: Nền tảng**
 >
