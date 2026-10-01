@@ -53,7 +53,7 @@ Nghiên cứu
 Nâng cao
 ```
 
-### Phần 0 — Bản đồ trước khi vào rừng
+### Phần 0 — Bản đồ tránh lạc lối
 
 **Mức đọc: Nền tảng**
 
