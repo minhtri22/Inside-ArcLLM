@@ -1,5 +1,9 @@
 # TOKEN — Đường đi của mảnh tri thức
 
+<p align="center">
+  <img src="./cover.jpg" alt="Bìa sách TOKEN — Đường đi của mảnh tri thức — Nguyễn Minh Trí" width="400">
+</p>
+
 > **Bản thảo độc lập**
 >
 > Cuốn sách này được viết để có thể đọc từ đầu mà không cần một cuốn sách khác làm điều kiện tiên quyết.
